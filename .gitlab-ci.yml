@@ -24,7 +24,7 @@ default:
 #
 # REMINDER: The "." prefix causes the "job" to be hidden (does not get run),
 # but can still be used for inheritance.
-
+# 
 # Run rules to activate at the major junction points: merge requests, tag
 # pipelines and branch pipelines for main.
 .run_automatically:
@@ -96,18 +96,70 @@ default:
     - .test_preamble
     - .poetry_install
 
-# Job to ensure the provided example script still runs
-test-pytest:
+# # Job to ensure the provided example script still runs
+# NOTE: this version of tests was to confirm the original pybsm_example.py
+# functioned properly, just as a dummy placeholder for unit testing. Until
+# we've updated this and/or the unit tests, we're using the notebook below.
+# test-pytest:
+#   extends: .test_defaults
+#   parallel:
+#     matrix:
+#       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.10" ]
+#   image: python:${PY_VERSION}
+#   script:
+#     - poetry run pip uninstall -qy opencv-python opencv-python-headless
+#     - poetry run pip install -q opencv-python-headless
+#     - poetry run python examples/pybsm_example.py
+#     - ls examples/fig_2.png
+#     - ls examples/fig_4a.png
+#     - ls examples/fig_5a.png
+#     - ls examples/fig_showcase.png
+
+# Job to test-run the example jupyter notebooks
+#
+# This job has a parallel matrix to parameterize different working-directories
+# and notebooks within to run. Each parallel instance of this job should only
+# run a single notebook. !reference:
+#
+# See GitLab docs for parallel-matrix functionality:
+#   https://docs.gitlab.com/ee/ci/yaml/#parallelmatrix
+#
+# The parallel-matrix list may have multiple items, and each entry should have
+# a pair of keys: "NOTEBOOK_DIR" and "NOTEBOOK_FILE". (Given the documentation
+# for the parallel-matrix functionality, combinatorics are only applied within
+# an item, not across items.)
+# * "NOTEBOOK_DIR" should be a single string that notes the directory in which
+#   notebook files should be run in (basically the working directory, generally
+#   the directory the notebook lives in). This path should be relative to the
+#   root of the repository.
+# * "NOTEBOOK_FILE" should be a list of strings that denote the notebook files
+#   to be run. These paths path should be relative to the "NOTEBOOK_DIR". Files
+#   in this list will be combinatorially combined with the path provided in
+#   the associated "NOTEBOOK_DIR" to create a job parameterization instance.
+test-notebooks:
   extends: .test_defaults
+  variables:
+    TORCH_HOME: "${CI_PROJECT_DIR}/.cache/torch"
+  tags:
+    - kitware
+  # Merge inherited caches
+  cache:
+    - !reference [.test_defaults, cache]
+    - key: dummy-cache
+      paths:
+        - ${TORCH_HOME}
+  # Specifying the various notebooks that we want to be tested. Each invocation
+  # of this job should try to execute only one notebook via papermill.
   parallel:
     matrix:
-      - PY_VERSION: [ "3.8", "3.9", "3.10", "3.10" ]
-  image: python:${PY_VERSION}
+      # Sequences combinatorically combine within a list entry
+      - NOTEBOOK_DIR: "examples"
+        NOTEBOOK_FILE: [
+          "pybsm_visualization.ipynb"
+        ]
+  # Using default container image defined above
   script:
-    - poetry run pip uninstall -qy opencv-python opencv-python-headless
-    - poetry run pip install -q opencv-python-headless
-    - poetry run python examples/pybsm_example.py
-    - ls examples/fig_2.png
-    - ls examples/fig_4a.png
-    - ls examples/fig_5a.png
-    - ls examples/fig_showcase.png
+    - cd "${NOTEBOOK_DIR}"
+    - poetry run papermill
+        --progress-bar -k python3 --stdout-file - --stderr-file -
+        "${NOTEBOOK_FILE}" /dev/null
