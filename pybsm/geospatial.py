@@ -45,24 +45,21 @@ def altitudeAlongSlantPath(hTarget,hSensor,slantRange):
     calculating the atmospheric coherence diameter, r0.
 
 
-    Parameters
-    ---------
-    hTarget:
+    :param hTarget:
         height of the target above sea level (m).
-    hSensor:
+    :param hSensor:
         height of the sensor above sea level (m).
-    slantRange:
+    :param slantRange:
         distance between the target and sensor (m).
 
-    Returns
-    -------
-    zPath :
-        array of samples along the path from the target (zPath = 0) to the
-        sensor. (m)
-    hPath :
-        height above the earth along a slantpath defined by zPath. (m)
+    :return:
+        zPath:
+            array of samples along the path from the target (zPath = 0) to the
+            sensor. (m)
+        hPath:
+            height above the earth along a slantpath defined by zPath. (m)
 
-        """
+    """
 
     #this is simple law of cosines problem
     nadir = nadirAngle(hTarget,hSensor,slantRange)
@@ -85,17 +82,14 @@ def groundSampleDistance(ifov, slantRange):
     """IBSM Equation 3-62.  The ground sample distance, i.e. the footprint
         of a single detector in object space.
 
-    Parameters
-    ----------
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
-    slantRange:
+    :param slantRange:
         slant range to target (m)
 
-    Returns
-    -------
-    gsd :
-        ground sample distance (m)
+    :return:
+        gsd:
+            ground sample distance (m)
     """
     gsd = slantRange*ifov
     return gsd
@@ -107,19 +101,17 @@ def nadirAngle(hTarget,hSensor,slantRange):
     a circular earth. (i.e. angle between looking straight down (nadir = 0) and looking along the
     slant path).
 
-    Parameters
-    ---------
-    hTarget:
+    
+    :param hTarget:
         height of the target above sea level (m).
-    hSensor:
+    :param hSensor:
         height of the sensor above sea level (m).
-    slantRange:
+    :param slantRange:
         distance between the target and sensor (m).
 
-    Returns
-    -------
-    nadir :
-        the sensor nadir angle. (rad)
+    :return:
+        nadir:
+            the sensor nadir angle. (rad)
     """
 
     a = rEarth+hSensor
@@ -134,19 +126,16 @@ def curvedEarthSlantRange(hTarget,hSensor,groundRange):
     """Returns the slant range from target to sensor above a curved (circular)
     Earth.
 
-    Parameters
-    ----------
-    hTarget:
+    :param hTarget:
         height of the target above sea level (m).
-    hSensor:
+    :param hSensor:
         height of the sensor above sea level (m).
-    groundRange:
+    :param groundRange:
         distance between the target and sensor on the ground (m).
 
-    Returns
-    -------
-    slantRange :
-        distance between the target and sensor (m).
+    :return:
+        slantRange:
+            distance between the target and sensor (m).
     """
     a = rEarth+hSensor
     c = rEarth+hTarget

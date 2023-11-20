@@ -48,17 +48,15 @@ def instantaneousFOV(w, f):
     """The instantaneous field-of-view, i.e. the angular footprint
         of a single detector in object space.
 
-    Parameters
-    ----------
-    w:
+    :param w:
         detector size (width) in the x and y directions (m)
-    f :
+    :type w: int
+    :param f:
         focal length (m)
+    :type f: int
 
-    Returns
-    -------
-    ifov:
-        detector instantaneous field-of-view (radians)
+    :return:
+        ifov - detector instantaneous field-of-view (radians)
     """
     ifov = w/f
     return ifov
@@ -76,19 +74,16 @@ def wienerFiler(otf,noiseToSignalPS):
     or, if so, ensure that the filter response wraps around Nyquist
     appropriately.
 
-    Parameters
-    ----------
-    otf:
+    :param otf:
         System optical transfer function.
-    noiseTosignalPS:
+    :type otf: list
+    :param noiseTosignalPS:
         Ratio of the noise power spectrum to the signal power spectrum.  This
         may be a function of spatial frequency (same size as otf) or an scalar.
+    :type noiseTosignalPS: float
 
-
-    Returns
-    -------
-    WF :
-        Frequency space representation of the Wienerfilter.
+    :return:
+        WF - Frequency space representation of the Wienerfilter.
     """
     WF = np.conj(otf) / (np.abs(otf)**2+noiseToSignalPS)
 
@@ -100,20 +95,18 @@ def img2reflectance(img,pix_values,refl_values):
     points.  Pixel values that map below zero reflectance or above unity reflectance
     are truncated.  Implicitly, reflectance is contast across the camera bandpass.
 
-    Parameters
-    ----------
-    img :
+    :param img:
         the image that will be transformed into reflectance (counts)
-    pix_values :
+    :type img: np.array
+    :param pix_values:
         array of values in img that map to a known reflectance (counts)
-    refl_values :
+    :type pix_values: np.array
+    :param refl_values:
         array of reflectances that correspond to pix_values (unitless)
+    :type refl_values: np.array
 
-
-    Returns
-    -------
-    refImg :
-        the image in reflectance space
+    :return:
+        refImg - the image in reflectance space
     """
     f = interpolate.interp1d(pix_values,refl_values, fill_value='extrapolate', assume_sorted = 0)
     refImg = f(img)
@@ -134,34 +127,33 @@ def simulate_image(ref_img, sensor, scenario):
     only model further degradation of image quality.
 
 
-    Parameters
-    ----------
-    ref_img : RefImage
+    :type ref_img: RefImage
+    :param ref_img:
         Reference image to use as the source view of the world to be emulated
         by the virtual camera defined by 'sensor'.
-    sensor : Sensor
+    :type sensor: Sensor
+    :param sensor:
         Virtual sensor definition.
-    scenario : Scenario
+    :type scenario: Scenario
+    :param scenario:
         Specification of the deployment of the virtual sensor within the world
         relative to the target.
 
-    Returns
-    -------
-    trueImg : Numpy float64 array
+    :return:
+        trueImg: Numpy float64 array
         The true image in units of photoelectrons.
-    blurImg : Numpy float64 array
+        blurImg: Numpy float64 array
         The image after blurring and resampling is applied to trueImg (still
         units of photoelectrons).
-    noisyImg : Numpy float64 array
+        noisyImg: Numpy float64 array
         The blur image with photon (Poisson) noise and gaussian noise applied
         (still units of photoelectrons).
 
-    WARNING
-    -------
-    imggsd must be small enough to properly sample the blur kernel! As a guide,
-    if the image system transfer function goes to zero at angular spatial frequency, coff,
-    then the sampling requirement will be readily met if imggsd <= rng/(4*coff).
-    In practice this is easily done by upsampling imgin.
+    :WARNING:
+        imggsd must be small enough to properly sample the blur kernel! As a guide,
+        if the image system transfer function goes to zero at angular spatial frequency, coff,
+        then the sampling requirement will be readily met if imggsd <= rng/(4*coff).
+        In practice this is easily done by upsampling imgin.
     """
     # integration time (s)
     intTime = sensor.intTime
@@ -243,25 +235,28 @@ def stretch_contrast_convert_8bit(img, perc=[0.1, 99.9]):
 class RefImage(object):
     """Reference image.
 
-    img : Numpy array
-        Reference image.
-    gsd : float
+    :type img: Numpy array
+    :param img: Reference image.
+    :type gsd: float
+    :param gsd:
         Spatial sampling for 'img' in meters. Each pixel in 'img' is assumed to
         capture a 'gsd' x 'gsd' square of some world surface. We assume the
         sampling is isotropic (x and y sampling are identical) and uniform
         across the whole field of view. This is generally a valid assumption
         for remote sensing imagery.
-    pix_values : array-like of float
+    :type pix_values: array-like of float, optional
+    :param pix_values:
         Pixel count values within 'img' that should be associated with the
         corresponding reflectance values in 'refl_values' by linear
         interpolation. This is used to convert raw image values into an assumed
         spectral reflectance of the scene being viewed.
-    refl_values : array-like of float
+    :type refl_values: array-like of float, optional
+    :param refl_values:
         Reflectance values associated with the corresponding pixel count values
         in 'pix_values' used to convert raw image values into an assumed
         spectral reflectance of the scene being viewed.
-    name : str | None
-        Name of the image.
+    :type name: str | None, optional
+    :param name:    Name of the image.
     """
     def __init__(self, img, gsd, pix_values=None, refl_values=None, name=None,
                  orthophoto=True):
@@ -327,96 +322,140 @@ class Sensor(object):
     """Example details of the camera system.  This is not intended to be a
     complete list but is more than adequate for the NIIRS demo (see pybsm.niirs).
 
-    Attributes (the first four are mandatory):
-    ------------------------------------------
-    name :
-        Name of the sensor (string)
-    D :
+    :param name:
+        Name of the sensor
+    :type name: str
+    :param D:
         Effective aperture diameter (m)
-    f :
+    :type D: float
+    :param f:
         Focal length (m)
-    px and py :
+    :type f: float
+    :param px:
         Detector center-to-center spacings (pitch) in the x and y directions
         (meters). IF py is not provided, it is assumed equal to px.
-    optTransWavelengths : numpy array
+    :type px: float
+    :param optTransWavelengths:
         Specifies the spectral bandpass of the camera (m).  At minimum, and
         start and end wavelength should be specified.
-
-    opticsTransmission :
+    :type optTransWavelengths: np.array
+    :param opticsTransmission:
         Full system in-band optical transmission (unitless).  Loss due to any
         telescope obscuration should *not* be included in with this optical
         transmission array.
-    eta :
+    :type opticsTransmission: np.array, optional
+    :param eta:
         Relative linear obscuration (unitless). Obscuration of the aperture
         commonly occurs within telescopes due to secondary mirror or spider
         supports.
-    wx and wy :
+    :type eta: float, optional
+    :param py:
+        Detector center-to-center spacings (pitch) in the x and y directions
+        (meters). IF py is not provided, it is assumed equal to px.
+    :type py: float, optional
+    :param wx:
         Detector width in the x and y directions (m). If set equal to px and
         py, this corresponds to an assumed full pixel fill factor. In general,
         wx and wy are less than px and py due to non-photo-sensitive area
         (typically transistors) around each pixel.
-    qe :
+    :type wx: float, optional
+    :param wy:
+        Detector width in the x and y directions (m). If set equal to px and
+        py, this corresponds to an assumed full pixel fill factor. In general,
+        wx and wy are less than px and py due to non-photo-sensitive area
+        (typically transistors) around each pixel.
+    :type wy: float, optional
+    :param qe:
         Quantum efficiency as a function of wavelength (e-/photon).
-    qewavelengths :
+    :type qe: float, optional
+    :param qewavelengths:
         Wavelengths corresponding to the array qe (m).
-    otherIrradiance :
+    :type qewavelengths: np.array, optional
+    :param otherIrradiance:
         Spectral irradiance from other sources (W/m^2 m). This is particularly
         useful for self emission in infrared cameras.  It may also represent
         stray light.
-    darkCurrent :
+    :type otherIrradiance: float, optional
+    :param darkCurrent:
         Detector dark current (e-/s). Dark current is the relatively small
         electric current that flows through photosensitive devices even when no
         photons enter the device.
-    maxN :
+    :type darkCurrent: int, optional
+    :param maxN:
         Detector electron well capacity (e-). The default 100 million,
         initializes to a large number so that, in the absence of better
         information, it doesn't affect outcomes.
-    maxFill :
-        Desired electron well fill, i.e. maximum well size x desired fill
-        fraction.
-    bitdepth :
+    :type maxN: int, optional
+    :param bitdepth:
         Resolution of the detector ADC in bits (unitless). Default of 100 is
         sufficiently large number so that in the absense of better information,
         it doesn't affect outcomes.
-    ntdi :
+    :type bitdepth: float, optional
+    :param ntdi:
         Number of TDI stages (unitless).
-    coldshieldTemperature :
+    :type ntdi: float, optional
+    :param coldshieldTemperature:
         Temperature of the cold shield (K).  It is a common approximation to assume
         that the coldshield is at the same temperature as the detector array.
-    opticsTemperature :
+    :type coldshieldTemperature: float, optional
+    :param opticsTemperature:
         Temperature of the optics (K)
-    opticsEmissivity :
+    :type opticsTemperature: float, optional
+    :param opticsEmissivity:
         Emissivity of the optics (unitless) except for the cold filter.
         A common approximation is 1-optics transmissivity.
-    coldfilterTransmission :
+    :type opticsEmissivity: float, optional
+    :param coldfilterTransmission:
         Transmission through the cold filter (unitless)
-    coldfilterTemperature :
+    :type coldfilterTransmission: float, optional
+    :param coldfilterTemperature:
         Temperature of the cold filter.  It is a common approximation to assume
         that the filter is at the same temperature as the detector array.
-    coldfilterEmissivity :
+    :type coldfilterTemperature: float, optional
+    :param coldfilterEmissivity:
         Emissivity through the cold filter (unitless).  A common approximation
         is 1-cold filter transmission
-    sx and sy :
-        Root-mean-squared jitter amplitudes in the x and y directions respectively. (rad)
-    dax and day :
-        Line-of-sight angular drift rate during one integration time in the x and y
-        directions respectively. (rad/s)
-    pv :
+    :type coldfilterEmissivity: float, optional
+    :param sx:
+        Root-mean-squared jitter amplitudes in the x direction. (rad)
+    :type sx: float, optional
+    :param sy:
+        Root-mean-squared jitter amplitudes in the y direction. (rad)
+    :type sy: float, optional
+    :param dax:
+        Line-of-sight angular drift rate during one integration time in the x
+        direction. (rad/s)
+    :type dax: float, optional
+    :param day:
+        Line-of-sight angular drift rate during one integration time in the y
+        direction. (rad/s)
+    :type day: float, optional
+    :param pv:
         Wavefront error phase variance (rad^2) - tip: write as (2*pi*waves of error)^2
-    pvwavelength :
+    :type pv: float, optional
+    :param pvwavelength:
         Wavelength at which pv is obtained (m)
-    Lx and Ly :
+    :type pvwavelength: float, optional
+    :param Lx:
         Correlation lengths of the phase autocorrelation function.  Apparently,
-        it is common to set the Lx and Ly to the aperture diameter.  (m)
-    otherNoise :
+        it is common to set the Lx to the aperture diameter.  (m)
+    :type Lx: float, optional
+    :param Ly:
+        Correlation lengths of the phase autocorrelation function.  Apparently,
+        it is common to set the Ly to the aperture diameter.  (m)
+    :type Ly: float, optional
+    :param otherNoise:
         A catch all for noise terms that are not explicitly included elsewhere
         (read noise, photon noise, dark current, quantization noise are
         all already included)
-    filterKernel:
+    :type otherNoise: np.array, optional
+    :param filterKernel:
          2-D filter kernel (for sharpening or whatever).  Note that
          the kernel is assumed to sum to one.
-    framestacks:
+    :type filterKernel: np.array, optional
+    :param framestacks:
          The number of frames to be added together for improved SNR.
+    :type framestacks: int, optional
 
     """
     def __init__(self, name, D, f, px, optTransWavelengths,
@@ -496,15 +535,18 @@ class Scenario(object):
     """Everything about the target and environment.  NOTE:  if the niirs model
     is called, values for target/background temperature, reflectance, etc. are
     overridden with the NIIRS model defaults.
-    ihaze:
+
+    :parameter ihaze:
         MODTRAN code for visibility, valid options are ihaze = 1 (Rural extinction with 23 km visibility)
         or ihaze = 2 (Rural extinction with 5 km visibility)
-    altiude:
+    :type ihaze: int
+    :parameter altitude:
         Sensor height above ground level in meters.  The database includes the
         following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
         12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
         24500.
-    ground_range:
+    :type altitude: int
+    :parameter ground_range:
         Projection of line of sight between the camera and target along on the
         ground in meters. The distance between the target and the camera is
         given by sqrt(altitude^2 + ground_range^2).
@@ -512,23 +554,31 @@ class Scenario(object):
         until the ground range exceeds the distance to the spherical earth horizon:
         0 100 500 1000 to 20000 in 1000 meter steps, 22000 to 80000 in 2000 m steps,
         and  85000 to 300000 in 5000 meter steps.
-    aircraftSpeed:
+    :type ground_range: int
+    :parameter aircraftSpeed:
         Ground speed of the aircraft (m/s)
-    targetReflectance:
+    :type aircraftSpeed: int, optional
+    :parameter targetReflectance:
         Object reflectance (unitless). The default 0.15 is the giqe standard.
-    targetTemperature:
+    :type targetReflectance: float, optional
+    :parameter targetTemperature:
         Object temperature (Kelvin). 282 K is used for GIQE calculation.
-    backgroundReflectance:
+    :type targetTemperature: int, optional
+    :parameter backgroundReflectance:
         Background reflectance (unitless)
-    backgroundTemperature:
+    :type backgroundReflectance: float, optional
+    :parameter backgroundTemperature:
         Background temperature (Kelvin). 280 K used for GIQE calculation.
-    haWindspeed:
+    :type backgroundTemperature: int, optional
+    :parameter haWindspeed:
         The high altitude windspeed (m/s).  Used to calculate the turbulence
         profile. The default, 21.0, is the HV 5/7 profile value.
-    cn2at1m:
+    :type haWindspeed: int, optional
+    :parameter cn2at1m:
         The refractive index structure parameter "near the ground"
         (e.g. at h = 1 m). Used to calculate the turbulence profile. The
         default, 1.7e-14, is the HV 5/7 profile value.
+    :type cn2at1m: float, optional
 
     """
     def __init__(self, name, ihaze, altitude, ground_range, aircraftSpeed=0,
@@ -581,21 +631,14 @@ class Scenario(object):
     def atm(self):
         """Return atmospheric spectral absorption.
 
-        Returns
-        -------
-        atm[:,0]:
-            wavelengths from .3 to 14 x 10^-6 m in 0.01x10^-6 m steps
-        atm[:,1]:
-            (TRANS) total transmission through the defined path.
-        atm[:,2]:
-            (PTH THRML) radiance component due to atmospheric emission and scattering received at the observer.
-        atm[:,3]:
-            (SURF EMIS) component of radiance due to surface emission received at the observer.
-        atm[:,4]:
-            (SOL SCAT) component of scattered solar radiance received at the observer.
-        atm[:,5]:
-            (GRND RFLT) is the total solar flux impingent on the ground and reflected directly to the sensor from the ground. (direct radiance + diffuse radiance) * surface reflectance
-        NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
+        :return: List of values
+            atm[:,0]- wavelengths from .3 to 14 x 10^-6 m in 0.01x10^-6 m steps
+            atm[:,1]- (TRANS) total transmission through the defined path.
+            atm[:,2]- (PTH THRML) radiance component due to atmospheric emission and scattering received at the observer.
+            atm[:,3]- (SURF EMIS) component of radiance due to surface emission received at the observer.
+            atm[:,4]- (SOL SCAT) component of scattered solar radiance received at the observer.
+            atm[:,5]- (GRND RFLT) is the total solar flux impingent on the ground and reflected directly to the sensor from the ground. (direct radiance + diffuse radiance) * surface reflectance
+            NOTE- units for columns 1 through 5 are in radiance W/(sr m^2 m)
 
         """
         if self._atm is None:

@@ -49,24 +49,22 @@ def giqe3(rer,gsd,eho,ng,snr):
         Note: geometric mean values are simply sqrt(value_x * value_y), where x
         and y are orthogonal directions in the image.
 
-    Parameters
-    ----------
-    rer :
+    
+    :param rer:
         geometric mean relative edge response (unitless)
-    gsd :
+    :param gsd:
         geometric mean ground sample distance (m)
-    eho :
+    :param eho:
         geometric mean edge height overshoot (unitless)
-    ng :
+    :param ng:
         noises gain, i.e. increase in noise due to sharpening (unitless). If no sharpening is
         applied then ng = 1
-    snr :
+    :param snr:
         contrast signal-to-noise ratio (unitless)
 
-    Returns
-    -------
-    niirs :
-        a National Image Interpretability Rating Scale value (unitless)
+    :return:
+        niirs :
+            a National Image Interpretability Rating Scale value (unitless)
     """
     niirs = 11.81+3.32*np.log10(rer/(gsd/.0254)) - 1.48*eho - ng/snr
     #note that, within the GIQE, gsd is defined in inches, hence the conversion
@@ -79,29 +77,27 @@ def giqe4(rer,gsd,eho,ng,snr,elevAngle):
     I don't endorse the use of GIQE 4 but it is added to pyBSM for historical
     completeness.
 
-    Parameters
-    ----------
-    rer :
+    
+    :param rer:
         geometric mean relative edge response (unitless)
-    gsd :
+    :param gsd:
         geometric mean ground sample distance (m) before projection into the ground plane
-    eho :
+    :param eho:
         geometric mean edge height overshoot (unitless)
-    ng :
+    :param ng:
         noises gain, i.e. increase in noise due to sharpening (unitless). If no sharpening is
         applied then ng = 1
-    snr :
+    :param snr:
         contrast signal-to-noise ratio (unitless)
-    elevangle:
+    :param elevangle:
         sensor elevation angle as measured from the target (rad), i.e., pi/2-nadirAngle.
         See pybsm.nadirAngle for more information.  Note that the GIQE4 paper defines
         this angle differently but we stick with this version to be consisent with the GIQE 5 code.
         The outcome is the same either way.
 
-    Returns
-    -------
-    niirs :
-        a National Image Interpretability Rating Scale value (unitless)
+    :return:
+        niirs :
+            a National Image Interpretability Rating Scale value (unitless)
     """
     if rer >= 0.9:
         c1 = 3.32
@@ -126,32 +122,32 @@ def giqe5(rer1,rer2,gsd,snr,elevAngle):
     future analyses.  See also "Airborne Validation of the General Image Quality Equation 5"
     https://www.osapublishing.org/ao/abstract.cfm?uri=ao-59-32-9978
 
-    Parameters
-    ----------
-    rer1, rer2 :
+    
+    :param rer1:
         relative edge response in two directions (e.g., along- and across- scan,
          horizontal and vertical, etc.) See also pybsm.giqe5RER. (unitless)
-    gsd :
+    :param rer2:
+        relative edge response in two directions (e.g., along- and across- scan,
+         horizontal and vertical, etc.) See also pybsm.giqe5RER. (unitless)
+    :param gsd:
         image plane geometric mean ground sample distance (m), as defined for GIQE3.  The GIQE 5 version
         of GSD is calculated within this function
-    snr :
+    :param snr:
         contrast signal-to-noise ratio (unitless), as defined for GIQE3
-    elevangle:
+    :param elevangle:
         sensor elevation angle as measured from the target (rad), i.e., pi/2-nadirAngle.
         See pybsm.nadirAngle for more information
 
-    Returns
-    -------
-    niirs :
-        a National Image Interpretability Rating Scale value (unitless)
-    gsdw :
-        elevlation angle weighted GSD (m)
-    rer :
-        weighted relative edge response (rer)
-    NOTES
-    -----
-    NIIRS 5 test case: rer1=rer2=0.35, gsd = 0.52832 (20.8 inches), snr = 50, elevangle = np.pi/2
-    From Figure 1 in the NGA GIQE5 paper.
+    :return:
+        niirs :
+            a National Image Interpretability Rating Scale value (unitless)
+        gsdw :
+            elevlation angle weighted GSD (m)
+        rer :
+            weighted relative edge response (rer)
+    :NOTE:
+        NIIRS 5 test case: rer1=rer2=0.35, gsd = 0.52832 (20.8 inches), snr = 50, elevangle = np.pi/2
+        From Figure 1 in the NGA GIQE5 paper.
 
     """
     #note that, within the GIQE, gsd is defined in inches, hence the conversion in the niirs equation below
@@ -170,24 +166,22 @@ def giqe5RER(mtf,df,ifovx,ifovy):
     implements IBSM equations 3-57 and 3-58.  See pybsm.giqeEdgeTerms for the
     GIQE 3 version.
 
-    Parameters
-    ----------
-    mtf:
+    
+    :param mtf:
         2-dimensional full system modulation transfer function (unitless).  MTF is
         the magnitude of the OTF.
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    ifovx:
+    :param ifovx:
         x-direction instantaneous field-of-view of a detector (radians)
-    ifovy:
+    :param ifovy:
         y-direction instantaneous field-of-view of a detector (radians)
 
-    Returns
-    -------
-    rer0:
-        relative edge response at 0 degrees orientation (unitless)
-    rer90:
-        relative edge response at 90 degrees orientation (unitless)
+    :return:
+        rer0:
+            relative edge response at 0 degrees orientation (unitless)
+        rer90:
+            relative edge response at 90 degrees orientation (unitless)
     """
     uslice = otf.sliceotf(mtf,0)
     vslice = otf.sliceotf(mtf,np.pi/2)
@@ -203,24 +197,22 @@ def giqeEdgeTerms(mtf,df,ifovx,ifovy):
     from a 2-D MTF.  This function is primarily for use with the GIQE. It
     implements IBSM equations 3-57 and 3-58.
 
-    Parameters
-    ----------
-    mtf:
+    
+    :param mtf:
         2-dimensional full system modulation transfer function (unitless).  MTF is
         the magnitude of the OTF.
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    ifovx:
+    :param ifovx:
         x-direction instantaneous field-of-view of a detector (radians)
-    ifovy:
+    :param ifovy:
         y-direction instantaneous field-of-view of a detector (radians)
 
-    Returns
-    -------
-    rer:
-        geometric mean relative edge response (unitless)
-    eho:
-        geometric mean edge height overshoot (unitless)
+    :return:
+        rer:
+            geometric mean relative edge response (unitless)
+        eho:
+            geometric mean edge height overshoot (unitless)
     """
     uslice = otf.sliceotf(mtf,0)
     vslice = otf.sliceotf(mtf,np.pi/2)
@@ -242,21 +234,19 @@ def groundResolvedDistance(mtfslice, df, snr, ifov, slantRange):
     limited by the detector itself (in which case GRD = 2*GSD) but, in general
     is a function of the system MTF and signal-to-noise ratio.
 
-    Parameters
-    ----------
-    mtfslice :
+    
+    :param mtfslice:
         1-D modulation transfer function (unitless) mtf[0] = 1 is at 0 cycles/radian
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    snr :
+    :param snr:
         contrast signal-to-noise ratio (unitless)
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
-    slantRange :
+    :param slantRange:
 
-    Returns
-    -------
-    grd : ground resolved distance (m)
+    :return:
+        grd : ground resolved distance (m)
     """
     w = df*np.arange(1.0*mtfslice.size)
     ur = np.interp(3.0/snr,mtfslice[::-1],w[::-1]) + 1e-12 #1e-12 prevents division by zero in grdcases
@@ -273,18 +263,16 @@ def niirs(sensor,scenario):
     implements the original MATLAB based NIIRS model and can serve as a template
     for building other sensor models.
 
-    Parameters
-    ----------
-    sensor:
+    
+    :param sensor:
         an object from the class sensor
-    scenario:
+    :param scenario:
         an object from the class scenario
 
-    Returns
-    --------
-    nm:
-        an object containing results of the GIQE calculation along with many
-        intermediate calculations
+    :return:
+        nm:
+            an object containing results of the GIQE calculation along with many
+            intermediate calculations
     """
     #initialize the output
     nm = Metrics('niirs ' + sensor.name + ' ' + scenario.name)
@@ -375,18 +363,16 @@ def niirs5(sensor,scenario):
     GIQE replaces the ealier versions and should be used in all
     future analyses
 
-    Parameters
-    ----------
-    sensor:
+    
+    :param sensor:
         an object from the class sensor
-    scenario:
+    :param scenario:
         an object from the class scenario
 
-    Returns
-    --------
-    nm:
-        an object containing results of the GIQE calculation along with many
-        intermediate calculations
+    :return:
+        nm:
+            an object containing results of the GIQE calculation along with many
+            intermediate calculations
     """
     #initialize the output
     nm = Metrics('niirs ' + sensor.name + ' ' + scenario.name)
@@ -470,20 +456,18 @@ def relativeEdgeResponse(mtfslice,df,ifov):
     at +/-0.5 pixels from a theoretical edge.  Edge response is used in the calculation of NIIRS
     via the General Image Quality Equation.
 
-    Parameters
-    ----------
-    mtfslice :
+    
+    :param mtfslice:
         1-D modulation transfer function (unitless) mtf[0] = 1 is at 0 cycles/radian
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
 
 
-    Returns
-    -------
-    rer :
-        relative edge response (unitless)
+    :return:
+        rer:
+            relative edge response (unitless)
     """
     rer = edgeResponse(0.5,mtfslice,df,ifov)-edgeResponse(-0.5,mtfslice,df,ifov)
     return rer
@@ -499,19 +483,17 @@ def edgeHeightOvershoot(mtfslice,df,ifov):
     in 0.25-pixel increments. If the edge is monotonically increasing, it is defined as the
     value at 1.25 pixels from the edge."
 
-    Parameters
-    ----------
-    mtfslice :
+    
+    :param mtfslice:
         1-D modulation transfer function (unitless) mtf[0] = 1 is at 0 cycles/radian
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
 
-    Returns
-    -------
-    eho :
-        edge height overshoot (unitless)
+    :return:
+        eho :
+            edge height overshoot (unitless)
     """
     rng = np.arange(1.0,3.25,.25)
     er = np.zeros(rng.size)
@@ -536,22 +518,20 @@ def edgeResponse(pixelPos,mtfslice,df,ifov):
     away from the true edge.  Edge response is used in the calculation of NIIRS
     via the General Image Quality Equation.
 
-    Parameters
-    ----------
-    pixelPos :
+    
+    :param pixelPos:
         distance from the theoretical edge (pixels)
-    mtfslice :
+    :param mtfslice:
         1-D modulation transfer function (unitless) mtf[0] = 1 is at 0 cycles/radian
-    df :
+    :param df:
         spatial frequency step size (cycles/radian)
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
 
 
-    Returns
-    -------
-    er :
-        normalized edge response (unitless)
+    :return:
+        er:
+            normalized edge response (unitless)
     """
     w = df*np.arange(1.0*mtfslice.size) + 1e-6 #note tiny offset to avoid infs
     y = (mtfslice/w)*np.sin(2*np.pi*w*ifov*pixelPos)
@@ -566,17 +546,15 @@ def plotCommonMTFs(metrics,orientationAngle=0):
     annotated on the plot with a black arrow.  Spatial frequencies are converted
     to image plane units (cycles/mm).
 
-    Parameters
-    ----------
-    metrics :
+    
+    :param metrics:
         the object output of (for instance) pybsm.niirs or equivalent
 
-    orientationAngle:
+    :param orientationAngle:
         angle to slice the MTF (radians).  A 0 radian slice is along the u axis.
         The angle rotates counterclockwise. Angle pi/2 is along the v axis.  The
         default value is 0 radians.
-    Returns
-    -------
+    :return:
         A plot.
     """
 
@@ -612,16 +590,14 @@ def plotNoiseTerms(metrics,maxval = 0,ax = 0):
     photoelectrons.  Components Total, Scene photons, Path photons, Emission / Stray photons,
     Dark Current, Quantization, Readout.
 
-    Parameters
-    ----------
-    metrics :
+    
+    :param metrics:
         the object output of (for instance) pybsm.niirs or equivalent
 
-    maxval:
+    :param maxval:
         (optional) sets the y-axis limit on photoelectrons.  Useful when comparing across plots.
         Default value of 0 allows matplotlib to automatically select the scale.
-    Returns
-    -------
+    :return:
         A plot.
     """
     fig, ax = plt.subplots()

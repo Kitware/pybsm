@@ -44,16 +44,13 @@ def noiseGain(kernel):
     Leachtenauer et al., "General Image-Quality Equation: GIQE" APPLIED OPTICS
     Vol. 36, No. 32 10 November 1997.
 
-    Parameters
-    ----------
-    kernal:
+    :param kernel:
          the 2-D image sharpening kernel.  Note that
          the kernel is assumed to sum to one.
 
-    Returns
-    -------
-    ng:
-        noise gain (unitless)
+    :return:
+        ng:
+            noise gain (unitless)
     """
     ng = np.sqrt(np.sum(np.sum(kernel**2)))
     return ng
@@ -64,18 +61,15 @@ def quantizationNoise(peRange, bitdepth):
     by a single count of the analog to digital converter.  Quantization noise
     is buried in the definition of signal-to-noise in IBSM equation 3-47.
 
-    Parameters
-    ----------
-    peRange :
+    :param peRange:
         the difference between the maximum and minimum number of photoelectrons
         that may be sampled by the read out electronics (e-)
-    bitdepth :
+    :param bitdepth:
         number of bits in the analog to digital converter (unitless)
 
-    Returns
-    -------
-    sigmaq :
-        quantization noise given as a photoelectron standard deviation (e-)
+    :return:
+        sigmaq :
+            quantization noise given as a photoelectron standard deviation (e-)
     """
     sigmaq = peRange/(np.sqrt(12)*(2.0**bitdepth-1.0))
     return sigmaq
