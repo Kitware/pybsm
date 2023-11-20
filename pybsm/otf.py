@@ -100,27 +100,25 @@ def circularApertureOTF(u,v,lambda0,D,eta):
     """IBSM Equation 3-20.  Obscured circular aperture diffraction OTF.  If eta
     is set to 0, the function will return the unobscured aperture result.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    lambda0 :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param lambda0:
         wavelength (m)
-    D :
+    :param D:
         effective aperture diameter (m)
-    eta :
+    :param eta:
         relative linear obscuration (unitless)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
-    Notes
-    -----
-    You will see several runtime warnings when this code is first accessed.  The
-    issue (calculating arccos and sqrt outside of their domains) is captured
-    and corrected np.nan_to_num
+    :NOTE:
+        You will see several runtime warnings when this code is first accessed.  The
+        issue (calculating arccos and sqrt outside of their domains) is captured
+        and corrected np.nan_to_num
     """
 
     rho = np.sqrt(u**2.0+v**2.0) # radial spatial frequency
@@ -162,26 +160,24 @@ def circularApertureOTFwithDefocus(u,v,wvl,D,f,defocus):
     Variable changes made to use angular spatial frequency and approximation of 1/(F/#) = sin(a).
     Contributed by Matthew Howard.
 
-    Parameters
-    ----------
-    (u,v) :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    wvl :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param wvl:
         wavelength (m)
-    D :
+    :param D:
         effective aperture diameter (m)
-    f:
+    :param f:
         focal length (m)
-    defocus :
+    :param defocus:
         focus error distance between in focus and out of focus planes (m).  In other
         words, this is the distance between the geometric focus and the actual focus.
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
-    Note:
-    ----
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
+    :NOTE:
         Code contributed by Matt Howard
     '''
     rho = np.sqrt(u**2.0+v**2.0) # radial spatial frequency
@@ -216,27 +212,30 @@ def cteOTF(u,v,px,py,cteNx,cteNy,phasesN,cteEff,f):
     """IBSM Equation 3-39.  Blur due to charge transfer efficiency losses in a
     CCD array.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         spatial frequency coordinates (rad^-1)
-    (px,py) :
-        detector center-to-center spacings (pitch) in the x and y directions (m)
-    (cteNx,cteNy) :
-        number of change transfers in the x and y directions (unitless)
-    phasesN:
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param px:
+        detector center-to-center spacings (pitch) in the x direction (m)
+    :param py:
+        detector center-to-center spacings (pitch) in the y direction (m)
+    :param cteNx:
+        number of change transfers in the x direction (unitless)
+    :param cteNy:
+        number of change transfers in the y direction (unitless)
+    :param phasesN:
         number of clock phases per transer (unitless)
-    beta :
+    :param beta:
         ratio of TDI clocking rate to image motion rate (unitless)
-    cteEff :
+    :param cteEff:
         charge transfer efficiency (unitless)
-    f :
+    :param f:
         focal length (m)
 
-    Returns
-    -------
-    H :
-        cte OTF
+    :return:
+        H:
+            cte OTF
     """
     #this OTF has the same form in the x and y directions so we'll define
     #an inline function to save us the trouble of doing this twice
@@ -254,19 +253,20 @@ def defocusOTF(u,v,D,wx,wy):
     axis. This function is retained for backward compatibility.  See
     circularApertureOTFwithDefocus for an exact solution.
 
-    Parameters
-    ----------
-    u or v :
-        angular spatial frequency coordinates (rad^-1)
-    D :
+    :param u:
+        spatial frequency coordinates (rad^-1)
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param D:
         effective aperture diameter (m)
-    (wx,wy) :
-        the 1/e blur spot radii in the x and y directions
+    :param wx:
+        the 1/e blur spot radii in the x direction
+    :param wy:
+        the 1/e blur spot radii in the y direction
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     H = np.exp((-np.pi**2.0/4.0) * (wx**2.0*u**2.0 + wy**2.0*v**2.0))
@@ -279,19 +279,21 @@ def detectorOTF(u,v,wx,wy,f):
     integrating effects of the detector size.  See detectorOTFwithAggregation
     if detector aggregation is desired (new for version 1).
 
-    Parameters
-    ----------
-    u or v :
+    
+    :param u:
         spatial frequency coordinates (rad^-1)
-    wx and wy :
-        detector size (width) in the x and y directions (m)
-    f :
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param wx:
+        the 1/e blur spot radii in the x direction
+    :param wy:
+        the 1/e blur spot radii in the y direction
+    :param f:
         focal length (m)
 
-    Returns
-    -------
-    H :
-        detector OTF
+    :return:
+        H:
+            detector OTF
     """
 
     H = np.sinc(wx*u/f)*np.sinc(wy*v/f)
@@ -305,25 +307,28 @@ def detectorOTFwithAggregation(u,v,wx,wy,px,py,f,N=1):
     function is particularly important for aggregating detectors with less
     than 100% fill factor (e.g. px > wx).
 
-    Parameters
-    ----------
-    (u,v) :
+    
+    :param u:
         spatial frequency coordinates (rad^-1)
-    (wx,wy):
-        detector size (width) in the x and y directions (m)
-    (px,py):
-        detector pitch in the x and y directions (m)
-    f :
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param wx:
+        the 1/e blur spot radii in the x direction
+    :param wy:
+        the 1/e blur spot radii in the y direction
+    :param px:
+        detector pitch in the x direction (m)
+    :param py:
+        detector pitch in the y direction (m)
+    :param f:
         focal length (m)
-    N:
+    :param N:
         number of pixels to aggregate
 
-    Returns
-    -------
-    H :
-        detector OTF
-    Note:
-    ----
+    :return:
+        H:
+            detector OTF
+    :NOTE:
         Code contributed by Matt Howard
     """
 
@@ -345,24 +350,24 @@ def diffusionOTF(u,v,alpha,ald,al0,f):
     in a CCD sensor.  Included for completeness but this isn't a good description
     of modern detector structures.
 
-    Parameters
-    ----------
-    u or v :
+    
+    :param u:
         spatial frequency coordinates (rad^-1)
-    alpha :
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param alpha:
         carrier spectral diffusion coefficient (m^-1). Note that IBSM Table 3-4
         contains aplpha values as a function of wavelength for silicon
-    ald :
+    :param ald:
         depletion layer width (m)
-    al0:
+    :param al0:
         diffusion length (m)
-    f :
+    :param f:
         focal length (m)
 
-    Returns
-    -------
-    H :
-        diffusion OTF
+    :return:
+        H:
+            diffusion OTF
     """
     fcn = lambda xx: 1.0-np.exp(-alpha*ald)/(1.0+alpha*xx)
 
@@ -379,18 +384,21 @@ def driftOTF(u,v,ax,ay):
     """IBSM Equation 3-29.  Blur due to constant angular line-of-sight motion during
     the integration time.
 
-    Parameters
-    ----------
-    u or v :
+    
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    ax or ay :
-        line-of-sight angular drift during one integration time in the x and y
-        directions respectively. (rad)
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param ax:
+        line-of-sight angular drift during one integration time in the x
+        direction respectively. (rad)
+    :param ay:
+        line-of-sight angular drift during one integration time in the y
+        direction respectively. (rad)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     H = np.sinc(ax*u)*np.sinc(ay*v)
@@ -402,20 +410,20 @@ def filterOTF(u,v,kernel,ifov):
     """Returns the OTF of any filter applied to the image (e.g. a sharpening
     filter).
 
-    Parameters
-    ----------
-    u and v :
+    
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    kernel:
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param kernel:
          the 2-D image sharpening kernel.  Note that
          the kernel is assumed to sum to one.
-    ifov:
+    :param ifov:
         instantaneous field-of-view of a detector (radians)
 
-    Returns
-    -------
-    H:
-        optical transfer function of the filter at spatial frequencies u and v
+    :return:
+        H:
+            optical transfer function of the filter at spatial frequencies u and v
     """
     #most filter kernels are only a few pixels wide so we'll use zero-padding
     #to make the OTF larger.  The exact size doesn't matter too much
@@ -454,21 +462,23 @@ def gaussianOTF(u,v,blurSizeX,blurSizeY):
     perhaps the cutoff frequency.  The blur size is defined to be where the PSF
     falls to about .043 times it's peak value.
 
-    Parameters
-    ----------
-    u and v :
-        angular spatial frequency in the x and y directions (cycles/radian)
-    blurSizeX and blurSizeY :
+    :param u:
+        angular spatial frequency coordinates (rad^-1)
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param blurSizeX:
+        angular extent of the blur spot in image space (radians)
+    :param blurSizeY:
         angular extent of the blur spot in image space (radians)
 
-    Returns
-    -------
-    H :
-        gaussian optical transfer function.
+    :return:
+        H:
+            gaussian optical transfer function.
 
-    Notes: The cutoff frequencies (where the MTF falls to .043 cycles/radian)
-    are the inverse of the blurSizes and the point spread function is therefore:
-    psf(x,y) = (fxX*fcY)*exp(-pi((fxX*x)^2+(fcY*y)^2))
+    :NOTE:
+        The cutoff frequencies (where the MTF falls to .043 cycles/radian)
+        are the inverse of the blurSizes and the point spread function is therefore:
+        psf(x,y) = (fxX*fcY)*exp(-pi((fxX*x)^2+(fcY*y)^2))
     """
     fcX = 1/blurSizeX #x-direction cutoff frequency
     fcY = 1/blurSizeY #y-direction cutoff frequency
@@ -483,17 +493,17 @@ def jitterOTF(u,v,sx,sy):
     frequency, i.e. many small random changes in line-of-sight during a single integration time.
     #Note that there is an error in Equation 3-28 - pi should be squared in the exponent.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    sx or sy :
-        Root-mean-squared jitter amplitudes in the x and y directions respectively. (rad)
-
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param sx:
+        Root-mean-squared jitter amplitudes in the x direction respectively. (rad)
+    :param sy:
+        Root-mean-squared jitter amplitudes in the y direction respectively. (rad)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     H = np.exp((-2.0*np.pi**2.0) * (sx**2.0*u**2.0 + sy**2.0*v**2.0))
@@ -506,40 +516,38 @@ def polychromaticTurbulenceOTF(u,v, wavelengths, weights, altitude, slantRange, 
     """Returns a polychromatic turbulence MTF based on the Hufnagel-Valley turbulence
     profile and the pyBSM function "windspeedTurbulenceOTF", i.e. IBSM Eqn 3.9.
 
-    Parameters
-    ---------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    wavelengths :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param wavelengths:
         wavelength array (m)
-    weights :
+    :param weights:
         how contributions from each wavelength are weighted
-    altitude :
+    :param altitude:
         height of the aircraft above the ground (m)
-    slantRange :
+    :param slantRange:
         line-of-sight range between the aircraft and target (target is assumed
         to be on the ground)
-    D :
+    :param D:
         effective aperture diameter (m)
-
-    intTime :
+    :param intTime:
         dwell (i.e. integration) time (seconds)
-    aircraftSpeed :
+    :param aircraftSpeed:
         apparent atmospheric velocity (m/s).  This can just be the windspeed at
         the sensor position if the sensor is stationary.
-    haWindspeed:
+    :param haWindspeed:
         the high altitude windspeed (m/s).  Used to calculate the turbulence profile.
-    cn2at1m:
+    :param cn2at1m:
         the refractive index structure parameter "near the ground" (e.g. at h = 1 m).
         Used to calculate the turbulence profile.
 
-    Returns
-    -------
-    turbulenceOTF :
-        turbulence OTF (unitless)
-    r0band :
-        the effective coherence diameter across the band (m)
-        """
+    :return:
+        turbulenceOTF:
+            turbulence OTF (unitless)
+        r0band:
+            the effective coherence diameter across the band (m)
+    """
     #calculate the Structure constant along the slant path
     (zPath,hPath) = altitudeAlongSlantPath(0.0,altitude,slantRange)
     cn2 = hufnagelValleyTurbulenceProfile(hPath,haWindspeed,cn2at1m)
@@ -563,17 +571,16 @@ def radialUserOTF(u,v,fname):
     3-3a, the OTF data are ASCII text, space delimited data.  Each line of text
     is formatted as - spatial_frequency OTF_real OTF_imaginary.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    fname :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param fname:
         filename and path to the radial OTF data.
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     radialData = np.genfromtxt(fname)
@@ -589,25 +596,25 @@ def tdiOTF(uorv,w,ntdi,phasesN,beta,f):
     """IBSM Equation 3-38.  Blur due to a mismatch between the time-delay-integration
     clocking rate and the image motion.
 
-    Parameters
-    ----------
-    u or v :
-        spatial frequency coordinates in the TDI direction.  (rad^-1)
-    w:
+    
+    :param u:
+        angular spatial frequency coordinates (rad^-1)
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param w:
         detector size (width) in the TDI direction (m)
-    ntdi:
+    :param ntdi:
         number of TDI stages (unitless)
-    phasesN:
+    :param phasesN:
         number of clock phases per transfer (unitless)
-    beta:
+    :param beta:
         ratio of TDI clocking rate to image motion rate (unitless)
-    f :
+    :param f:
         focal length (m)
 
-    Returns
-    -------
-    H :
-        tdi OTF
+    :return:
+        H:
+            tdi OTF
     """
 
     xx = w*uorv/(f*beta) #this occurs twice, so we'll pull it out to simplify the
@@ -624,24 +631,23 @@ def tdiOTF(uorv,w,ntdi,phasesN,beta,f):
 def turbulenceOTF(u,v,lambda0,D,r0,alpha):
     """IBSM Equation 3-3.  The long or short exposure turbulence OTF.
 
-    Parameters
-    ---------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    lambda0 :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param lambda0:
         wavelength (m)
-    D :
+    :param D:
         effective aperture diameter (m)
-    r0 :
+    :param r0:
         Fried's correlation diameter (m)
-    alpha :
+    :param alpha:
         long exposure (alpha = 0) or short exposure (alpha = 0.5)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
-        """
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
+    """
     rho = np.sqrt(u**2.0+v**2.0) # radial spatial frequency
     H = np.exp(-3.44*(lambda0*rho/r0)**(5.0/3.0) * \
         (1-alpha*(lambda0*rho/D)**(1.0/3.0)))
@@ -656,19 +662,19 @@ def userOTF2D(u,v,fname,nyquist):
     of the array.  All OTFs values extrapolate to zero outside of the domain of
     the imported OTF.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    fname :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param fname:
         filename and path to the OTF data.  Must include the .npy extension.
-    nyquist: the Nyquist (i.e. maximum) frequency of the OFT file.  The support
-    of the OTF is assumed to extend from -nyquist to nyquist. (rad^-1)
+    :param nyquist:
+        the Nyquist (i.e. maximum) frequency of the OFT file.  The support
+        of the OTF is assumed to extend from -nyquist to nyquist. (rad^-1)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     rawOTF = np.load(fname)
@@ -696,24 +702,26 @@ def wavefrontOTF(u,v,lambda0,pv,Lx,Ly):
     function.  Refer to the discussion on random phase screens in Goodman, "Statistical Optics"
     for a full explanation (this is also the source cited in the IBSM documentation).
     As an alternative, see wavefrontOTF2.
-    Parameters
-    ----------
-    u or v :
+
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    lambda0 :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param lambda0:
         wavelength (m)
-    pv :
+    :param pv:
         phase variance (rad^2) - tip: write as (2*pi*waves of error)^2.  pv is
         often defined at a specific wavelength (e.g. 633 nm) so scale appropriately.
-
-    Lx or Ly :
+    :param Lx:
         correlation lengths of the phase autocorrelation function.  Apparently,
-        it is common to set Lx and Ly to the aperture diameter.  (m)
+        it is common to set Lx to the aperture diameter.  (m)
+    :param Ly:
+        correlation lengths of the phase autocorrelation function.  Apparently,
+        it is common to set Ly to the aperture diameter.  (m)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     autoc = np.exp(-lambda0**2 * ( (u/Lx)**2 + (v/Ly)**2 ))
@@ -731,20 +739,20 @@ def wavefrontOTF2(u,v,cutoff,wrms):
     for most imaging systems, wrms falls between 0.1 and 0.25 waves rms.  This MTF
     becomes progressively less accurate as wrms exceeds .18 waves.
 
-    Parameters
-    ----------
-    (u,v) :
+    
+    :param u:
         spatial frequency coordinates (rad^-1)
-    cutoff:
+    :param v:
+        spatial frequency coordinates (rad^-1)
+    :param cutoff:
         spatial frequency cutoff due to diffraction, i.e. aperture diameter / wavelength (rad^-1)
-    wrms:
+    :param wrms:
         root mean square wavefront error (waves of error).
 
 
-    Returns
-    -------
-    H :
-        wavefront OTF
+    :return:
+        H:
+            wavefront OTF
     """
 
     v = np.sqrt(u**2.0+v**2.0)/cutoff
@@ -758,26 +766,25 @@ def windspeedTurbulenceOTF(u,v,lambda0,D,r0,td,vel):
     """IBSM Equation 3-9.  Turbulence OTF adjusted for windspeed and
     integration time.
 
-    Parameters
-    ---------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    lambda0 :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param lambda0:
         wavelength (m)
-    D :
+    :param D:
         effective aperture diameter (m)
-    r0 :
+    :param r0:
         Fried's coherence diameter (m)
-    td :
+    :param td:
         dwell (i.e. integration) time (seconds)
-    vel :
+    :param vel:
         apparent atmospheric velocity (m/s)
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
-        """
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
+    """
     weight = np.exp(-vel*td/r0)
     H = weight*turbulenceOTF(u,v,lambda0,D,r0,0.5) + \
         (1-weight)*turbulenceOTF(u,v,lambda0,D,r0,0.0)
@@ -792,17 +799,16 @@ def xandyUserOTF(u,v,fname):
     appears to be a typo in the IBSM documentation - Table 3-3c should represent
     the "x and y" case, not "x or y".)
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    fname :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param fname:
         filename and path to the x and y OTF data.
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     xandyData = np.genfromtxt(fname)
@@ -827,17 +833,16 @@ def xandyUserOTF2(u,v,fname):
     is given as Hx*Hy, the result being that the off-axis OTF is lower than either Hx or Hy.
     The output is now given by the geometric mean.
 
-    Parameters
-    ----------
-    u or v :
+    :param u:
         angular spatial frequency coordinates (rad^-1)
-    fname :
+    :param v:
+        angular spatial frequency coordinates (rad^-1)
+    :param fname:
         filename and path to the x and y OTF data.
 
-    Returns
-    -------
-    H :
-        OTF at spatial frequency (u,v) (unitless)
+    :return:
+        H:
+            OTF at spatial frequency (u,v) (unitless)
 
     """
     xandyData = np.genfromtxt(fname)
@@ -857,20 +862,18 @@ def otf2psf(otf, df, dxout):
     """transform an optical transfer function into a point spread function
     (i.e., image space blur filter)
 
-    Parameters
-    ----------
-    otf :
+    
+    :param otf:
         Complex optical transfer function (OTF).
-    df :
+    :param df:
         Sample spacing for the optical transfer function (radians^-1)
-    dxout :
+    :param dxout:
         desired sample spacing of the point spread function (radians).
         WARNING: dxout must be small enough to properly sample the blur kernel!!!
 
-    Returns
-    -------
-    psf :
-        blur kernel
+    :return:
+        psf:
+            blur kernel
 
     """
     #transform the psf
@@ -904,19 +907,18 @@ def otf2psf(otf, df, dxout):
 
 def weightedByWavelength(wavelengths,weights,myFunction):
     """Returns a wavelength weighted composite array based on myFunction
-    Parameters
-    ----------
-    wavelengths:
+
+
+    :param wavelengths:
         array of wavelengths (m)
-    weights:
+    :param weights:
         array of weights corresponding to the "wavelengths" array.
         Weights are normalized within this function so that weights.sum()==1
-    myFunction
+    :param myFunction:
         a lambda function parameterized by wavelength, e.g.
         otfFunction = lambda wavelengths: pybsm.circularApertureOTF(uu,vv,wavelengths,D,eta)
 
-    Returns
-    --------
+    :return:
         weightedfcn:
             the weighted function
     """
@@ -939,28 +941,26 @@ def coherenceDiameter(lambda0,zPath,cn2):
     turn, Schmidt references Sasiela, "Electromagnetic Wave Propagation in
     Turbulence: Evaluation of Application of Mellin Transforms" SPIE Press (2007).
 
-    Parameters
-    ---------
-    lambda0 :
+
+    :param lambda0:
         wavelength (m).  As an implementation note, r0 can be calculated at a
         1e-6 m and then multiplied by lambda^6/5 to scale to other
         wavelengths.  This saves the time lost to needlessly evaluating extra
         integrals.
-    zPath :
+    :param zPatH:
         array of samples along the path from the target (zPath = 0) to the
         sensor. (m) WARNING: trapz will FAIL if you give it a two element path,
         use a long zPath array, even if cn2 is constant
-    cn2 :
+    :param cn2:
         refractive index structure parameter values at the sample locations in
         zPath (m^(-2/3)).  Typically Cn2 is a function of height so, as an
         intermediate step, heights should be calculated at each point along
         zPath (see altitudeAlongSlantPath)
 
-    Returns
-    -------
-    r0 :
-        correlation diameter (m) at wavelength lambda0
-        """
+    :return:
+        r0:
+            correlation diameter (m) at wavelength lambda0
+    """
     #the path integral of the structure parameter term
     spIntegral = np.trapz(cn2*(zPath/zPath.max())**(5.0/3.0),zPath)
 
@@ -980,20 +980,17 @@ def hufnagelValleyTurbulenceProfile(h,v,cn2at1m):
     in a 5 cm coherence diameter (r0) and 7 urad isoplanatic angle along a
     vertical slant path into space.
 
-    Parameters
-    ---------
-    h:
+    :param h:
         height above ground level in (m)
-    v:
+    :param v:
         the high altitude windspeed (m/s)
-    cn2at1m:
+    :param cn2at1m:
         the refractive index structure parameter "near the ground" (e.g. at h = 1 m)
 
-    Returns
-    -------
-    cn2 :
-        refractive index structure parameter as a function of height (m^(-2/3))
-        """
+    :return:
+        cn2 :
+            refractive index structure parameter as a function of height (m^(-2/3))
+    """
     cn2 = 5.94e-53*(v/27.0)**2.0*h**10.0*np.exp(-h/1000.0) \
     + 2.7e-16*np.exp(-h/1500.0) +cn2at1m*np.exp(-h/100.0)
 
@@ -1003,19 +1000,16 @@ def hufnagelValleyTurbulenceProfile(h,v,cn2at1m):
 def objectDomainDefocusRadii(D,R,R0):
     """IBSM Equation 3-26.  Axial defocus blur spot radii in the object domain.
 
-    Parameters
-    ----------
-    D :
+    :param D:
         effective aperture diameter (m)
-    R :
+    :param R:
         object range (m)
-    R0 :
+    :param R0:
         range at which the focus is set (m)
 
-    Returns
-    -------
-    w :
-        the 1/e blur spot radii (rad) in one direction
+    :return:
+        w :
+            the 1/e blur spot radii (rad) in one direction
 
     """
     w = 0.62*D*(1.0/R-1.0/R0)
@@ -1029,18 +1023,17 @@ def darkCurrentFromDensity(jd, wx, wy):
     this out from 3-42 for noise source analysis purposes and because sometimes
     dark current is defined in another way.
 
-    Parameters
-    ----------
-    jd :
+    :param jd:
         dark current density (A/m^2)
-    (wx,wy):
-        detector size (width) in the x and y directions (m)
+    :param wx:
+        the 1/e blur spot radii in the x direction
+    :param wy:
+        the 1/e blur spot radii in the y direction
 
-    Returns
-    -------
-    jde :
-        dark current electron rate (e-/s).  For TDI systems, just multiply the result
-        by the number of TDI stages.
+    :return:
+        jde :
+            dark current electron rate (e-/s).  For TDI systems, just multiply the result
+            by the number of TDI stages.
     """
     jde = jd*wx*wy/qc #recall that qc is defined as charge of an electron
     return jde
@@ -1049,19 +1042,16 @@ def darkCurrentFromDensity(jd, wx, wy):
 def imageDomainDefocusRadii(D,dz,f):
     """IBSM Equation 3-27.  Axial defocus blur spot radii in the image domain.
 
-    Parameters
-    ----------
-    D :
+    :param D:
         effective aperture diameter (m)
-    dz :
+    :param dz:
         axial defocus in the image domain (m)
-    f :
+    :param f:
         focal length (m)
 
-    Returns
-    -------
-    w :
-        the 1/e blur spot radii (rad) in one direction
+    :return:
+        w :
+            the 1/e blur spot radii (rad) in one direction
 
     """
     w = 0.62*D*dz/(f**2.0)
@@ -1072,15 +1062,12 @@ def sliceotf(otf,ang):
     """Returns a one dimensional slice of a 2D OTF (or MTF) along the direction
     specified by the input angle.
 
-    Parameters
-    ----------
-        otf :
-            OTF defined by spatial frequencies (u,v) (unitless)
-        ang :
-            slice angle (radians) A 0 radian slice is along the u axis.  The
-            angle rotates counterclockwise. Angle pi/2 is along the v axis.
-    Returns
-    --------
+    :param otf:
+        OTF defined by spatial frequencies (u,v) (unitless)
+    :param ang:
+        slice angle (radians) A 0 radian slice is along the u axis.  The
+        angle rotates counterclockwise. Angle pi/2 is along the v axis.
+    :return:
         oslice:
             One dimensional OTF in the direction of angle.  The sample spacing
             of oslice is the same as the original otf
@@ -1133,42 +1120,38 @@ def apply_otf_to_image(ref_img, ref_gsd, ref_range, otf, df, ifov):
     interpret 'ref_range' is the distance from the virtual camera to the
     object-of-interest.
 
-    Parameters
-    ----------
-    ref_img :
+    :param ref_img:
         An ideal image of a view of the world that we want to emulate what it
         would look like from the imaging system defined by the remaining
         parameters.
-    ref_gsd :
+    :param ref_gsd:
         Spatial sampling for 'ref_img' in meters. Each pixel in 'ref_img' is
         assumed to capture a 'ref_gsd' x 'ref_gsd' square of some world
         surface. We assume the sampling is isotropic (x and y sampling are
         identical) and uniform across the whole field of view. This is
         generally a valid assumption for remote sensing imagery.
-    ref_range :
+    :param ref_range:
         The assumed line of sight range from the virtual camera being simulated
         to the world surface or object-of-interest within 'ref_img'.
-    otf :
+    :param otf:
         The complex optical transfer function (OTF) of the imaging system as
         returned by the functions of pybsm.otf.
-    df :
+    :param df:
         The spatial frequency sampling assocatied with 'otf' (radians^-1).
-    ifov :
+    :param ifov:
         Instantaneous field of view (iFOV) of the virtual imaging system that
         we are modeling (radians).
 
-    Returns
-    -------
-    sim_img :
-        the blurred and resampled image
-    sim_psf :
-        the resampled blur kernel (useful for checking the health of the simulation)
+    :return:
+        sim_img:
+            the blurred and resampled image
+        sim_psf :
+            the resampled blur kernel (useful for checking the health of the simulation)
 
-    WARNING
-    -------
-    ref_gsd must be small enough to properly sample the blur kernel! As a guide,
-    if the image system transfer function goes to zero at angular spatial frequency, coff,
-    then the sampling requirement will be readily met if ref_gsd <= ref_range/(4*coff).
+    :WARNING:
+        ref_gsd must be small enough to properly sample the blur kernel! As a guide,
+        if the image system transfer function goes to zero at angular spatial frequency, coff,
+        then the sampling requirement will be readily met if ref_gsd <= ref_range/(4*coff).
     """
 
     # Generate a blur function from the OTF that is resampled to match the
@@ -1209,28 +1192,27 @@ def commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights,
     OTFs for the aperture, detector, turbulence, jitter, drift, wavefront
     errors, and image filtering are all explicity considered.
 
-    Parameters
-    ----------
-    sensor :
+    :param sensor:
         an object from the class sensor
-    scenario :
+    :param scenario:
         an object from the class scenario
-    uu and vv:
-        spatial frequency arrays in the x and y directions respectively (cycles/radian)
-    mtfwavelengths :
+    :param uu:
+        spatial frequency arrays in the x directions respectively (cycles/radian)
+    :param vv:
+        spatial frequency arrays in the y directions respectively (cycles/radian)
+    :param mtfwavelengths:
         a numpy array of wavelengths (m)
-    mtfweights :
+    :param mtfweights:
         a numpy array of weights for each wavelength contribution (arb)
-    slantRange :
+    :param slantRange:
         distance between the sensor and the target (m)
-    intTime :
+    :param intTime:
         integration time (s)
 
-    Returns
-    --------
-    otf:
-        an object containing results of the OTF calculations along with many
-        intermediate calculations.  The full system OTF is contained in otf.systemOTF.
+    :return:
+        otf:
+            an object containing results of the OTF calculations along with many
+            intermediate calculations.  The full system OTF is contained in otf.systemOTF.
     """
 
     otf = OTF()
@@ -1281,19 +1263,16 @@ def commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights,
 def resample2D(imgin, dxin, dxout):
     """Resample an image.
 
-    Parameters
-    ----------
-    img :
+    :param img:
         the input image
-    dxin :
+    :param dxin:
         sample spacing of the input image (radians)
-    dxout :
+    :param dxout:
         sample spacing of the output image (radians)
 
-    Returns
-    -------
-    imgout :
-        output image
+    :return:
+        imgout:
+            output image
 
     """
 
