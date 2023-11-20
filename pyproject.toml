@@ -39,3 +39,6 @@ sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
 
 [tool.poetry.group.dev.dependencies]
+# Linting
+flake8 = ">=6"
+flake8-mutable = ">=1.2.0"
