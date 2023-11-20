@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-The python Based Sensor Model (pyBSM) is a collection of electro-optical camera
-modeling functions developed by the Air Force Research Laboratory, Sensors Directorate.
+"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+camera modeling functions developed by the Air Force Research Laboratory,
+Sensors Directorate.
 
 Please use the following citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -15,34 +15,34 @@ Public release approval for version 0.1: 88ABW-2018-5226
 contact: daniel.lemaster@us.af.mil
 
 version 0.2: CURRENTLY IN BETA!!
-
-
 """
-import numpy as np
+# standard library imports
 import os
 import inspect
 import warnings
 
-# pybsm imports
+# 3rd party imports
+import numpy as np
 
-#new in version 0.2.  We filter warnings associated with calculations in the function
-#circularApertureOTF.  These invalid values are caught as NaNs and appropriately
-#replaced.
-warnings.filterwarnings('ignore', r'invalid value encountered in arccos')
-warnings.filterwarnings('ignore', r'invalid value encountered in sqrt')
-warnings.filterwarnings('ignore', r'invalid value encountered in true_divide')
-warnings.filterwarnings('ignore', r'divide by zero encountered in true_divide')
 
-#find the current path (used to locate the atmosphere database)
-#dirpath = os.path.dirname(os.path.abspath(__file__))
+# new in version 0.2.  We filter warnings associated with calculations in the
+# function circularApertureOTF.  These invalid values are caught as NaNs and
+# appropriately replaced.
+warnings.filterwarnings("ignore", r"invalid value encountered in arccos")
+warnings.filterwarnings("ignore", r"invalid value encountered in sqrt")
+warnings.filterwarnings("ignore", r"invalid value encountered in true_divide")
+warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
+
+# find the current path (used to locate the atmosphere database)
+# dirpath = os.path.dirname(os.path.abspath(__file__))
 dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def noiseGain(kernel):
-    """Noise Gain is the GIQE term representing increase in noise due to image sharpening.
-    The definition is not included in the IBSM manual.  This version comes from
-    Leachtenauer et al., "General Image-Quality Equation: GIQE" APPLIED OPTICS
-    Vol. 36, No. 32 10 November 1997.
+    """Noise Gain is the GIQE term representing increase in noise due to image
+    sharpening. The definition is not included in the IBSM manual.  This
+    version comes from Leachtenauer et al., "General Image-Quality Equation:
+    GIQE" APPLIED OPTICS Vol. 36, No. 32 10 November 1997.
 
     :param kernel:
          the 2-D image sharpening kernel.  Note that
@@ -71,5 +71,5 @@ def quantizationNoise(peRange, bitdepth):
         sigmaq :
             quantization noise given as a photoelectron standard deviation (e-)
     """
-    sigmaq = peRange/(np.sqrt(12)*(2.0**bitdepth-1.0))
+    sigmaq = peRange / (np.sqrt(12) * (2.0**bitdepth - 1.0))
     return sigmaq
