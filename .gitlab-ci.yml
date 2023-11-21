@@ -2,6 +2,7 @@
 # to configure the job to run in a specific stage.
 stages:
   - test
+  - publish
 
 # Global default environment variables set for all jobs unless overridden by
 # job-specific configuration.
@@ -37,6 +38,16 @@ default:
       when: on_success
     # If changes are pushed to the default branch.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+
+# Run rule to trigger on a tag push/update that matches our expected release
+# versioning pattern.
+.run_on_tag:
+  rules:
+    # If changes are pushed for a tag and the tag matches a
+    #- if: $CI_COMMIT_TAG && $CI_COMMIT_TAG =~ /^v\d+(\.\d+)*$/
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG =~ /^X\d+(\.\d+)*$/
       when: on_success
     - when: never  # explicit fail-exclude terminal condition.
 
@@ -111,3 +122,29 @@ test-pytest:
     - ls examples/fig_4a.png
     - ls examples/fig_5a.png
     - ls examples/fig_showcase.png
+
+###############################################################################
+# Jobs -- Publishing
+#
+# Jobs related to automation around publishing our package.before_script:
+#
+
+# When a tag is created matching the release pattern, build and publish our
+# package to PYPI.
+publish-on-tag:
+  extends:
+    - .run_on_tag
+  stage: publish
+  tags:
+    - kitware
+  script:
+    - |
+      if [[ -n "${PYPI_PUBLISH_TOKEN}" ]]
+      then
+        echo "Publishing token does exist with a value"
+      fi
+    # Ensure there is alignment with the tag reference and the reported
+    # version of the package
+    - |
+      PACKAGE_VERSION="v$(poetry version -s)"
+      echo "PACKAGE_VERSION: ${PACKAGE_VERSION}"
