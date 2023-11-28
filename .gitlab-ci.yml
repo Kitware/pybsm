@@ -152,11 +152,6 @@ publish-on-tag:
   # Note: using of default image/interruptable/tags
   stage: publish
   script:
-    - |
-      if [[ -n "${PYPI_PUBLISH_TOKEN}" ]]
-      then
-        echo "Publishing token does exist with a value"
-      fi
     # Ensure there is alignment with the tag reference and the reported
     # version of the package
     - |
@@ -168,7 +163,7 @@ publish-on-tag:
         echo "       Git ref name   : ${CI_COMMIT_TAG}"
         exit 1
       fi
-    # Actually publish
+    # Ensure that we have token
     - |
       if [[ -z "${PYPI_PUBLISH_TOKEN}" ]]
       then
@@ -176,4 +171,7 @@ publish-on-tag:
         echo "       Did you forget to set the appropriate PYPI_PUBLISH_TOKEN secret?"
         exit 1
       fi
-    - poetry publish --build --dry-run
+    # Actually publish
+    - |
+      export POETRY_PYPI_TOKEN_PYPI="${PYPI_PUBLISH_TOKEN}"
+      poetry publish --build
