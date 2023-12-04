@@ -9,12 +9,10 @@ Welcome to pybsm's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   geospatial
-   metrics
-   noise
-   otf
-   radiance
-   simulation
+   installation
+   review_process
+   releasing
+   functionality
 
 
 Indices and tables
