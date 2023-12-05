@@ -2,7 +2,7 @@
 
 This is a placeholder for a potential future release of pyBSM. For now this repo can be used on imports internally to JATIC repos.
 
-This repo builds off of the work done by LeMaster and Eismann in creating an original package for modeling image systems [[1]](#1) as well as LeMaster, et al in their work in validating the orginal pybsm package [[2]](#2).
+This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems [[1]](#1) as well as LeMaster, et al. in their work in validating the pyBSM package [[2]](#2).
 
 # References
 <a id="1">[1]</a> 
