@@ -10,9 +10,9 @@ Welcome to pybsm's documentation!
    :caption: Contents:
 
    installation
+   functionality
    review_process
    releasing
-   functionality
 
 
 Indices and tables

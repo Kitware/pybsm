@@ -1,12 +1,12 @@
 Review Process
 **************
 
-The process for reviewing and integrating branches into ``nrtk`` is described
+The process for reviewing and integrating branches into ``pybsm`` is described
 below.
 
-For guidelines on contributing to ``nrtk``, see ``CONTRIBUTING.md``.
+For guidelines on contributing to ``pybsm``, see ``CONTRIBUTING.md``.
 
-For guidelines on the release process for ``nrtk``, see `Release Process and
+For guidelines on the release process for ``pybsm``, see `Release Process and
 Notes`_.
 
 .. _`Release Process and Notes`: release_process.html
@@ -18,7 +18,7 @@ Merge Request (MR)
 ==================
 An MR is initiated by a user intending to integrate a branch from their forked
 repository.
-Before the branch is integrated into the ``nrtk`` master branch, it must
+Before the branch is integrated into the ``pybsm`` master branch, it must
 first go through a series of checks and a review to ensure that the branch is
 consistent with the rest of the repository and doesn't contain any issues.
 
@@ -156,5 +156,5 @@ merged.
 
 Close
 -----
-If it is decided that the MR will not be integrated into ``nrtk``, then
+If it is decided that the MR will not be integrated into ``pybsm``, then
 it can be closed through GitLab.

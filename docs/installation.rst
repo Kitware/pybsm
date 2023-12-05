@@ -63,7 +63,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-The documentation for pybsn is maintained as a collection of
+The documentation for pybsm is maintained as a collection of
 `reStructuredText`_ documents in the :file:`docs/` folder of the project.
 The :program:`Sphinx` documentation tool can process this documentation
 into a variety of formats, the most common of which is HTML.
