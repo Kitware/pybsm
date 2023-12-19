@@ -10,6 +10,7 @@ description = ""
 authors = ["TODO"]
 readme = "README.md"
 packages = [{include = "pybsm"}]
+documentation = "https://pybsm.readthedocs.io/"
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
