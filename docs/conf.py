@@ -27,10 +27,6 @@ copyright = '2023, Kitware, Inc.'
 author = 'Kitware, Inc.'
 release = pybsm.__version__
 
-site_url = "https://jatic.pages.jatic.net/kitware/pybsm/"
-repo_url = "https://gitlab.jatic.net/jatic/kitware/pybsm"
-repo_name = "pybsm"
-
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
