@@ -132,7 +132,7 @@ test-py-typecheck:
 test-docs-build:
   extends: .test_defaults
   script:
-    - apt update && apt install libgl1
+    - apt update && apt install -y libgl1
     - cd docs
     - poetry run make html
   artifacts:
