@@ -16,6 +16,7 @@ contact: daniel.lemaster@us.af.mil
 
 version 0.2: CURRENTLY IN BETA!!
 """
+
 # standard library imports
 import os
 import inspect
@@ -24,12 +25,16 @@ import warnings
 # 3rd party imports
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Any, Tuple
 
 # local imports
-from pybsm import otf
+import pybsm.otf as otf
+import pybsm.radiance as radiance
 from pybsm import geospatial
-from pybsm import radiance
 from pybsm import noise
+from pybsm import utils
+from pybsm.simulation import Scenario, Sensor
+from .metrics import Metrics
 
 # new in version 0.2.  We filter warnings associated with calculations in the
 # function circularApertureOTF.  These invalid values are caught as NaNs and
@@ -44,7 +49,13 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def giqe3(rer, gsd, eho, ng, snr):
+def giqe3(
+    rer: float,
+    gsd: float,
+    eho: float,
+    ng: float,
+    snr: float
+) -> float:
     """IBSM Equation 3-56.  The General Image Quality Equation version 3.0.
 
         The GIQE returns values on the National Image Interpretability Rating
@@ -75,7 +86,14 @@ def giqe3(rer, gsd, eho, ng, snr):
     return niirs
 
 
-def giqe4(rer, gsd, eho, ng, snr, elevAngle):
+def giqe4(
+    rer: float,
+    gsd: float,
+    eho: float,
+    ng: float,
+    snr: float,
+    elevAngle: float
+) -> Tuple[float, float]:
     """General Image Quality Equation version 4 from Leachtenauer, et al.,
     "General Image Quality Equation: GIQE," Applied Optics, Vol 36, No 32,
     1997. I don't endorse the use of GIQE 4 but it is added to pyBSM for
@@ -129,7 +147,13 @@ def giqe4(rer, gsd, eho, ng, snr, elevAngle):
     return niirs, gsdgp
 
 
-def giqe5(rer1, rer2, gsd, snr, elevAngle):
+def giqe5(
+    rer1: float,
+    rer2: float,
+    gsd: float,
+    snr: float,
+    elevAngle: float
+) -> Tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015
     https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
     This version of the GIQE replaces the ealier versions and should be used
@@ -184,7 +208,12 @@ def giqe5(rer1, rer2, gsd, snr, elevAngle):
     return niirs, gsdw, rer
 
 
-def giqe5RER(mtf, df, ifovx, ifovy):
+def giqe5RER(
+    mtf: np.ndarray,
+    df: float,
+    ifovx: float,
+    ifovy: float
+) -> Tuple[float, float]:
     """Calculates the relative edge response from a 2-D MTF.  This function is
     primarily for use with the GIQE 5. It implements IBSM equations 3-57 and
     3-58.  See pybsm.giqeEdgeTerms for the GIQE 3 version.
@@ -205,8 +234,8 @@ def giqe5RER(mtf, df, ifovx, ifovy):
         rer90:
             relative edge response at 90 degrees orientation (unitless)
     """
-    uslice = otf.sliceotf(mtf, 0)
-    vslice = otf.sliceotf(mtf, np.pi / 2)
+    uslice = otf.functional.sliceotf(mtf, 0)
+    vslice = otf.functional.sliceotf(mtf, np.pi / 2)
 
     rer0 = relativeEdgeResponse(uslice, df, ifovx)
     rer90 = relativeEdgeResponse(vslice, df, ifovy)
@@ -214,10 +243,15 @@ def giqe5RER(mtf, df, ifovx, ifovy):
     return rer0, rer90
 
 
-def giqeEdgeTerms(mtf, df, ifovx, ifovy):
-    """Calculates the geometric mean relative edge response and edge high
-    overshoot, from a 2-D MTF.  This function is primarily for use with the
-    GIQE. It implements IBSM equations 3-57 and 3-58.
+def giqeEdgeTerms(
+    mtf: np.ndarray,
+    df: float,
+    ifovx: float,
+    ifovy: float
+) -> Tuple[float, float]:
+    """Calculates the geometric mean relative edge response and edge high overshoot,
+    from a 2-D MTF.  This function is primarily for use with the GIQE. It
+    implements IBSM equations 3-57 and 3-58.
 
     :param mtf:
         2-dimensional full system modulation transfer function (unitless).
@@ -235,8 +269,8 @@ def giqeEdgeTerms(mtf, df, ifovx, ifovy):
         eho:
             geometric mean edge height overshoot (unitless)
     """
-    uslice = otf.sliceotf(mtf, 0)
-    vslice = otf.sliceotf(mtf, np.pi / 2)
+    uslice = otf.functional.sliceotf(mtf, 0)
+    vslice = otf.functional.sliceotf(mtf, np.pi / 2)
 
     urer = relativeEdgeResponse(uslice, df, ifovx)
     vrer = relativeEdgeResponse(vslice, df, ifovy)
@@ -249,7 +283,13 @@ def giqeEdgeTerms(mtf, df, ifovx, ifovy):
     return rer, eho
 
 
-def groundResolvedDistance(mtfslice, df, snr, ifov, slantRange):
+def groundResolvedDistance(
+    mtfslice: np.ndarray,
+    df: float,
+    snr: float,
+    ifov: float,
+    slantRange: float
+) -> float:
     """IBSM Equation 3-54.  The ground resolved distance is the period of the
     smallest square wave pattern that can be resolved in an image.  GRD can be
     limited by the detector itself (in which case GRD = 2*GSD) but, in general
@@ -281,7 +321,10 @@ def groundResolvedDistance(mtfslice, df, snr, ifov, slantRange):
     return grd
 
 
-def niirs(sensor, scenario):
+def niirs(
+    sensor: Sensor,
+    scenario: Scenario
+) -> Metrics:
     """Returns NIIRS values and all intermetiate calculations.  This function
     implements the original MATLAB based NIIRS model and can serve as a
     template for building other sensor models.
@@ -301,13 +344,13 @@ def niirs(sensor, scenario):
     nm.sensor = sensor
     nm.scenario = scenario
     nm.slantRange = geospatial.curvedEarthSlantRange(
-        0.0, scenario.altitude, scenario.groundRange
+        0.0, scenario.altitude, scenario.ground_range
     )
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
-    nm.atm = radiance.loadDatabaseAtmosphere(
-        scenario.altitude, scenario.groundRange, scenario.ihaze
+    nm.atm = utils.loadDatabaseAtmosphere(
+        scenario.altitude, scenario.ground_range, scenario.ihaze
     )
 
     # crop out out-of-band data (saves time integrating later)
@@ -381,7 +424,7 @@ def niirs(sensor, scenario):
         nm.sensor.wx,
         nm.sensor.wy,
         nm.snr.qe,
-        0.0,
+        np.zeros(1),
         0.0,
     )
     nm.snr.pathNoise = np.sqrt(scatrate * nm.snr.intTime * sensor.ntdi)
@@ -401,7 +444,7 @@ def niirs(sensor, scenario):
     )  # meshgrid of spatial frequencies out to the optics cutoff
     nm.df = urng[1] - urng[0]  # spatial frequency step size
 
-    nm.otf = otf.commonOTFs(
+    nm.otf = otf.functional.commonOTFs(
         sensor,
         scenario,
         nm.uu,
@@ -450,7 +493,10 @@ def niirs(sensor, scenario):
     return nm
 
 
-def niirs5(sensor, scenario):
+def niirs5(
+    sensor: Sensor,
+    scenario: Scenario
+) -> Metrics:
     """Returns NIIRS values calculate using GIQE 5 and all intermetiate
     calculations.  See pybsm.niirs for the GIQE 3 version.  This version of the
     GIQE replaces the ealier versions and should be used in all future
@@ -472,13 +518,13 @@ def niirs5(sensor, scenario):
     nm.sensor = sensor
     nm.scenario = scenario
     nm.slantRange = geospatial.curvedEarthSlantRange(
-        0.0, scenario.altitude, scenario.groundRange
+        0.0, scenario.altitude, scenario.ground_range
     )
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
-    nm.atm = radiance.loadDatabaseAtmosphere(
-        scenario.altitude, scenario.groundRange, scenario.ihaze
+    nm.atm = utils.loadDatabaseAtmosphere(
+        scenario.altitude, scenario.ground_range, scenario.ihaze
     )
 
     # crop out out-of-band data (saves time integrating later)
@@ -552,7 +598,7 @@ def niirs5(sensor, scenario):
         nm.sensor.wx,
         nm.sensor.wy,
         nm.snr.qe,
-        0.0,
+        np.zeros(1),
         0.0,
     )
     nm.snr.pathNoise = np.sqrt(scatrate * nm.snr.intTime * sensor.ntdi)
@@ -575,7 +621,7 @@ def niirs5(sensor, scenario):
     sensor.filterKernel = np.array(
         [1]
     )  # ensures that shapening is turned off.  Not valid for GIQE5
-    nm.otf = otf.commonOTFs(
+    nm.otf = otf.functional.commonOTFs(
         sensor,
         scenario,
         nm.uu,
@@ -610,7 +656,11 @@ def niirs5(sensor, scenario):
     return nm
 
 
-def relativeEdgeResponse(mtfslice, df, ifov):
+def relativeEdgeResponse(
+    mtfslice: np.ndarray,
+    df: float,
+    ifov: float
+) -> float:
     """IBSM Equation 3-61.  The slope of the edge response of the system taken
     at +/-0.5 pixels from a theoretical edge.  Edge response is used in the
     calculation of NIIRS via the General Image Quality Equation.
@@ -634,16 +684,19 @@ def relativeEdgeResponse(mtfslice, df, ifov):
     return rer
 
 
-def edgeHeightOvershoot(mtfslice, df, ifov):
-    """IBSM Equation 3-60.  Edge Height Overshoot is a measure of image
-    distortion caused by sharpening.  Note that there is a typo in Equation
-    3-60. The correct definition is given in Leachtenauer et al.,
-    "General Image-Quality Equation: GIQE" APPLIED OPTICS Vol. 36,
-    No. 32 10 November 1997. "The overshoot-height term H models the edge
-    response overshoot that is due to MTFC. It is measured over the range of
-    1.0 to 3.0 pixels from the edge in 0.25-pixel increments. If the edge is
-    monotonically increasing, it is defined as the value at 1.25 pixels from
-    the edge."
+def edgeHeightOvershoot(
+    mtfslice: np.ndarray,
+    df: float,
+    ifov: float
+) -> float:
+    """IBSM Equation 3-60.  Edge Height Overshoot is a measure of image distortion
+    caused by sharpening.  Note that there is a typo in Equation 3-60.  The
+    correct definition is given in Leachtenauer et al., "General Image-Quality
+    Equation: GIQE" APPLIED OPTICS Vol. 36, No. 32 10 November 1997. "The
+    overshoot-height term H models the edge response overshoot that is due to
+    MTFC. It is measured over the range of 1.0 to 3.0 pixels from the edge
+    in 0.25-pixel increments. If the edge is monotonically increasing, it is defined as the
+    value at 1.25 pixels from the edge."
 
     :param mtfslice:
         1-D modulation transfer function (unitless) mtf[0] = 1 is at 0
@@ -673,12 +726,17 @@ def edgeHeightOvershoot(mtfslice, df, ifov):
     return eho
 
 
-def edgeResponse(pixelPos, mtfslice, df, ifov):
-    """IBSM Equation 3-63.  Imagine a perfectly sharp edge in object space.
-    After the edge is blurred by the system MTF, the edge response is the
-    normalized value of this blurred edge in image space at a distance of
-    pixelPos pixels away from the true edge.  Edge response is used in the
-    calculation of NIIRS via the General Image Quality Equation.
+def edgeResponse(
+    pixelPos: float,
+    mtfslice: np.ndarray,
+    df: float,
+    ifov: float
+) -> float:
+    """IBSM Equation 3-63.  Imagine a perfectly sharp edge in object space.  After
+    the edge is blurred by the system MTF, the edge response is the normalized
+    value of this blurred edge in image space at a distance of pixelPos pixels
+    away from the true edge.  Edge response is used in the calculation of NIIRS
+    via the General Image Quality Equation.
 
     :param pixelPos:
         distance from the theoretical edge (pixels)
@@ -704,7 +762,10 @@ def edgeResponse(pixelPos, mtfslice, df, ifov):
     return er
 
 
-def plotCommonMTFs(metrics, orientationAngle=0):
+def plotCommonMTFs(
+    metrics: Metrics,
+    orientationAngle: float = 0.0
+) -> int:
     """Generates a plot of common MTF components: aperture,turbulence,detector,
     jitter,drift,wavefront,image processing,system.  The Nyquist frequency is
     annotated on the plot with a black arrow.  Spatial frequencies are
@@ -723,19 +784,19 @@ def plotCommonMTFs(metrics, orientationAngle=0):
 
     # spatial frequencies in the image plane in (cycles/mm)
     radfreq = np.sqrt(metrics.uu**2 + metrics.vv**2)
-    sf = otf.sliceotf(
+    sf = otf.functional.sliceotf(
         0.001 * (1.0 / metrics.sensor.f) * radfreq, orientationAngle
     )
 
     # extract MTFs
-    apmtf = np.abs(otf.sliceotf(metrics.otf.apOTF, orientationAngle))
-    turbmtf = np.abs(otf.sliceotf(metrics.otf.turbOTF, orientationAngle))
-    detmtf = np.abs(otf.sliceotf(metrics.otf.detOTF, orientationAngle))
-    jitmtf = np.abs(otf.sliceotf(metrics.otf.jitOTF, orientationAngle))
-    drimtf = np.abs(otf.sliceotf(metrics.otf.drftOTF, orientationAngle))
-    wavmtf = np.abs(otf.sliceotf(metrics.otf.wavOTF, orientationAngle))
-    sysmtf = np.abs(otf.sliceotf(metrics.otf.systemOTF, orientationAngle))
-    filmtf = np.abs(otf.sliceotf(metrics.otf.filterOTF, orientationAngle))
+    apmtf = np.abs(otf.functional.sliceotf(metrics.otf.apOTF, orientationAngle))
+    turbmtf = np.abs(otf.functional.sliceotf(metrics.otf.turbOTF, orientationAngle))
+    detmtf = np.abs(otf.functional.sliceotf(metrics.otf.detOTF, orientationAngle))
+    jitmtf = np.abs(otf.functional.sliceotf(metrics.otf.jitOTF, orientationAngle))
+    drimtf = np.abs(otf.functional.sliceotf(metrics.otf.drftOTF, orientationAngle))
+    wavmtf = np.abs(otf.functional.sliceotf(metrics.otf.wavOTF, orientationAngle))
+    sysmtf = np.abs(otf.functional.sliceotf(metrics.otf.systemOTF, orientationAngle))
+    filmtf = np.abs(otf.functional.sliceotf(metrics.otf.filterOTF, orientationAngle))
 
     plt.plot(
         sf,
@@ -782,7 +843,10 @@ def plotCommonMTFs(metrics, orientationAngle=0):
     return 0
 
 
-def plotNoiseTerms(metrics, maxval=0, ax=0):
+def plotNoiseTerms(
+    metrics: Any,
+    maxval: int = 0
+) -> int:
     """Generates a plot of common noise components in units of equivalent
     photoelectrons.  Components Total, Scene photons, Path photons, Emission /
     Stray photons, Dark Current, Quantization, Readout.
@@ -841,11 +905,3 @@ def plotNoiseTerms(metrics, maxval=0, ax=0):
         plt.ylim([0, maxval])
     plt.tight_layout()  # prevents text from getting cutoff
     return 0
-
-
-class Metrics(object):
-    """A generic class to fill with any outputs of interest."""
-
-    def __init__(self, name):
-        """Returns a sensor object whose name is *name*"""
-        self.name = name

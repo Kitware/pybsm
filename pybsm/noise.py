@@ -24,7 +24,6 @@ import warnings
 # 3rd party imports
 import numpy as np
 
-
 # new in version 0.2.  We filter warnings associated with calculations in the
 # function circularApertureOTF.  These invalid values are caught as NaNs and
 # appropriately replaced.
@@ -38,11 +37,11 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def noiseGain(kernel):
-    """Noise Gain is the GIQE term representing increase in noise due to image
-    sharpening. The definition is not included in the IBSM manual.  This
-    version comes from Leachtenauer et al., "General Image-Quality Equation:
-    GIQE" APPLIED OPTICS Vol. 36, No. 32 10 November 1997.
+def noiseGain(kernel: np.ndarray) -> float:
+    """Noise Gain is the GIQE term representing increase in noise due to image sharpening.
+    The definition is not included in the IBSM manual.  This version comes from
+    Leachtenauer et al., "General Image-Quality Equation: GIQE" APPLIED OPTICS
+    Vol. 36, No. 32 10 November 1997.
 
     :param kernel:
          the 2-D image sharpening kernel.  Note that
@@ -56,7 +55,10 @@ def noiseGain(kernel):
     return ng
 
 
-def quantizationNoise(peRange, bitdepth):
+def quantizationNoise(
+    peRange: float,
+    bitdepth: float
+) -> float:
     """Effective noise contribution from the number of photoelectrons quantized
     by a single count of the analog to digital converter.  Quantization noise
     is buried in the definition of signal-to-noise in IBSM equation 3-47.

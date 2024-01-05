@@ -10,7 +10,7 @@ import pybsm.simulation as simulation
 
 
 img_fname = (
-    "./examples/data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+    "./data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 )
 
 
