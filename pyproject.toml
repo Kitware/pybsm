@@ -25,18 +25,12 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
-numpy = "^1.23.1"
-matplotlib = "^3.5.2"
-scipy = "^1.8.1"
+python = ">=3.8.1"
+numpy = ">=1.23.1"
+matplotlib = ">=3.5.2"
+scipy = ">=1.8.1"
 opencv-python = ">=4.6"
 setuptools = ">=65.6.1"
-# Type checking
-mypy = ">=0.991"
-types-setuptools = ">=65.6.0.1"
-# Jupyter notebook testing
-jupyter = ">=1.0.0"
-papermill = ">=2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 # Linting
@@ -47,3 +41,9 @@ Sphinx = ">=5.3.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
+# Type checking
+mypy = ">=0.991"
+types-setuptools = ">=65.6.0.1"
+# Jupyter notebook testing
+jupyter = ">=1.0.0"
+papermill = ">=2.4.0"
