@@ -202,7 +202,7 @@ test-coverage-percent:
   allow_failure: true
   script:
     # TODO: Read required percentages from config file?
-    - coverage report --include 'nrtk/*' --precision=2 --fail-under=99
+    - coverage report --include 'pybsm/*' --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
 
 # # Job to ensure the provided example script still runs
