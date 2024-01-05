@@ -47,3 +47,28 @@ types-setuptools = ">=65.6.0.1"
 # Jupyter notebook testing
 jupyter = ">=1.0.0"
 papermill = ">=2.4.0"
+# Testing
+coverage = ">=6.5.0"
+pytest = ">=7.2.0"
+pytest-cov = ">=4.0.0"
+
+
+###############################################################################
+[tool.pytest.ini_options]
+addopts = [
+    "-lv",                              # Show local in trace-backs.
+    "--doctest-modules",                # Increased verbosity.
+    "--tb=long",                        # Trace-back print mode.
+    "--cov=./pybsm",                    # Cover our package specifically
+    "--cov=./tests",                    # Also cover our tests for dead spots
+    "--cov-report=term",                # Coverage report to terminal
+    "--cov-report=xml:coverage.xml",    # for external tool reporting
+]
+testpaths = [
+    "tests",
+    "pybsm",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+]

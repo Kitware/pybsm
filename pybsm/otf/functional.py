@@ -1109,15 +1109,15 @@ def otf2psf(
 
     """
     # transform the psf
-    psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
+    transform = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
 
     # determine image space sampling
     dxin = 1 / (otf.shape[0] * df)
 
     # resample to the desired sample size
-    newx = max([1, int(psf.shape[1] * dxin / dxout)])
-    newy = max([1, int(psf.shape[0] * dxin / dxout)])
-    psf = cv2.resize(psf, (newx, newy))
+    newx = max([1, int(transform.shape[1] * dxin / dxout)])
+    newy = max([1, int(transform.shape[0] * dxin / dxout)])
+    psf = cv2.resize(transform, (newx, newy))
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
