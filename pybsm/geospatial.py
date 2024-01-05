@@ -23,6 +23,7 @@ import warnings
 
 # 3rd party imports
 import numpy as np
+from typing import Tuple
 
 # new in version 0.2.  We filter warnings associated with calculations in the
 # function circularApertureOTF.  These invalid values are caught as NaNs and
@@ -40,8 +41,17 @@ dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 rEarth = 6378.164e3  # radius of the earth (m)
 
 
-def altitudeAlongSlantPath(hTarget, hSensor, slantRange):
-    """Calculate the height above the curved earth at points along a path from
+def altitudeAlongSlantPath(
+    hTarget: float,
+    hSensor: float,
+    slantRange: float
+) -> Tuple[np.ndarray, float]:
+    """
+    Calculate the height above the curved earth at points along a path from the
+    target (zPath=0) to the sensor (zPath.max()).  This is primarily useful for
+    calculating the atmospheric coherence diameter, r0.
+
+    Calculate the height above the curved earth at points along a path from
     the target (zPath=0) to the sensor (zPath.max()).  This is primarily useful
     for calculating the atmospheric coherence diameter, r0.
 
@@ -80,9 +90,12 @@ def altitudeAlongSlantPath(hTarget, hSensor, slantRange):
     return (zPath, hPath)
 
 
-def groundSampleDistance(ifov, slantRange):
-    """IBSM Equation 3-62.  The ground sample distance, i.e. the footprint of a
-    single detector in object space.
+def groundSampleDistance(
+    ifov: float,
+    slantRange: float
+) -> float:
+    """IBSM Equation 3-62.  The ground sample distance, i.e. the footprint
+        of a single detector in object space.
 
     :param ifov:
         instantaneous field-of-view of a detector (radians)
@@ -97,11 +110,15 @@ def groundSampleDistance(ifov, slantRange):
     return gsd
 
 
-def nadirAngle(hTarget, hSensor, slantRange):
-    """Work through the law of cosines to calculate the sensor nadir angle
-    above a circular earth. (i.e. angle between looking straight down (nadir =
-    0) and looking along the slant path).
-
+def nadirAngle(
+    hTarget: float,
+    hSensor: float,
+    slantRange: float
+) -> float:
+    """
+    Work through the law of cosines to calculate the sensor nadir angle above
+    a circular earth. (i.e. angle between looking straight down (nadir = 0) and looking along the
+    slant path).
 
     :param hTarget:
         height of the target above sea level (m).
@@ -123,7 +140,11 @@ def nadirAngle(hTarget, hSensor, slantRange):
     return nadir
 
 
-def curvedEarthSlantRange(hTarget, hSensor, groundRange):
+def curvedEarthSlantRange(
+    hTarget: float,
+    hSensor: float,
+    groundRange: float
+) -> float:
     """Returns the slant range from target to sensor above a curved (circular)
     Earth.
 

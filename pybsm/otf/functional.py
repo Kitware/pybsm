@@ -71,10 +71,14 @@ import warnings
 import numpy as np
 from scipy import interpolate
 from scipy.special import jn
+from typing import Callable, Tuple
 import cv2
 
 # local imports
 from pybsm.geospatial import altitudeAlongSlantPath
+from pybsm.simulation.sensor import Sensor
+from pybsm.simulation.scenario import Scenario
+from .otf import OTF
 
 
 # new in version 0.2.  We filter warnings associated with calculations in the
@@ -98,7 +102,14 @@ rEarth = 6378.164e3  # radius of the earth (m)
 
 
 # ------------------------------- OTF Models ---------------------------------
-def circularApertureOTF(u, v, lambda0, D, eta):
+
+def circularApertureOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,
+    eta: float
+) -> np.ndarray:
     """IBSM Equation 3-20.  Obscured circular aperture diffraction OTF.  If eta
     is set to 0, the function will return the unobscured aperture result.
 
@@ -164,7 +175,15 @@ def circularApertureOTF(u, v, lambda0, D, eta):
     return H
 
 
-def circularApertureOTFwithDefocus(u, v, wvl, D, f, defocus):
+def circularApertureOTFwithDefocus(
+    u: np.ndarray,
+    v: np.ndarray,
+    wvl: float,
+    D: float,
+    f: float,
+    defocus: float
+) -> np.ndarray:
+
     """Calculate MTF for an unobscured circular aperture with a defocus
     aberration.From "The frequency response of a defocused optical system"
     (Hopkins, 1955) Variable changes made to use angular spatial frequency and
@@ -225,7 +244,17 @@ def circularApertureOTFwithDefocus(u, v, wvl, D, f, defocus):
     return H
 
 
-def cteOTF(u, v, px, py, cteNx, cteNy, phasesN, cteEff, f):
+def cteOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    px: float,
+    py: float,
+    cteNx: float,
+    cteNy: float,
+    phasesN: int,
+    cteEff: float,
+    f: float
+) -> np.ndarray:
     """IBSM Equation 3-39.  Blur due to charge transfer efficiency losses in a
     CCD array.
 
@@ -259,7 +288,13 @@ def cteOTF(u, v, px, py, cteNx, cteNy, phasesN, cteEff, f):
     # a function to save us the trouble of doing this twice N is either cteNx
     # or cteNy and pu is the product of pitch and spatial frequency - either
     # v*py or u*px
-    def cteOTF_xy(N, pu, phasesN, cteEff, f):
+    def cteOTF_xy(
+                N: float,
+                pu: np.ndarray,
+                phasesN: int,
+                cteEff: float,
+                f: float
+                ) -> np.ndarray:
         return np.exp(
             -1.0
             * phasesN
@@ -275,7 +310,13 @@ def cteOTF(u, v, px, py, cteNx, cteNy, phasesN, cteEff, f):
     return H
 
 
-def defocusOTF(u, v, D, wx, wy):
+def defocusOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    D: float,
+    wx: float,
+    wy: float
+) -> np.ndarray:
     """IBSM Equation 3-25.  Gaussian approximation for defocus on the optical
     axis. This function is retained for backward compatibility.  See
     circularApertureOTFwithDefocus for an exact solution.
@@ -303,7 +344,13 @@ def defocusOTF(u, v, D, wx, wy):
     return H
 
 
-def detectorOTF(u, v, wx, wy, f):
+def detectorOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    wx: float,
+    wy: float,
+    f: float
+) -> np.ndarray:
     """A simplified version of IBSM Equation 3-36.  Blur due to the spatial
     integrating effects of the detector size.  See detectorOTFwithAggregation
     if detector aggregation is desired (new for version 1).
@@ -330,12 +377,20 @@ def detectorOTF(u, v, wx, wy, f):
     return H
 
 
-def detectorOTFwithAggregation(u, v, wx, wy, px, py, f, N=1):
+def detectorOTFwithAggregation(
+    u: np.ndarray,
+    v: np.ndarray,
+    wx: float,
+    wy: float,
+    px: float,
+    py: float,
+    f: float,
+    N: int = 1
+) -> np.ndarray:
     """Blur due to the spatial integrating effects of the detector size and
     aggregation. Contributed by Matt Howard.  Derivation verified by Ken
     Barnard.  Note: this function is particularly important for aggregating
     detectors with less than 100% fill factor (e.g. px > wx).
-
 
     :param u:
         spatial frequency coordinates (rad^-1)
@@ -378,11 +433,17 @@ def detectorOTFwithAggregation(u, v, wx, wy, px, py, f, N=1):
     return H
 
 
-def diffusionOTF(u, v, alpha, ald, al0, f):
+def diffusionOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    alpha: np.ndarray,
+    ald: float,
+    al0: float,
+    f: float
+) -> float:
     """IBSM Equation 3-40.  Blur due to the effects of minority carrier
     diffusion in a CCD sensor.  Included for completeness but this isn't a good
     description of modern detector structures.
-
 
     :param u:
         spatial frequency coordinates (rad^-1)
@@ -403,7 +464,7 @@ def diffusionOTF(u, v, alpha, ald, al0, f):
             diffusion OTF
     """
 
-    def diffusionOTF_params(al, alpha, ald):
+    def diffusionOTF_params(al: float, alpha: np.ndarray, ald: float) -> float:
         return 1.0 - np.exp(-alpha * ald) / (1.0 + alpha * al)
 
     rho = np.sqrt(u**2 + v**2)
@@ -417,10 +478,14 @@ def diffusionOTF(u, v, alpha, ald, al0, f):
     return H
 
 
-def driftOTF(u, v, ax, ay):
+def driftOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    ax: float,
+    ay: float
+) -> np.ndarray:
     """IBSM Equation 3-29.  Blur due to constant angular line-of-sight motion
     during the integration time.
-
 
     :param u:
         angular spatial frequency coordinates (rad^-1)
@@ -443,7 +508,12 @@ def driftOTF(u, v, ax, ay):
     return H
 
 
-def filterOTF(u, v, kernel, ifov):
+def filterOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    kernel: np.ndarray,
+    ifov: float
+) -> np.ndarray:
     """Returns the OTF of any filter applied to the image (e.g. a sharpening
     filter).
 
@@ -484,7 +554,7 @@ def filterOTF(u, v, kernel, ifov):
     nv = nv.reshape(-1)
 
     # use this function to wrap spatial frequencies beyond Nyquist
-    def wrapval(value, nyquist):
+    def wrapval(value: np.ndarray, nyquist: float) -> np.ndarray:
         return (value + nyquist) % (2 * nyquist) - nyquist
 
     # and interpolate up to the desired range
@@ -499,7 +569,12 @@ def filterOTF(u, v, kernel, ifov):
     return H
 
 
-def gaussianOTF(u, v, blurSizeX, blurSizeY):
+def gaussianOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    blurSizeX: float,
+    blurSizeY: float
+) -> np.ndarray:
     """A real-valued Gaussian OTF.  This is useful for modeling systems when
     you have some general idea of the width of the point-spread-function or
     perhaps the cutoff frequency.  The blur size is defined to be where the PSF
@@ -532,7 +607,12 @@ def gaussianOTF(u, v, blurSizeX, blurSizeY):
     return H
 
 
-def jitterOTF(u, v, sx, sy):
+def jitterOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    sx: float,
+    sy: float
+) -> np.ndarray:
     """IBSM Equation 3-28.  Blur due to random line-of-sight motion that occurs
     at high.
 
@@ -563,18 +643,18 @@ def jitterOTF(u, v, sx, sy):
 
 
 def polychromaticTurbulenceOTF(
-    u,
-    v,
-    wavelengths,
-    weights,
-    altitude,
-    slantRange,
-    D,
-    haWindspeed,
-    cn2at1m,
-    intTime,
-    aircraftSpeed,
-):
+    u: np.ndarray,
+    v: np.ndarray,
+    wavelengths: np.ndarray,
+    weights: np.ndarray,
+    altitude: float,
+    slantRange: float,
+    D: float,
+    haWindspeed: float,
+    cn2at1m: float,
+    intTime: float,
+    aircraftSpeed: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """Returns a polychromatic turbulence MTF based on the Hufnagel-Valley
     turbulence profile and the pyBSM function "windspeedTurbulenceOTF", i.e.
     IBSM Eqn 3.9.
@@ -632,7 +712,11 @@ def polychromaticTurbulenceOTF(
     return turbulenceOTF, r0band
 
 
-def radialUserOTF(u, v, fname):
+def radialUserOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    fname: str
+) -> np.ndarray:
     """IBSM Section 3.2.6.  Import a user-defined, 1-dimensional radial OTF and
     interpolate it onto a 2-dimensional spatial frequency grid.  Per ISBM
     Table.
@@ -665,7 +749,14 @@ def radialUserOTF(u, v, fname):
     return H
 
 
-def tdiOTF(uorv, w, ntdi, phasesN, beta, f):
+def tdiOTF(
+    uorv: np.ndarray,
+    w: float,
+    ntdi: float,
+    phasesN: int,
+    beta: float,
+    f: float
+) -> np.ndarray:
     """IBSM Equation 3-38.  Blur due to a mismatch between the time-delay-
     integration clocking rate and the image motion.
 
@@ -703,7 +794,14 @@ def tdiOTF(uorv, w, ntdi, phasesN, beta, f):
     return H
 
 
-def turbulenceOTF(u, v, lambda0, D, r0, alpha):
+def turbulenceOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,
+    r0: float,
+    alpha: float
+) -> np.ndarray:
     """IBSM Equation 3-3.  The long or short exposure turbulence OTF.
 
     :param u:
@@ -732,7 +830,12 @@ def turbulenceOTF(u, v, lambda0, D, r0, alpha):
     return H
 
 
-def userOTF2D(u, v, fname, nyquist):
+def userOTF2D(
+    u: np.ndarray,
+    v: np.ndarray,
+    fname: str,
+    nyquist: float
+) -> np.ndarray:
     """IBSM Section 3.2.7.  Import an user-defined, 2-dimensional OTF and
     interpolate onto a 2-dimensional spatial frequency grid.  The OTF data is
     assumed to be stored as a 2D Numpy array (e.g. 'fname.npy'); this is easier
@@ -775,7 +878,14 @@ def userOTF2D(u, v, fname, nyquist):
     return H
 
 
-def wavefrontOTF(u, v, lambda0, pv, Lx, Ly):
+def wavefrontOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    pv: float,
+    Lx: float,
+    Ly: float
+) -> np.ndarray:
     """IBSM Equation 3-31.  Blur due to small random wavefront errors in the
     pupil. Use with the caution that this function assumes a specifc phase
     autocorrelation function.  Refer to the discussion on random phase screens
@@ -811,7 +921,12 @@ def wavefrontOTF(u, v, lambda0, pv, Lx, Ly):
     return H
 
 
-def wavefrontOTF2(u, v, cutoff, wrms):
+def wavefrontOTF2(
+    u: np.ndarray,
+    v: np.ndarray,
+    cutoff: float,
+    wrms: float
+) -> np.ndarray:
     """MTF due to wavefront errors.  In an ideal imaging system, a spherical
     waves converge to form an image at the focus.  Wavefront errors represent a
     departures from this ideal that lead to degraded image quality.  This
@@ -820,7 +935,6 @@ def wavefrontOTF2(u, v, cutoff, wrms):
     Useful notes from the author: for most imaging systems, wrms falls between
     0.1 and 0.25 waves rms.  This MTF becomes progressively less accurate as
     wrms exceeds .18 waves.
-
 
     :param u:
         spatial frequency coordinates (rad^-1)
@@ -845,7 +959,15 @@ def wavefrontOTF2(u, v, cutoff, wrms):
     return H
 
 
-def windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel):
+def windspeedTurbulenceOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,
+    r0: float,
+    td: float,
+    vel: float
+) -> np.ndarray:
     """IBSM Equation 3-9.  Turbulence OTF adjusted for windspeed and
     integration time.
 
@@ -875,12 +997,15 @@ def windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel):
     return H
 
 
-def xandyUserOTF(u, v, fname):
+def xandyUserOTF(
+    u: np.ndarray,
+    v: np.ndarray,
+    fname: str
+) -> np.ndarray:
     """USE xandyUserOTF2 INSTEAD!  The original pyBSM documentation contains an
     error. IBSM Equation 3-32.  Import user-defined, 1-dimensional x-direction
     and y-direction OTFs and interpolate them onto a 2-dimensional spatial
     frequency grid.  Per ISBM Table.
-
     3-3c, the OTF data are ASCII text, space delimited data.  (Note: There
     appears to be a typo in the IBSM documentation - Table 3-3c should
     represent the "x and y" case, not "x or y".)
@@ -914,7 +1039,11 @@ def xandyUserOTF(u, v, fname):
     return H
 
 
-def xandyUserOTF2(u, v, fname):
+def xandyUserOTF2(
+    u: np.ndarray,
+    v: np.ndarray,
+    fname: str
+) -> np.ndarray:
     """UPDATE to IBSM Equation 3-32.  Import user-defined x-direction and
     y-direction OTFs and interpolate them onto a 2-dimensional spatial
     frequency grid.
@@ -956,8 +1085,11 @@ def xandyUserOTF2(u, v, fname):
 
 # ----------------------------- END OTF Models -------------------------------
 
-
-def otf2psf(otf, df, dxout):
+def otf2psf(
+    otf: np.ndarray,
+    df: float,
+    dxout: float
+) -> np.ndarray:
     """Transform an optical transfer function into a point spread function
     (i.e., image space blur filter)
 
@@ -1017,7 +1149,11 @@ def otf2psf(otf, df, dxout):
     return psfout
 
 
-def weightedByWavelength(wavelengths, weights, myFunction):
+def weightedByWavelength(
+    wavelengths: np.ndarray,
+    weights: np.ndarray,
+    myFunction: Callable
+) -> np.ndarray:
     """Returns a wavelength weighted composite array based on myFunction
 
 
@@ -1046,7 +1182,11 @@ def weightedByWavelength(wavelengths, weights, myFunction):
     return weightedfcn
 
 
-def coherenceDiameter(lambda0, zPath, cn2):
+def coherenceDiameter(
+    lambda0: float,
+    zPath: np.ndarray,
+    cn2: float
+) -> np.ndarray:
     """
     This is an improvement / replacement for IBSM Equation 3-5: calculation of
     Fried's coherence diameter (m) for spherical wave propagation.
@@ -1085,7 +1225,11 @@ def coherenceDiameter(lambda0, zPath, cn2):
     return r0
 
 
-def hufnagelValleyTurbulenceProfile(h, v, cn2at1m):
+def hufnagelValleyTurbulenceProfile(
+    h: float,
+    v: float,
+    cn2at1m: float
+) -> float:
     """Replaces IBSM Equations 3-6 through 3-8.  The Hufnagel-Valley Turbulence
     profile (i.e. a profile of the refractive index structure parameter as a
     function of altitude).  I suggest the HV profile because it seems to be in
@@ -1118,7 +1262,11 @@ def hufnagelValleyTurbulenceProfile(h, v, cn2at1m):
     return cn2
 
 
-def objectDomainDefocusRadii(D, R, R0):
+def objectDomainDefocusRadii(
+    D: float,
+    R: float,
+    R0: float,
+) -> float:
     """IBSM Equation 3-26.  Axial defocus blur spot radii in the object domain.
 
     :param D:
@@ -1137,7 +1285,11 @@ def objectDomainDefocusRadii(D, R, R0):
     return w
 
 
-def darkCurrentFromDensity(jd, wx, wy):
+def darkCurrentFromDensity(
+    jd: float,
+    wx: float,
+    wy: float
+) -> float:
     """The dark current part of Equation 3-42.  Use this function to calculate
     the total number of electrons generated from dark current during an
     integration time given a dark current density.  It is useful to separate
@@ -1162,7 +1314,11 @@ def darkCurrentFromDensity(jd, wx, wy):
     return jde
 
 
-def imageDomainDefocusRadii(D, dz, f):
+def imageDomainDefocusRadii(
+    D: float,
+    dz: float,
+    f: float
+) -> float:
     """IBSM Equation 3-27.  Axial defocus blur spot radii in the image domain.
 
     :param D:
@@ -1181,7 +1337,10 @@ def imageDomainDefocusRadii(D, dz, f):
     return w
 
 
-def sliceotf(otf, ang):
+def sliceotf(
+    otf: np.ndarray,
+    ang: float
+) -> np.ndarray:
     """Returns a one dimensional slice of a 2D OTF (or MTF) along the direction
     specified by the input angle.
 
@@ -1208,7 +1367,14 @@ def sliceotf(otf, ang):
     return oslice
 
 
-def apply_otf_to_image(ref_img, ref_gsd, ref_range, otf, df, ifov):
+def apply_otf_to_image(
+    ref_img: np.ndarray,
+    ref_gsd: float,
+    ref_range: float,
+    otf: np.ndarray,
+    df: float,
+    ifov: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """Applies OTF to ideal reference image to simulate real imaging.
 
     We assume that 'ref_img' is an ideal, high-resolution view of the world
@@ -1304,16 +1470,16 @@ def apply_otf_to_image(ref_img, ref_gsd, ref_range, otf, df, ifov):
     return sim_img, sim_psf
 
 
-class OTF(object):
-    """Pretty much simple object to hold all the of the."""
-
-    def __init__(self):
-        pass
-
-
 def commonOTFs(
-    sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime
-):
+    sensor: Sensor,
+    scenario: Scenario,
+    uu: np.ndarray,
+    vv: np.ndarray,
+    mtfwavelengths: np.ndarray,
+    mtfweights: np.ndarray,
+    slantRange: float,
+    intTime: float
+) -> OTF:
     """Returns optical transfer functions for the most common sources.  This
     code originally served the NIIRS model but has been abstracted for other
     uses. OTFs for the aperture, detector, turbulence, jitter, drift, wavefront
@@ -1372,8 +1538,8 @@ def commonOTFs(
             scenario.aircraftSpeed,
         )
     else:
-        otf.turbOTF = 1.0
-        otf.r0band = 1e6
+        otf.turbOTF = np.ones(uu.shape)
+        otf.r0band = 1e6 * np.ones(uu.shape)
 
     # detector OTF
     otf.detOTF = detectorOTF(uu, vv, sensor.wx, sensor.wy, sensor.f)
@@ -1423,7 +1589,11 @@ def commonOTFs(
     return otf
 
 
-def resample2D(imgin, dxin, dxout):
+def resample2D(
+    imgin: np.ndarray,
+    dxin: float,
+    dxout: float
+) -> np.ndarray:
     """Resample an image.
 
     :param img:

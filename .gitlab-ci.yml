@@ -123,6 +123,12 @@ default:
     - .test_preamble
     - .poetry_install
 
+# Job to typecheck python code
+test-py-typecheck:
+  extends: .test_defaults
+  script:
+    - poetry run mypy
+
 test-docs-build:
   extends: .test_defaults
   script:

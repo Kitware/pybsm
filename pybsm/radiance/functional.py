@@ -29,10 +29,12 @@ import warnings
 
 # 3rd party imports
 import numpy as np
+from typing import Tuple
 
 # local imports
-from pybsm import metrics
 from pybsm import noise
+from pybsm.simulation.sensor import Sensor
+from .snr_metrics import SNRMetrics
 
 # new in version 0.2.  We filter warnings associated with calculations in the
 # function circularApertureOTF.  These invalid values are caught as NaNs and
@@ -53,7 +55,11 @@ kc = 1.38064852e-23  # Boltzmann constant (m^2 kg / s^2 K)
 qc = 1.60217662e-19  # charge of an electron (coulombs)
 
 
-def atFocalPlaneIrradiance(D, f, L):
+def atFocalPlaneIrradiance(
+    D: float,
+    f: float,
+    L: np.ndarray
+) -> np.ndarray:
     """Converts pupil plane radiance to focal plane irradiance for an extended
     source.This is a variation on part of IBSM Equation 3-34.  There is one
     modification: the IBSM conversion factor pi/(4(f/#)^2) is replaced with
@@ -82,7 +88,10 @@ def atFocalPlaneIrradiance(D, f, L):
     return E
 
 
-def blackbodyRadiance(lambda0, T):
+def blackbodyRadiance(
+    lambda0: np.ndarray,
+    T: float
+) -> np.ndarray:
     """Calculates blackbody spectral radiance.  IBSM Equation 3-35.
 
     :param lambda0:
@@ -104,7 +113,10 @@ def blackbodyRadiance(lambda0, T):
     return Lbb
 
 
-def checkWellFill(totalPhotoelectrons, maxfill):
+def checkWellFill(
+    totalPhotoelectrons: float,
+    maxfill: float
+) -> float:
     """Check to see if the total collected photoelectrons are greater than the
     desired maximum well fill.  If so, provide a scale factor to reduce the
     integration time.
@@ -126,7 +138,12 @@ def checkWellFill(totalPhotoelectrons, maxfill):
     return scalefactor
 
 
-def coldshieldSelfEmission(wavelengths, coldshieldTemperature, D, f):
+def coldshieldSelfEmission(
+    wavelengths: np.ndarray,
+    coldshieldTemperature: float,
+    D: float,
+    f: float
+) -> np.ndarray:
     """For infrared systems, this term represents spectral irradiance on the
     FPA due to emissions from the walls of the dewar itself.
 
@@ -154,8 +171,12 @@ def coldshieldSelfEmission(wavelengths, coldshieldTemperature, D, f):
 
 
 def coldstopSelfEmission(
-    wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f
-):
+    wavelengths: np.ndarray,
+    coldfilterTemperature: float,
+    coldfilterEmissivity: float,
+    D: float,
+    f: float
+) -> np.ndarray:
     """For infrared systems, this term represents spectral irradiance emitted
     by the cold stop on to the FPA.
 
@@ -185,8 +206,16 @@ def coldstopSelfEmission(
 
 
 def focalplaneIntegratedIrradiance(
-    L, Ls, topt, eopt, lambda0, dlambda, opticsTemperature, D, f
-):
+    L: np.ndarray,
+    Ls: float,
+    topt: float,
+    eopt: float,
+    lambda0: np.ndarray,
+    dlambda: float,
+    opticsTemperature: float,
+    D: float,
+    f: float
+) -> np.ndarray:
     """IBSM Equation 3-34.  Calculates band integrated irradiance at the focal
     plane, including at-aperture scene radiance, optical self-emission, and
     non-thermal stray radiance.  NOTE: this function is only included for
@@ -230,211 +259,14 @@ def focalplaneIntegratedIrradiance(
     return E
 
 
-def loadDatabaseAtmosphere_nointerp(altitude, groundRange, ihaze):
-    """Loads a precalculated MODTRAN 5.2.1 Tape 7 atmosphere over a wavelength
-    range of 0.3 to 14 micrometers.  All screnario details are in
-    'atmosphere_README.txt'. NOTE: the _nointerp suffix was added for version
-    0.2. See pybsm.loadDatabaseAtmosphere for more information.
-
-    :param altitude:
-        sensor height above ground level in meters.  The database includes the
-        following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
-        12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
-        24500 meters
-    :param groundRange:
-        distance *on the ground* between the target and sensor in meters.
-        The following ground ranges are included in the database at each
-        altitude until the ground range exceeds the distance to the spherical
-        earth horizon: 0 100 500 1000 to 20000 in 1000 meter steps, 22000 to
-        80000 in 2000 m steps, and  85000 to 300000 in 5000 meter steps.
-    :param ihaze:
-        MODTRAN code for visibility, valid options are ihaze = 1 (Rural
-        extinction with 23 km visibility) or ihaze = 2 (Rural extinction
-        with 5 km visibility)
-
-
-    :return:
-        atm[:,0]:
-            wavelengths from .3 to 14 x 10^-6 m in 0.01x10^-6 m steps
-        atm[:,1]:
-            (TRANS) total transmission through the defined path.
-        atm[:,2]:
-            (PTH THRML) radiance component due to atmospheric emission and
-            scattering received at the observer.
-        atm[:,3]:
-            (SURF EMIS) component of radiance due to surface emission received
-            at the observer.
-        atm[:,4]:
-            (SOL SCAT) component of scattered solar radiance received at the
-            observer.
-        atm[:,5]:
-            (GRND RFLT) is the total solar flux impingent on the ground and
-            reflected directly to the sensor from the ground. (direct radiance
-            + diffuse radiance) * surface reflectance
-    :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
-    """
-
-    # decoder maps filenames to atmospheric attributes
-    atmpath = os.path.join(dirpath, "atms", "fileDecoder.csv")
-    decoder = np.genfromtxt(atmpath, delimiter=",", skip_header=1)
-
-    decoder = decoder[
-        decoder[:, 3] == ihaze
-    ]  # downselects to the right ihaze mode
-    decoder = decoder[
-        decoder[:, 1] == altitude / 1000.0
-    ]  # downselects to the right altitude
-    decoder = decoder[
-        decoder[:, 2] == groundRange / 1000.0
-    ]  # downselects to the right ground range
-
-    rawdata = np.fromfile(
-        dirpath + "/atms/" + str(int(decoder[0, 0])) + ".bin",
-        dtype=np.float32,
-        count=-1,
-    )
-
-    rawdata = rawdata.reshape((1371, 5), order="F")
-    rawdata[:, 1:5] = (
-        rawdata[:, 1:5] / 1e-10
-    )  # convert radiance columns to W/(sr m^2 m)
-
-    # append wavelength as first column
-    wavl = 1e-6 * np.linspace(0.3, 14.0, 1371)
-    wavl = np.expand_dims(wavl, axis=1)
-    atm = np.hstack((wavl, rawdata))
-
-    return atm
-
-
-def loadDatabaseAtmosphere(altitude, groundRange, ihaze):
-    """linear interpolation of the pre-calculated MODTRAN atmospheres.
-    See the original 'loadDatabaseAtmosphere' (now commented out) for more
-    details on the outputs.
-    NOTE: This is experimental code.  Linear interpolation between atmospheres
-    may not be a good approximation in every case!!!!
-
-
-    :param altitude:
-        sensor height above ground level in meters
-    :param groundRange:
-    :param ihaze:
-        MODTRAN code for visibility, valid options are ihaze = 1 (Rural
-        extinction with 23 km visibility) or ihaze = 2 (Rural extinction
-        with 5 km visibility)
-
-    :return:
-        atm[:,0]:
-            wavelengths from .3 to 14 x 10^-6 m in 0.01x10^-6 m steps
-        atm[:,1]:
-            (TRANS) total transmission through the defined path.
-        atm[:,2]:
-            (PTH THRML) radiance component due to atmospheric emission and
-            scattering received at the observer.
-        atm[:,3]:
-            (SURF EMIS) component of radiance due to surface emission received
-            at the observer.
-        atm[:,4]:
-            (SOL SCAT) component of scattered solar radiance received at the
-            sobserver.
-        atm[:,5]:
-            (GRND RFLT) is the total solar flux impingent on the ground and
-            reflected directly to the sensor from the ground. (direct radiance
-            + diffuse radiance) * surface reflectance
-    :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
-    """
-
-    def getGroundRangeArray(maxGroundRange):
-        """Returns an array of ground ranges that are valid in the
-        precalculated MODTRAN database.
-
-        :param maxGroundRange:
-            largest ground Range of interest (m)
-
-        :return:
-            G:
-                array of ground ranges less than maxGroundRange (m)
-        """
-        G = np.array([0.0, 100.0, 500.0])
-        G = np.append(G, np.arange(1000.0, 20000.01, 1000.0))
-        G = np.append(G, np.arange(22000.0, 80000.01, 2000.0))
-        G = np.append(G, np.arange(85000.0, 300000.01, 5000.0))
-        G = G[G <= maxGroundRange]
-        return G
-
-    def altAtmInterp(lowalt, highalt, altitude, groundRange, ihaze):
-        # this is an internal function for interpolating atmospheres across
-        # altitudes
-        lowatm = loadDatabaseAtmosphere_nointerp(lowalt, groundRange, ihaze)
-        if lowalt != highalt:
-            highatm = loadDatabaseAtmosphere_nointerp(
-                highalt, groundRange, ihaze
-            )
-            lowweight = 1 - ((altitude - lowalt) / (highalt - lowalt))
-            highweight = (altitude - lowalt) / (highalt - lowalt)
-            atm = lowweight * lowatm + highweight * highatm
-        else:
-            atm = lowatm
-        return atm
-
-    # define arrays of all possible altitude and ground ranges
-    altarray = np.array(
-        [
-            2,
-            32.55,
-            75,
-            150,
-            225,
-            500,
-            1000,
-            2000,
-            3000,
-            4000,
-            5000,
-            6000,
-            7000,
-            8000,
-            9000,
-            10000,
-            11000,
-            12000,
-            14000,
-            16000,
-            18000,
-            20000,
-        ]
-    )
-    grangearray = getGroundRangeArray(301e3)
-
-    # find the database altitudes and ground ranges that bound the values of
-    # interest
-    lowalt = altarray[altarray <= altitude][-1]
-    highalt = altarray[altarray >= altitude][0]
-    lowrng = grangearray[grangearray <= groundRange][-1]
-    highrng = grangearray[grangearray >= groundRange][0]
-
-    # first interpolate across the low and high altitudes
-    # then interpolate across ground range
-    atm_lowrng = altAtmInterp(lowalt, highalt, altitude, lowrng, ihaze)
-    if lowrng != highrng:
-        atm_highrng = altAtmInterp(lowalt, highalt, altitude, highrng, ihaze)
-        lowweight = 1 - ((groundRange - lowrng) / (highrng - lowrng))
-        highweight = (groundRange - lowrng) / (highrng - lowrng)
-        atm = lowweight * atm_lowrng + highweight * atm_highrng
-    else:
-        atm = atm_lowrng
-
-    return atm
-
-
 def opticsSelfEmission(
-    wavelengths,
-    opticsTemperature,
-    opticsEmissivity,
-    coldfilterTransmission,
-    D,
-    f,
-):
+    wavelengths: np.ndarray,
+    opticsTemperature: float,
+    opticsEmissivity: float,
+    coldfilterTransmission: float,
+    D: float,
+    f: float
+) -> np.ndarray:
     """For infrared systems, this term represents spectral irradiance emitted
     by the optics (but not the cold stop) on to the FPA.
 
@@ -466,7 +298,13 @@ def opticsSelfEmission(
     return opticsE
 
 
-def photonDetectionRate(E, wx, wy, wavelengths, qe):
+def photonDetectionRate(
+    E: np.ndarray,
+    wx: float,
+    wy: float,
+    wavelengths: np.ndarray,
+    qe: np.ndarray
+) -> np.ndarray:
     """IBSM Equation 3-42 with dark current, integration time, and tdi
     separated out. Conversion of photons into photoelectrons.  There is a
     possible disconnect here in the documentation. Equation 3-42 appears to be
@@ -498,8 +336,11 @@ def photonDetectionRate(E, wx, wy, wavelengths, qe):
 
 
 def photonDetectorSNR(
-    sensor, radianceWavelengths, targetRadiance, backgroundRadiance
-):
+    sensor: Sensor,
+    radianceWavelengths: np.ndarray,
+    targetRadiance: np.ndarray,
+    backgroundRadiance: np.ndarray
+) -> SNRMetrics:
     """Calculates extended target contrast SNR for semiconductor- based photon
     detector systems (as opposed to thermal detectors).  This code originally
     served the NIIRS model but has been abstracted for other uses.  Photon,
@@ -523,7 +364,7 @@ def photonDetectorSNR(
             an object containing results of the SNR calculation along with many
             intermediate calculations.  The SNR value is contained in snr.snr
     """
-    snr = metrics.Metrics("signal-to-noise calculation")
+    snr = SNRMetrics("signal-to-noise calculation")
 
     # resample the optical transmission and quantum efficiency functions
     snr.optTrans = (
@@ -655,7 +496,12 @@ def photonDetectorSNR(
     return snr
 
 
-def reflectance2photoelectrons(atm, sensor, intTime, target_temp=300):
+def reflectance2photoelectrons(
+    atm: np.ndarray,
+    sensor: Sensor,
+    intTime: float,
+    target_temp: int = 300
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Provides a mapping between reflectance (0 to 1 in 100 steps) on the
     ground and photoelectrons collected in the sensor well for a given
     atmosphere. The target is assumed to be fully illuminated and spectrally
@@ -668,7 +514,7 @@ def reflectance2photoelectrons(atm, sensor, intTime, target_temp=300):
     is included.
 
     :param atm:
-        atmospheric data as defined in loadDatabaseAtmosphere.  The slant
+        atmospheric data as defined in utils.loadDatabaseAtmosphere.  The slant
         range between the target and sensor are implied by this choice.
     :param sensor:
         sensor parameters as defined in the pybsm sensor class
@@ -770,17 +616,17 @@ def reflectance2photoelectrons(atm, sensor, intTime, target_temp=300):
 
 
 def signalRate(
-    wavelengths,
-    targetRadiance,
-    opticalTransmission,
-    D,
-    f,
-    wx,
-    wy,
-    qe,
-    otherIrradiance,
-    darkCurrent,
-):
+    wavelengths: np.ndarray,
+    targetRadiance: np.ndarray,
+    opticalTransmission: np.ndarray,
+    D: float,
+    f: float,
+    wx: float,
+    wy: float,
+    qe: np.ndarray,
+    otherIrradiance: np.ndarray,
+    darkCurrent: float
+) -> Tuple[float, np.ndarray, np.ndarray]:
     """For semiconductor-based detectors, returns the signal rate (total
     photoelectrons/s) generated at the output of the detector along with a
     number of other related quantities.  Multiply this quantity by the
@@ -837,14 +683,16 @@ def signalRate(
     return tgtRate, tgtFPAirradiance, tgtdN
 
 
-def totalRadiance(atm, reflectance, temperature):
+def totalRadiance(
+    atm: np.ndarray,
+    reflectance: float,
+    temperature: float
+) -> np.ndarray:
     """Calculates total spectral radiance at the aperture for a object of
     interest.
 
-
-
     :param atm:
-        matrix of atmospheric data (see loadDatabaseAtmosphere for details)
+        matrix of atmospheric data (see utils.loadDatabaseAtmosphere for details)
     :param reflectance:
         object reflectance (unitless)
     :param temperature:
@@ -874,7 +722,10 @@ def totalRadiance(atm, reflectance, temperature):
     return radiance
 
 
-def giqeRadiance(atm, isEmissive):
+def giqeRadiance(
+    atm: np.ndarray,
+    isEmissive: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """This function provides target and background spectral radiance as
     defined by the GIQE.
 
@@ -933,7 +784,11 @@ def giqeRadiance(atm, isEmissive):
     return targetRadiance, backgroundRadiance
 
 
-def resampleByWavelength(wavelengths, values, newWavelengths):
+def resampleByWavelength(
+    wavelengths: np.ndarray,
+    values: np.ndarray,
+    newWavelengths: np.ndarray
+) -> np.ndarray:
     """Resamples arrays that are input as a function of wavelength.
 
     :param wavelengths:
