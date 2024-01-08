@@ -8,10 +8,14 @@ from typing import ContextManager, Tuple
 from contextlib import nullcontext as does_not_raise
 
 
+@pytest.mark.filterwarnings("ignore:Input array")
 class TestReflectance2Photoelectrons:
 
     @pytest.mark.parametrize("E, wx, wy, wavelengths, qe, expected, expectation", [
         (np.array([]), 0.0, 0.0, np.array([]), np.array([]), np.array([]), does_not_raise()),
+        (np.array([1.0]), 0.0, 0.0, np.array([1.0]), np.array([]), np.array([]), does_not_raise()),
+        (np.array([1.0]), 0.0, 0.0, np.array([]), np.array([1.0]), np.array([]), does_not_raise()),
+        (np.array([]), 0.0, 0.0, np.array([1.0]), np.array([1.0]), np.array([]), does_not_raise()),
         (np.array([1.0]), 1.0, 1.0, np.array([1.0]), np.array([1.0]), np.array([5.03411665e+24]), does_not_raise()),
         (np.array([1.0, 1.0]), 1.0, 1.0, np.array([1.0, 1.0]), np.array([1.0, 1.0]),
             np.array([5.03411665e+24, 5.03411665e+24]), does_not_raise()),
@@ -32,6 +36,7 @@ class TestReflectance2Photoelectrons:
 
     @pytest.mark.parametrize("D, f, L, expected, expectation", [
         (0.0, 0.0, np.array([]), np.array([]), pytest.raises(ZeroDivisionError)),
+        (1.0, 1.0, np.array([]), np.array([]), does_not_raise()),
         (1.0, 1.0, np.array([1.0]), np.array([0.62831853]), does_not_raise()),
         (1.0, 1.0, np.array([1.0, 1.0]), np.array([0.62831853, 0.62831853]), does_not_raise()),
     ])
@@ -66,6 +71,10 @@ class TestReflectance2Photoelectrons:
         assert np.isclose(output, expected).all()
 
     @pytest.mark.parametrize("wavelengths, values, newWavelengths, expected, expectation", [
+        (np.array([]), np.array([]), np.array([]), np.array([]), pytest.raises(ValueError)),
+        (np.array([1.0]), np.array([1.0]), np.array([]), np.array([]),  does_not_raise()),
+        (np.array([1.0]), np.array([]), np.array([1.0]), np.array([]), pytest.raises(ValueError)),
+        (np.array([]), np.array([1.0]), np.array([1.0]), np.array([]), pytest.raises(ValueError)),
         (np.array([1.0]), np.array([1.0]), np.array([1.0]), np.array([1.0]), does_not_raise()),
         (np.array([1.0, 2.0]), np.array([1.0, 3.0]), np.array([1.0, 1.5, 2.0]), np.array([1.0, 2.0, 3.0]),
             does_not_raise()),
@@ -99,6 +108,18 @@ class TestReflectance2Photoelectrons:
         (np.array([]), np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0, np.array([]), np.array([]), 0.0,
             (0.0, np.array([]), np.array([])), pytest.raises(ZeroDivisionError)),
         (np.array([]), np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0, np.array([]), np.array([]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([1.0]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([]), np.array([1.0]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([1.0]), np.array([1.0]), np.array([]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([1.0]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([1.0]), np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([1.0]), 1.0,
+            (1.0, np.array([]), np.array([])), does_not_raise()),
+        (np.array([]), np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([1.0]), 1.0,
             (1.0, np.array([]), np.array([])), does_not_raise()),
         (np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, np.array([1.0]), np.array([1.0]), 1.0,
             (1.0, np.array([1.62831853]), np.array([8.19714543e+24])), does_not_raise()),
@@ -150,6 +171,7 @@ class TestReflectance2Photoelectrons:
         output = None
         with expectation:
             output = radiance.coldstopSelfEmission(wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f)
+        print(output)
         if output is not None:
             assert np.isclose(output, expected).all()
 
