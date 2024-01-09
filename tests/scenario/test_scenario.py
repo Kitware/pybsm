@@ -6,6 +6,7 @@ from pybsm import utils
 from typing import ContextManager, Dict
 from contextlib import nullcontext as does_not_raise
 
+
 class TestScenario:
 
     def check_scenario(self, scenario: Scenario, name: str, ihaze: int, altitude: float,
@@ -28,8 +29,8 @@ class TestScenario:
         ('', 0, 0.0, 0.0, {}, does_not_raise()),
         ('test', 1, 1.0, 1.0, {}, does_not_raise()),
         ('test', 1, 1.0, 1.0, {'aircraftSpeed': 1.0, 'targetReflectance': 1.0,
-            'targetTemperature': 1.0, 'backgroundReflectance': 1.0, 'backgroundTemperature': 1.0,
-            'haWindspeed': 1.0, 'cn2at1m': 1.0}, does_not_raise()),
+                               'targetTemperature': 1.0, 'backgroundReflectance': 1.0, 'backgroundTemperature': 1.0,
+                               'haWindspeed': 1.0, 'cn2at1m': 1.0}, does_not_raise()),
     ])
     def test_initialization(
         self,
@@ -46,7 +47,7 @@ class TestScenario:
 
     @pytest.mark.parametrize('original_ihaze, new_ihaze, expectation', [
         (0, 1, does_not_raise()),
-    ])   
+    ])
     def test_ihaze(
         self,
         original_ihaze: int,
@@ -62,7 +63,7 @@ class TestScenario:
 
     @pytest.mark.parametrize('original_altitude, new_altitude, expectation', [
         (0.0, 1.0, does_not_raise()),
-    ])   
+    ])
     def test_altitude(
         self,
         original_altitude: float,
@@ -78,8 +79,8 @@ class TestScenario:
 
     @pytest.mark.parametrize('original_ground_range, new_ground_range, expectation', [
         (0.0, 1.0, does_not_raise()),
-    ])   
-    def test_altitude(
+    ])
+    def test_ground_range(
         self,
         original_ground_range: float,
         new_ground_range: float,
@@ -101,7 +102,7 @@ class TestScenario:
         ('test', 1, 1000.0, 5.0, np.array([]), pytest.raises(ValueError)),
         ('test', 1, 1000.0, 100.0, np.array([]), pytest.raises(ValueError)),
     ])
-    def test_initialization(
+    def test_atm(
         self,
         name: str,
         ihaze: int,
@@ -114,4 +115,3 @@ class TestScenario:
             scenario = Scenario(name, ihaze, altitude, ground_range)
             atm = scenario.atm
             assert np.isclose(atm, expected).all()
-
