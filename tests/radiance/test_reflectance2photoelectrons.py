@@ -4,7 +4,7 @@ import pytest
 from pybsm import radiance
 from pybsm import utils
 from pybsm.simulation import Sensor
-from typing import ContextManager, Tuple
+from typing import Tuple
 
 
 @pytest.mark.filterwarnings("ignore:Input array")
