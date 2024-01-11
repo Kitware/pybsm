@@ -50,21 +50,20 @@ class TestReflectance2Photoelectrons:
         output = radiance.photonDetectionRate(E, wx, wy, wavelengths, qe)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize("D, f, L, expectation", [
-        (0.0, 0.0, np.array([]), pytest.raises(ZeroDivisionError)),
-        (0.0, 1.0, np.array([]), pytest.raises(ZeroDivisionError)),
+    @pytest.mark.parametrize("D, f, L", [
+        (0.0, 0.0, np.array([])),
+        (0.0, 1.0, np.array([])),
     ])
     def test_at_focal_plane_irradiance_zero_division(
         self,
         D: float,
         f: float,
-        L: np.ndarray,
-        expectation: ContextManager
+        L: np.ndarray
     ) -> None:
         """
         Cover cases where ZeroDivisionError occurs
         """
-        with expectation:
+        with pytest.raises(ZeroDivisionError):
             radiance.atFocalPlaneIrradiance(D, f, L)
 
     @pytest.mark.parametrize("D, f, L", [
@@ -131,24 +130,23 @@ class TestReflectance2Photoelectrons:
         output = radiance.blackbodyRadiance(lambda0, T)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize("wavelengths, values, newWavelengths, expectation", [
-        (np.array([]), np.array([]), np.array([]), pytest.raises(ValueError)),
-        (np.array([1.0]), np.array([]), np.array([1.0]), pytest.raises(ValueError)),
-        (np.array([]), np.array([1.0]), np.array([1.0]), pytest.raises(ValueError)),
-        (np.array([1.0, 2.0]), np.array([1.0, 1.5, 2.0]), np.array([0.0, 1.0, 3.0]), pytest.raises(ValueError)),
-        (np.array([1.0, 2.0, 3.0]), np.array([1.0, 2.0]), np.array([0.0, 1.0, 3.0]), pytest.raises(ValueError)),
+    @pytest.mark.parametrize("wavelengths, values, newWavelengths", [
+        (np.array([]), np.array([]), np.array([])),
+        (np.array([1.0]), np.array([]), np.array([1.0])),
+        (np.array([]), np.array([1.0]), np.array([1.0])),
+        (np.array([1.0, 2.0]), np.array([1.0, 1.5, 2.0]), np.array([0.0, 1.0, 3.0])),
+        (np.array([1.0, 2.0, 3.0]), np.array([1.0, 2.0]), np.array([0.0, 1.0, 3.0])),
     ])
     def test_resample_by_wavelength_value_error(
         self,
         wavelengths: np.ndarray,
         values: np.ndarray,
-        newWavelengths: np.ndarray,
-        expectation: ContextManager
+        newWavelengths: np.ndarray
     ) -> None:
         """
         Cover cases where ValueError occurs
         """
-        with expectation:
+        with pytest.raises(ValueError):
             radiance.resampleByWavelength(wavelengths, values, newWavelengths)
 
     @pytest.mark.parametrize("wavelengths, values, newWavelengths", [
@@ -187,11 +185,9 @@ class TestReflectance2Photoelectrons:
         assert np.isclose(output, expected).all()
 
     @pytest.mark.parametrize(("wavelengths, targetRadiance, opticalTransmission, D, f, wx, wy, qe, otherIrradiance,"
-                             "darkCurrent, expectation"), [
-        (np.array([]), np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0, np.array([]), np.array([]), 0.0,
-            pytest.raises(ZeroDivisionError)),
-        (np.array([]), np.array([]), np.array([]), 0.0, 1.0, 1.0, 1.0, np.array([]), np.array([]), 1.0,
-            pytest.raises(ZeroDivisionError)),
+                             "darkCurrent"), [
+        (np.array([]), np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0, np.array([]), np.array([]), 0.0),
+        (np.array([]), np.array([]), np.array([]), 0.0, 1.0, 1.0, 1.0, np.array([]), np.array([]), 1.0),
     ])
     def test_signal_rate_zero_division(
         self,
@@ -204,13 +200,12 @@ class TestReflectance2Photoelectrons:
         wy: float,
         qe: np.ndarray,
         otherIrradiance: np.ndarray,
-        darkCurrent: float,
-        expectation: ContextManager
+        darkCurrent: float
     ) -> None:
         """
         Cover cases where ZeroDivisionError occurs
         """
-        with expectation:
+        with pytest.raises(ZeroDivisionError):
             radiance.signalRate(wavelengths, targetRadiance, opticalTransmission, D, f, wx, wy, qe,
                                 otherIrradiance, darkCurrent)
 
@@ -311,9 +306,9 @@ class TestReflectance2Photoelectrons:
         assert np.isclose(output[1], expected[1]).all()
         assert np.isclose(output[2], expected[2]).all()
 
-    @pytest.mark.parametrize("wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f, expectation", [
-        (np.array([]), 0.0, 0.0, 0.0, 0.0, pytest.raises(ZeroDivisionError)),
-        (np.array([]), 1.0, 1.0, 0.0, 1.0, pytest.raises(ZeroDivisionError)),
+    @pytest.mark.parametrize("wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f", [
+        (np.array([]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), 1.0, 1.0, 0.0, 1.0),
     ])
     def test_coldstop_self_emission_zero_division(
         self,
@@ -322,12 +317,11 @@ class TestReflectance2Photoelectrons:
         coldfilterEmissivity: float,
         D: float,
         f: float,
-        expectation: ContextManager
     ) -> None:
         """
         Cover cases where ZeroDivisionError occurs
         """
-        with expectation:
+        with pytest.raises(ZeroDivisionError):
             radiance.coldstopSelfEmission(wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f)
 
     @pytest.mark.parametrize("wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f", [
@@ -368,10 +362,9 @@ class TestReflectance2Photoelectrons:
         output = radiance.coldstopSelfEmission(wavelengths, coldfilterTemperature, coldfilterEmissivity, D, f)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize(("wavelengths, opticsTemperature, opticsEmissivity, coldfilterTransmission, D, f,"
-                              "expectation"), [
-        (np.array([]), 0.0, 0.0, 0.0, 0.0, 0.0, pytest.raises(ZeroDivisionError)),
-        (np.array([]), 1.0, 1.0, 1.0, 0.0, 1.0, pytest.raises(ZeroDivisionError)),
+    @pytest.mark.parametrize(("wavelengths, opticsTemperature, opticsEmissivity, coldfilterTransmission, D, f"), [
+        (np.array([]), 0.0, 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), 1.0, 1.0, 1.0, 0.0, 1.0),
     ])
     def test_optics_self_emission_zero_division(
         self,
@@ -380,13 +373,12 @@ class TestReflectance2Photoelectrons:
         opticsEmissivity: float,
         coldfilterTransmission: float,
         D: float,
-        f: float,
-        expectation: ContextManager
+        f: float
     ) -> None:
         """
         Cover cases where ZeroDivisionError occurs
         """
-        with expectation:
+        with pytest.raises(ZeroDivisionError):
             radiance.opticsSelfEmission(wavelengths, opticsTemperature, opticsEmissivity,
                                         coldfilterTransmission, D, f)
 
@@ -433,22 +425,21 @@ class TestReflectance2Photoelectrons:
                                              coldfilterTransmission, D, f)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize("wavelengths, coldshieldTemperature, D, f, expectation", [
-        (np.array([]), 0.0, 0.0, 0.0, pytest.raises(ZeroDivisionError)),
-        (np.array([]), 1.0, 0.0, 1.0, pytest.raises(ZeroDivisionError)),
+    @pytest.mark.parametrize("wavelengths, coldshieldTemperature, D, f", [
+        (np.array([]), 0.0, 0.0, 0.0),
+        (np.array([]), 1.0, 0.0, 1.0),
     ])
     def test_coldshield_self_emission_zero_division(
         self,
         wavelengths: np.ndarray,
         coldshieldTemperature: float,
         D: float,
-        f: float,
-        expectation: ContextManager
+        f: float
     ) -> None:
         """
         Cover cases where ZeroDivisionError occurs
         """
-        with expectation:
+        with pytest.raises(ZeroDivisionError):
             radiance.coldshieldSelfEmission(wavelengths, coldshieldTemperature, D, f)
 
     @pytest.mark.parametrize("wavelengths, coldshieldTemperature, D, f", [
@@ -486,21 +477,20 @@ class TestReflectance2Photoelectrons:
         output = radiance.coldshieldSelfEmission(wavelengths, coldshieldTemperature, D, f)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize("atm, reflectance, temperature, expectation", [
-        (np.array([]), 0.0, 0.0, pytest.raises(IndexError)),
-        (np.array([]), 1.0, 1.0, pytest.raises(IndexError)),
+    @pytest.mark.parametrize("atm, reflectance, temperature", [
+        (np.array([]), 0.0, 0.0),
+        (np.array([]), 1.0, 1.0),
     ])
     def test_total_radiance_index_error(
         self,
         atm: np.ndarray,
         reflectance: float,
-        temperature: float,
-        expectation: ContextManager
+        temperature: float
     ) -> None:
         """
         Cover cases where IndexError occurs
         """
-        with expectation:
+        with pytest.raises(IndexError):
             radiance.totalRadiance(atm, reflectance, temperature)
 
     @pytest.mark.parametrize("atm, reflectance, temperature, expected", [
@@ -540,22 +530,21 @@ class TestReflectance2Photoelectrons:
         output = radiance.totalRadiance(atm, reflectance, temperature)
         assert np.isclose(output, expected).all()
 
-    @pytest.mark.parametrize("atm, sensor, intTime, target_temp, expectation", [
-        (np.array([]), Sensor('Test', 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 0.0, 0, pytest.raises(IndexError)),
-        (np.array([]), Sensor('Test', 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 1.0, 1, pytest.raises(IndexError)),
+    @pytest.mark.parametrize("atm, sensor, intTime, target_temp", [
+        (np.array([]), Sensor('Test', 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 0.0, 0),
+        (np.array([]), Sensor('Test', 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 1.0, 1),
     ])
     def test_reflectance_2_photoelectrons_index_error(
         self,
         atm: np.ndarray,
         sensor: Sensor,
         intTime: float,
-        target_temp: int,
-        expectation: ContextManager
+        target_temp: int
     ) -> None:
         """
         Cover cases where IndexError occurs
         """
-        with expectation:
+        with pytest.raises(IndexError):
             radiance.reflectance2photoelectrons(atm, sensor, intTime, target_temp)
 
     @pytest.mark.parametrize("atm, sensor, intTime, target_temp, expected", [
