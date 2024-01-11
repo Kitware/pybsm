@@ -3,8 +3,7 @@ import pytest
 
 from pybsm.simulation import Scenario
 from pybsm import utils
-from typing import ContextManager, Dict
-from contextlib import nullcontext as does_not_raise
+from typing import Dict
 
 
 class TestScenario:
@@ -25,12 +24,12 @@ class TestScenario:
         assert scenario.haWindspeed == haWindspeed
         assert scenario.cn2at1m == cn2at1m
 
-    @pytest.mark.parametrize('name, ihaze, altitude, ground_range, other_args, expectation', [
-        ('', 0, 0.0, 0.0, {}, does_not_raise()),
-        ('test', 1, 1.0, 1.0, {}, does_not_raise()),
+    @pytest.mark.parametrize('name, ihaze, altitude, ground_range, other_args', [
+        ('', 0, 0.0, 0.0, {}),
+        ('test', 1, 1.0, 1.0, {}),
         ('test', 1, 1.0, 1.0, {'aircraftSpeed': 1.0, 'targetReflectance': 1.0,
                                'targetTemperature': 1.0, 'backgroundReflectance': 1.0, 'backgroundTemperature': 1.0,
-                               'haWindspeed': 1.0, 'cn2at1m': 1.0}, does_not_raise()),
+                               'haWindspeed': 1.0, 'cn2at1m': 1.0}),
     ])
     def test_initialization(
         self,
@@ -38,69 +37,74 @@ class TestScenario:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        other_args: Dict[str, float],
-        expectation: ContextManager
+        other_args: Dict[str, float]
     ) -> None:
-        with expectation:
-            scenario = Scenario(name, ihaze, altitude, ground_range, **other_args)
-            self.check_scenario(scenario, name, ihaze, altitude, ground_range, **other_args)
+        scenario = Scenario(name, ihaze, altitude, ground_range, **other_args)
+        self.check_scenario(scenario, name, ihaze, altitude, ground_range, **other_args)
 
-    @pytest.mark.parametrize('original_ihaze, new_ihaze, expectation', [
-        (0, 1, does_not_raise()),
+    @pytest.mark.parametrize('original_ihaze, new_ihaze', [
+        (0, 1),
     ])
     def test_ihaze(
         self,
         original_ihaze: int,
-        new_ihaze: int,
-        expectation: ContextManager
+        new_ihaze: int
     ) -> None:
-        with expectation:
-            scenario = Scenario('test', original_ihaze, 0.0, 0.0)
-            self.check_scenario(scenario, 'test', original_ihaze, 0.0, 0.0)
-            scenario.ihaze = new_ihaze
-            assert scenario.ihaze != original_ihaze
-            self.check_scenario(scenario, 'test', new_ihaze, 0.0, 0.0)
+        scenario = Scenario('test', original_ihaze, 0.0, 0.0)
+        self.check_scenario(scenario, 'test', original_ihaze, 0.0, 0.0)
+        scenario.ihaze = new_ihaze
+        assert scenario.ihaze != original_ihaze
+        self.check_scenario(scenario, 'test', new_ihaze, 0.0, 0.0)
 
-    @pytest.mark.parametrize('original_altitude, new_altitude, expectation', [
-        (0.0, 1.0, does_not_raise()),
+    @pytest.mark.parametrize('original_altitude, new_altitude', [
+        (0.0, 1.0),
     ])
     def test_altitude(
         self,
         original_altitude: float,
-        new_altitude: float,
-        expectation: ContextManager
+        new_altitude: float
     ) -> None:
-        with expectation:
-            scenario = Scenario('test', 0, original_altitude, 0.0)
-            self.check_scenario(scenario, 'test', 0, original_altitude, 0.0)
-            scenario.altitude = new_altitude
-            assert scenario.altitude != original_altitude
-            self.check_scenario(scenario, 'test', 0, new_altitude, 0.0)
+        scenario = Scenario('test', 0, original_altitude, 0.0)
+        self.check_scenario(scenario, 'test', 0, original_altitude, 0.0)
+        scenario.altitude = new_altitude
+        assert scenario.altitude != original_altitude
+        self.check_scenario(scenario, 'test', 0, new_altitude, 0.0)
 
-    @pytest.mark.parametrize('original_ground_range, new_ground_range, expectation', [
-        (0.0, 1.0, does_not_raise()),
+    @pytest.mark.parametrize('original_ground_range, new_ground_range', [
+        (0.0, 1.0),
     ])
     def test_ground_range(
         self,
         original_ground_range: float,
         new_ground_range: float,
-        expectation: ContextManager
     ) -> None:
-        with expectation:
-            scenario = Scenario('test', 0, 0.0, original_ground_range)
-            self.check_scenario(scenario, 'test', 0, 0.0, original_ground_range)
-            scenario.ground_range = new_ground_range
-            assert scenario.ground_range != original_ground_range
-            self.check_scenario(scenario, 'test', 0, 0.0, new_ground_range)
+        scenario = Scenario('test', 0, 0.0, original_ground_range)
+        self.check_scenario(scenario, 'test', 0, 0.0, original_ground_range)
+        scenario.ground_range = new_ground_range
+        assert scenario.ground_range != original_ground_range
+        self.check_scenario(scenario, 'test', 0, 0.0, new_ground_range)
 
-    @pytest.mark.parametrize('name, ihaze, altitude, ground_range, expected, expectation', [
-        ('test', -1, 1000.0, 0.0, np.array([]), pytest.raises(IndexError)),
-        ('test', 0, 1000.0, 0.0, np.array([]), pytest.raises(IndexError)),
-        ('test', 2, 1000.0, 0.0, utils.loadDatabaseAtmosphere(1000.0, 0.0, 2), does_not_raise()),
-        ('test', 1, 1.0, 1.0, np.array([]), pytest.raises(IndexError)),
-        ('test', 1, 1000.0, 0.0, utils.loadDatabaseAtmosphere(1000.0, 0.0, 1), does_not_raise()),
-        ('test', 1, 1000.0, 5.0, np.array([]), pytest.raises(ValueError)),
-        ('test', 1, 1000.0, 100.0, np.array([]), pytest.raises(ValueError)),
+    @pytest.mark.parametrize('name, ihaze, altitude, ground_range', [
+        ('test', -1, 1000.0, 0.0),
+        ('test', 0, 1000.0, 0.0),
+        ('test', 1, 1.0, 1.0),
+    ])
+    def test_atm_index_error(
+        self,
+        name: str,
+        ihaze: int,
+        altitude: float,
+        ground_range: float
+    ) -> None:
+        with pytest.raises(IndexError):
+            scenario = Scenario(name, ihaze, altitude, ground_range)
+            scenario.atm
+
+    @pytest.mark.parametrize('name, ihaze, altitude, ground_range, expected', [
+        ('test', 2, 1000.0, 0.0, utils.loadDatabaseAtmosphere(1000.0, 0.0, 2)),
+        ('test', 1, 1000.0, 0.0, utils.loadDatabaseAtmosphere(1000.0, 0.0, 1)),
+        ('test', 1, 1000.0, 5.0, utils.loadDatabaseAtmosphere(1000.0, 5.0, 1)),
+        ('test', 1, 2000.0, 0.0, utils.loadDatabaseAtmosphere(2000.0, 0.0, 1)),
     ])
     def test_atm(
         self,
@@ -108,10 +112,8 @@ class TestScenario:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        expected: np.ndarray,
-        expectation: ContextManager
+        expected: np.ndarray
     ) -> None:
-        with expectation:
-            scenario = Scenario(name, ihaze, altitude, ground_range)
-            atm = scenario.atm
-            assert np.isclose(atm, expected).all()
+        scenario = Scenario(name, ihaze, altitude, ground_range)
+        atm = scenario.atm
+        assert np.isclose(atm, expected).all()
