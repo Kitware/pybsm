@@ -48,10 +48,9 @@ types-setuptools = ">=65.6.0.1"
 jupyter = ">=1.0.0"
 papermill = ">=2.4.0"
 # Testing
-coverage = ">=6.5.0"
-pytest = ">=7.2.0"
-pytest-cov = ">=4.0.0"
-
+coverage = ">=7.4.0"
+pytest = ">=7.2"
+pytest-cov = ">=4"
 
 ###############################################################################
 [tool.pytest.ini_options]
