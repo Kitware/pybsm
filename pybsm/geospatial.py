@@ -45,7 +45,7 @@ def altitudeAlongSlantPath(
     hTarget: float,
     hSensor: float,
     slantRange: float
-) -> Tuple[np.ndarray, float]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Calculate the height above the curved earth at points along a path from the
     target (zPath=0) to the sensor (zPath.max()).  This is primarily useful for

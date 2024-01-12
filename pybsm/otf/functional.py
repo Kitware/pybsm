@@ -1185,7 +1185,7 @@ def weightedByWavelength(
 def coherenceDiameter(
     lambda0: float,
     zPath: np.ndarray,
-    cn2: float
+    cn2: np.ndarray
 ) -> float:
     """
     This is an improvement / replacement for IBSM Equation 3-5: calculation of
@@ -1226,10 +1226,10 @@ def coherenceDiameter(
 
 
 def hufnagelValleyTurbulenceProfile(
-    h: float,
+    h: np.ndarray,
     v: float,
     cn2at1m: float
-) -> float:
+) -> np.ndarray:
     """Replaces IBSM Equations 3-6 through 3-8.  The Hufnagel-Valley Turbulence
     profile (i.e. a profile of the refractive index structure parameter as a
     function of altitude).  I suggest the HV profile because it seems to be in

@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import math
 
 from pybsm import otf
 from pybsm.simulation import Sensor, Scenario
@@ -10,79 +9,94 @@ from typing import Callable, Dict, Tuple
 class TestOTF:
 
     @pytest.mark.parametrize("lambda0, zPath, cn2", [
-        (0.0, np.array([]), 0.0),
-        (1.0, np.array([]), 1.0),
+        (0.0, np.array([]), np.array([])),
+        (0.0, np.array([]), np.array([1.0])),
+        (1.0, np.array([]), np.array([])),
     ])
     def test_coherence_diameter_value_error(
         self,
         lambda0: float,
         zPath: np.ndarray,
-        cn2: float
+        cn2: np.ndarray
     ) -> None:
         with pytest.raises(ValueError):
             otf.coherenceDiameter(lambda0, zPath, cn2)
 
     @pytest.mark.parametrize("lambda0, zPath, cn2", [
-        (0.0, np.array([1.0]), 0.0),
-        (0.0, np.array([1.0]), 1.0),
+        (0.0, np.array([1.0]), np.array([])),
+        (0.0, np.array([1.0]), np.array([0.0])),
+        (0.0, np.array([1.0]), np.array([1.0])),
     ])
     def test_coherence_diameter_zero_division(
         self,
         lambda0: float,
         zPath: np.ndarray,
-        cn2: float
+        cn2: np.ndarray
     ) -> None:
         with pytest.raises(ZeroDivisionError):
             otf.coherenceDiameter(lambda0, zPath, cn2)
 
     @pytest.mark.parametrize("lambda0, zPath, cn2", [
-        (1.0, np.array([1.0]), 0.0),
-        (1.0, np.array([1.0, 2.0]), 0.0),
-        (1.0, np.array([1.0]), 1.0),
-        (1.0, np.array([2.0]), 1.0),
+        (1.0, np.array([1.0]), np.array([0.0])),
+        (1.0, np.array([1.0, 2.0]), np.array([0.0])),
+        (1.0, np.array([1.0]), np.array([1.0])),
+        (1.0, np.array([2.0]), np.array([1.0])),
     ])
     def test_coherence_diameter_infinite(
         self,
         lambda0: float,
         zPath: np.ndarray,
-        cn2: float
+        cn2: np.ndarray
     ) -> None:
         output = otf.coherenceDiameter(lambda0, zPath, cn2)
-        assert math.isinf(output)
+        assert np.isinf(output)
 
     @pytest.mark.parametrize("lambda0, zPath, cn2, expected", [
-        (1.0, np.array([1.0, 2.0]), 1.0, 0.23749058343491444),
-        (2.0, np.array([1.0, 2.0]), 1.0, 0.5456100850379446),
-        (1.0, np.array([1.0, 2.0]), 2.0, 0.15668535178821985),
-        (1.0, np.array([1.0, 2.0, 3.0]), 1.0, 0.17546491199555045),
+        (1.0, np.array([1.0, 2.0]), np.array([1.0]), 0.23749058343491444),
+        (2.0, np.array([1.0, 2.0]), np.array([1.0]), 0.5456100850379446),
+        (1.0, np.array([1.0, 2.0]), np.array([2.0]), 0.15668535178821985),
+        (1.0, np.array([1.0, 2.0, 3.0]), np.array([1.0]), 0.17546491199555045),
     ])
     def test_coherence_diameter(
         self,
         lambda0: float,
         zPath: np.ndarray,
-        cn2: float,
+        cn2: np.ndarray,
         expected: float
     ) -> None:
         output = otf.coherenceDiameter(lambda0, zPath, cn2)
         assert np.isclose(output, expected)
 
+    @pytest.mark.parametrize("h, v, cn2at1m", [
+        (np.array([]), 0.0, 0.0),
+        (np.array([]), 1.0, 1.0),
+    ])
+    def test_hufnagel_valley_turbulence_profile_empty_array(
+        self,
+        h: np.ndarray,
+        v: float,
+        cn2at1m: float
+    ) -> None:
+        output = otf.hufnagelValleyTurbulenceProfile(h, v, cn2at1m)
+        assert output.size == 0
+
     @pytest.mark.parametrize("h, v, cn2at1m, expected", [
-        (0.0, 0.0, 0.0, 0.0),
-        (1.0, 1.0, 0.0, 0.0),
-        (1.0, 0.0, 1.0, 0.9900498337491683),
-        (0.0, 1.0, 1.0, 1.0),
-        (1.0, 1.0, 1.0, 0.9900498337491683),
-        (-1.0, -1.0, -1.0, -1.0100501670841677),
+        (np.array([1.0]), 1.0, 0.0, np.array([0.0])),
+        (np.array([1.0]), 0.0, 1.0, np.array([0.9900498337491683])),
+        (np.array([0.0]), 1.0, 1.0, np.array([1.0])),
+        (np.array([1.0]), 1.0, 1.0, np.array([0.9900498337491683])),
+        (np.array([-1.0]), -1.0, -1.0, np.array([-1.0100501670841677])),
+        (np.array([1.0, 1.0]), 1.0, 0.0, np.array([0.0, 0.0])),
     ])
     def test_hufnagel_valley_turbulence_profile(
         self,
-        h: float,
+        h: np.ndarray,
         v: float,
         cn2at1m: float,
-        expected: float
+        expected: np.ndarray
     ) -> None:
         output = otf.hufnagelValleyTurbulenceProfile(h, v, cn2at1m)
-        assert np.isclose(output, expected)
+        assert np.isclose(output, expected).all()
 
     @pytest.mark.parametrize("wavelengths, weights, myFunction", [
         (np.array([]), np.array([]), lambda wavelengths: wavelengths),
