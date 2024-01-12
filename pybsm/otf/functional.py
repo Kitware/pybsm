@@ -1186,7 +1186,7 @@ def coherenceDiameter(
     lambda0: float,
     zPath: np.ndarray,
     cn2: float
-) -> np.ndarray:
+) -> float:
     """
     This is an improvement / replacement for IBSM Equation 3-5: calculation of
     Fried's coherence diameter (m) for spherical wave propagation.
