@@ -12,3 +12,11 @@ Documentation
 * Added Read the Docs configuration files
 
 * Added Apache license file
+
+CI/CD
+
+* Add pytest and coverage reports to CI
+
+Tests
+
+* Add tests for `reflectance2photoelectrons` and its downstream functions.

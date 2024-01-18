@@ -83,6 +83,9 @@ def atFocalPlaneIrradiance(
         focal plane
 
     """
+    if L.size == 0:
+        warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
+
     E = L * np.pi / (1.0 + 4.0 * (f / D) ** 2.0)
 
     return E
@@ -106,6 +109,9 @@ def blackbodyRadiance(
             blackbody spectral radiance (W/m^2 sr m)
     """
     # lambda0 = lambda0+1e-20
+    if lambda0.size == 0:
+        warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
+
     Lbb = (2.0 * hc * cc**2.0 / lambda0**5.0) * (
         np.exp(hc * cc / (lambda0 * kc * T)) - 1.0
     ) ** (-1.0)
@@ -162,6 +168,8 @@ def coldshieldSelfEmission(
         coldshieldE:
             cold shield spectral irradiance at the FPA (W / m^2 m)
     """
+    if wavelengths.size == 0:
+        warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
     # coldshield solid angle x blackbody emitted radiance
     coldshieldE = (
         np.pi - np.pi / (4.0 * (f / D) ** 2.0 + 1.0)
@@ -197,6 +205,8 @@ def coldstopSelfEmission(
         coldstopE:
             optics emitted irradiance on to the FPA (W / m^2 m)
     """
+    if wavelengths.size == 0:
+        warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
 
     coldstopL = coldfilterEmissivity * blackbodyRadiance(
         wavelengths, coldfilterTemperature
@@ -288,6 +298,8 @@ def opticsSelfEmission(
         opticsE:
             optics emitted irradiance on to the FPA (W / m^2 m)
     """
+    if wavelengths.size == 0:
+        warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
 
     opticsL = (
         coldfilterTransmission
@@ -330,6 +342,8 @@ def photonDetectionRate(
         wavelens) where td is integration time (s) and ntdi is the number of
         tdi stages (optional)
     """
+    if E.size == 0 or wavelengths.size == 0 or qe.size == 0:
+        warnings.warn(UserWarning("Input array(s) are empty. Expect output to be empty"))
 
     dN = (wavelengths / (hc * cc)) * qe * wx * wy * E
     return dN
@@ -668,6 +682,9 @@ def signalRate(
             spectral photoelectrons (e-/s m)
 
     """
+    if wavelengths.size == 0 or targetRadiance.size == 0 or opticalTransmission.size == 0 or otherIrradiance.size == 0:
+        warnings.warn(UserWarning("Input array(s) are empty. Expect output to be empty"))
+
     # get at FPA spectral irradiance
     tgtFPAirradiance = (
         opticalTransmission * atFocalPlaneIrradiance(D, f, targetRadiance)
