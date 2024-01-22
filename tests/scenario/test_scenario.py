@@ -68,11 +68,12 @@ class TestScenario:
         new_ihaze: int
     ) -> None:
         """
-         Test that setting the ihaze attribute appropriately updates the internal value as
+        Test that setting the ihaze attribute appropriately updates the internal value as
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', original_ihaze, 0.0, 0.0)
         self.check_scenario(scenario, 'test', original_ihaze, 0.0, 0.0)
+        scenario._atm = np.array([0])
         scenario.ihaze = new_ihaze
         assert scenario._atm is None
         assert scenario._ihaze != original_ihaze
@@ -88,11 +89,12 @@ class TestScenario:
         new_altitude: float
     ) -> None:
         """
-         Test that setting the altitude attribute appropriately updates the internal value as
+        Test that setting the altitude attribute appropriately updates the internal value as
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', 0, original_altitude, 0.0)
         self.check_scenario(scenario, 'test', 0, original_altitude, 0.0)
+        scenario._atm = np.array([0])
         scenario.altitude = new_altitude
         assert scenario._atm is None
         assert scenario._altitude != original_altitude
@@ -108,11 +110,12 @@ class TestScenario:
         new_ground_range: float,
     ) -> None:
         """
-         Test that setting the ground_range attribute appropriately updates the internal value as
+        Test that setting the ground_range attribute appropriately updates the internal value as
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', 0, 0.0, original_ground_range)
         self.check_scenario(scenario, 'test', 0, 0.0, original_ground_range)
+        scenario._atm = np.array([0])
         scenario.ground_range = new_ground_range
         assert scenario._atm is None
         assert scenario._ground_range != original_ground_range
