@@ -19,6 +19,9 @@ class TestOTF:
         zPath: np.ndarray,
         cn2: np.ndarray
     ) -> None:
+        """
+        Cover cases where ValueError occurs
+        """
         with pytest.raises(ValueError):
             otf.coherenceDiameter(lambda0, zPath, cn2)
 
@@ -33,6 +36,9 @@ class TestOTF:
         zPath: np.ndarray,
         cn2: np.ndarray
     ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
         with pytest.raises(ZeroDivisionError):
             otf.coherenceDiameter(lambda0, zPath, cn2)
 
@@ -48,6 +54,9 @@ class TestOTF:
         zPath: np.ndarray,
         cn2: np.ndarray
     ) -> None:
+        """
+        Cover cases where infinte output occurs
+        """
         output = otf.coherenceDiameter(lambda0, zPath, cn2)
         assert np.isinf(output)
 
@@ -64,6 +73,9 @@ class TestOTF:
         cn2: np.ndarray,
         expected: float
     ) -> None:
+        """
+        Test coherenceDiameter with normal inputs and expected outputs
+        """
         output = otf.coherenceDiameter(lambda0, zPath, cn2)
         assert np.isclose(output, expected)
 
@@ -77,6 +89,9 @@ class TestOTF:
         v: float,
         cn2at1m: float
     ) -> None:
+        """
+        Test hufnagelValleyTurbulenceProfile with empty input
+        """
         output = otf.hufnagelValleyTurbulenceProfile(h, v, cn2at1m)
         assert output.size == 0
 
@@ -95,6 +110,9 @@ class TestOTF:
         cn2at1m: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test hufnagelValleyTurbulenceProfile with normal inputs and expected outputs
+        """
         output = otf.hufnagelValleyTurbulenceProfile(h, v, cn2at1m)
         assert np.isclose(output, expected).all()
 
@@ -108,6 +126,9 @@ class TestOTF:
         weights: np.ndarray,
         myFunction: Callable,
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             otf.weightedByWavelength(wavelengths, weights, myFunction)
 
@@ -122,6 +143,9 @@ class TestOTF:
         weights: np.ndarray,
         myFunction: Callable
     ) -> None:
+        """
+        Cover cases where nan output occurs
+        """
         output = otf.weightedByWavelength(wavelengths, weights, myFunction)
         assert np.isnan(output).all()
 
@@ -139,6 +163,9 @@ class TestOTF:
         myFunction: Callable,
         expected: np.ndarray
     ) -> None:
+        """
+        Test weightedByWavelength with normal inputs and expected outputs
+        """
         output = otf.weightedByWavelength(wavelengths, weights, myFunction)
         assert np.isclose(output, expected).all()
 
@@ -164,6 +191,9 @@ class TestOTF:
         intTime: float,
         aircraftSpeed: float
     ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
         with pytest.raises(ZeroDivisionError):
             otf.polychromaticTurbulenceOTF(u, v, wavelengths, weights, altitude, slantRange, D, haWindspeed,
                                            cn2at1m, intTime, aircraftSpeed)
@@ -194,6 +224,9 @@ class TestOTF:
         intTime: float,
         aircraftSpeed: float
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             otf.polychromaticTurbulenceOTF(u, v, wavelengths, weights, altitude, slantRange, D, haWindspeed,
                                            cn2at1m, intTime, aircraftSpeed)
@@ -227,6 +260,9 @@ class TestOTF:
         aircraftSpeed: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test polychromaticTurbulenceOTF with empty input
+        """
         output = otf.polychromaticTurbulenceOTF(u, v, wavelengths, weights, altitude, slantRange, D, haWindspeed,
                                                 cn2at1m, intTime, aircraftSpeed)
         assert output[0].size == 0
@@ -274,6 +310,9 @@ class TestOTF:
         aircraftSpeed: float,
         expected: Tuple[np.ndarray, np.ndarray]
     ) -> None:
+        """
+        Test polychromaticTurbulenceOTF with normal inputs and expected outputs
+        """
         output = otf.polychromaticTurbulenceOTF(u, v, wavelengths, weights, altitude, slantRange, D, haWindspeed,
                                                 cn2at1m, intTime, aircraftSpeed)
         assert np.isclose(output[0], expected[0]).all()
@@ -293,6 +332,9 @@ class TestOTF:
         wy: float,
         f: float
     ) -> None:
+        """
+        Test detectorOTF with empty input
+        """
         output = otf.detectorOTF(u, v, wx, wy, f)
         assert output.size == 0
 
@@ -309,6 +351,9 @@ class TestOTF:
         wy: float,
         f: float
     ) -> None:
+        """
+        Cover cases where nan output occurs
+        """
         output = otf.detectorOTF(u, v, wx, wy, f)
         assert np.isnan(output).all()
 
@@ -328,6 +373,9 @@ class TestOTF:
         f: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test detectorOTF with normal inputs and expected outputs
+        """
         output = otf.detectorOTF(u, v, wx, wy, f)
         assert np.isclose(output, expected, atol=5e-34).all()
 
@@ -344,6 +392,9 @@ class TestOTF:
         ax: float,
         ay: float
     ) -> None:
+        """
+        Test detectorOTF with empty input
+        """
         output = otf.driftOTF(u, v, ax, ay)
         assert output.size == 0
 
@@ -362,6 +413,9 @@ class TestOTF:
         ay: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test driftOTF with normal inputs and expected outputs
+        """
         output = otf.driftOTF(u, v, ax, ay)
         assert np.isclose(output, expected, atol=5e-34).all()
 
@@ -378,6 +432,9 @@ class TestOTF:
         sx: float,
         sy: float
     ) -> None:
+        """
+        Test jitterOTF with empty input
+        """
         output = otf.jitterOTF(u, v, sx, sy)
         assert output.size == 0
 
@@ -396,6 +453,9 @@ class TestOTF:
         sy: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test jitterOTF with normal inputs and expected outputs
+        """
         output = otf.jitterOTF(u, v, sx, sy)
         assert np.isclose(output, expected, atol=5e-20).all()
 
@@ -412,6 +472,9 @@ class TestOTF:
         filterOTF: np.ndarray,
         systemOTF: np.ndarray
     ) -> None:
+        """
+        Internal function to check if OTF object's attributes match expected values
+        """
         assert np.isclose(otf.apOTF, apOTF).all()
         assert np.isclose(otf.turbOTF, turbOTF).all()
         assert np.isclose(otf.r0band, r0band).all()
@@ -443,6 +506,9 @@ class TestOTF:
         slantRange: float,
         intTime: float
     ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
         with pytest.raises(ZeroDivisionError):
             otf.commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime)
 
@@ -470,6 +536,9 @@ class TestOTF:
         slantRange: float,
         intTime: float
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             otf.commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime)
 
@@ -513,5 +582,8 @@ class TestOTF:
         intTime: float,
         expected: Dict[str, np.ndarray]
     ) -> None:
+        """
+        Test commonOTFs with normal inputs and expected outputs
+        """
         output = otf.commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime)
         self.check_OTF(output, **expected)

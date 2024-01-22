@@ -16,6 +16,9 @@ class TestGeospatial:
         hSensor: float,
         slantRange: float
     ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
         with pytest.raises(ZeroDivisionError):
             geospatial.nadirAngle(hTarget, hSensor, slantRange)
 
@@ -31,6 +34,9 @@ class TestGeospatial:
         slantRange: float,
         expected: float
     ) -> None:
+        """
+        Test nadirAngle with normal inputs and expected outputs
+        """
         output = geospatial.nadirAngle(hTarget, hSensor, slantRange)
         assert np.isclose(output, expected)
 
@@ -44,6 +50,9 @@ class TestGeospatial:
         hSensor: float,
         slantRange: float
     ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
         with pytest.raises(ZeroDivisionError):
             geospatial.altitudeAlongSlantPath(hTarget, hSensor, slantRange)
 
@@ -59,6 +68,9 @@ class TestGeospatial:
         slantRange: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test altitudeAlongSlantPath with normal inputs and expected outputs
+        """
         output = geospatial.altitudeAlongSlantPath(hTarget, hSensor, slantRange)
         assert np.isclose(output[0], np.linspace(0.0, 1.0, 10000)).all()
         assert np.isclose(output[1], expected).all()
