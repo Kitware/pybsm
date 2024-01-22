@@ -8,10 +8,24 @@ from typing import Dict
 
 class TestScenario:
 
-    def check_scenario(self, scenario: Scenario, name: str, ihaze: int, altitude: float,
-                       ground_range: float, aircraftSpeed: float = 0, targetReflectance: float = 0.15,
-                       targetTemperature: float = 295, backgroundReflectance: float = 0.07,
-                       backgroundTemperature: float = 293, haWindspeed: float = 21, cn2at1m: float = 1.7e-14) -> None:
+    def check_scenario(
+        self,
+        scenario: Scenario,
+        name: str,
+        ihaze: int,
+        altitude: float,
+        ground_range: float,
+        aircraftSpeed: float = 0,
+        targetReflectance: float = 0.15,
+        targetTemperature: float = 295,
+        backgroundReflectance: float = 0.07,
+        backgroundTemperature: float = 293,
+        haWindspeed: float = 21,
+        cn2at1m: float = 1.7e-14
+    ) -> None:
+        """
+        Check if created scenario matches expected parameters
+        """
         assert scenario.name == name
         assert scenario.ihaze == ihaze
         assert scenario.altitude == altitude
@@ -39,6 +53,9 @@ class TestScenario:
         ground_range: float,
         other_args: Dict[str, float]
     ) -> None:
+        """
+        Test initialization with and without default parameters
+        """
         scenario = Scenario(name, ihaze, altitude, ground_range, **other_args)
         self.check_scenario(scenario, name, ihaze, altitude, ground_range, **other_args)
 
@@ -50,9 +67,15 @@ class TestScenario:
         original_ihaze: int,
         new_ihaze: int
     ) -> None:
+        """
+         Test that setting the ihaze attribute appropriately updates the internal value as
+        well as clear the internal atm attribute.
+        """
         scenario = Scenario('test', original_ihaze, 0.0, 0.0)
         self.check_scenario(scenario, 'test', original_ihaze, 0.0, 0.0)
         scenario.ihaze = new_ihaze
+        assert scenario._atm is None
+        assert scenario._ihaze != original_ihaze
         assert scenario.ihaze != original_ihaze
         self.check_scenario(scenario, 'test', new_ihaze, 0.0, 0.0)
 
@@ -64,9 +87,15 @@ class TestScenario:
         original_altitude: float,
         new_altitude: float
     ) -> None:
+        """
+         Test that setting the altitude attribute appropriately updates the internal value as
+        well as clear the internal atm attribute.
+        """
         scenario = Scenario('test', 0, original_altitude, 0.0)
         self.check_scenario(scenario, 'test', 0, original_altitude, 0.0)
         scenario.altitude = new_altitude
+        assert scenario._atm is None
+        assert scenario._altitude != original_altitude
         assert scenario.altitude != original_altitude
         self.check_scenario(scenario, 'test', 0, new_altitude, 0.0)
 
@@ -78,9 +107,15 @@ class TestScenario:
         original_ground_range: float,
         new_ground_range: float,
     ) -> None:
+        """
+         Test that setting the ground_range attribute appropriately updates the internal value as
+        well as clear the internal atm attribute.
+        """
         scenario = Scenario('test', 0, 0.0, original_ground_range)
         self.check_scenario(scenario, 'test', 0, 0.0, original_ground_range)
         scenario.ground_range = new_ground_range
+        assert scenario._atm is None
+        assert scenario._ground_range != original_ground_range
         assert scenario.ground_range != original_ground_range
         self.check_scenario(scenario, 'test', 0, 0.0, new_ground_range)
 
@@ -96,6 +131,9 @@ class TestScenario:
         altitude: float,
         ground_range: float
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             scenario = Scenario(name, ihaze, altitude, ground_range)
             scenario.atm
@@ -114,6 +152,12 @@ class TestScenario:
         ground_range: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test atm with expected inputs and outputs as well as checking _atm attribute
+        is set properly.
+        """
         scenario = Scenario(name, ihaze, altitude, ground_range)
+        assert scenario._atm is None
         atm = scenario.atm
+        assert scenario._atm is not None
         assert np.isclose(atm, expected).all()

@@ -19,6 +19,9 @@ class TestUtils:
         altitude: float,
         ground_range: float,
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             utils.loadDatabaseAtmosphere_nointerp(altitude, ground_range, ihaze)
 
@@ -33,6 +36,9 @@ class TestUtils:
         ground_range: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test loadDatabaseAtmosphere_nointerp with normal inputs and expected outputs
+        """
         output = utils.loadDatabaseAtmosphere_nointerp(altitude, ground_range, ihaze)
         assert np.isclose(output, expected).all()
 
@@ -47,6 +53,9 @@ class TestUtils:
         altitude: float,
         ground_range: float
     ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
         with pytest.raises(IndexError):
             utils.loadDatabaseAtmosphere(altitude, ground_range, ihaze)
 
@@ -63,5 +72,8 @@ class TestUtils:
         ground_range: float,
         expected: np.ndarray
     ) -> None:
+        """
+        Test loadDatabaseAtmosphere with normal inputs and expected outputs
+        """
         output = utils.loadDatabaseAtmosphere(altitude, ground_range, ihaze)
         assert np.isclose(output, expected).all()
