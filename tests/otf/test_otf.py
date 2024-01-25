@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import cv2
 
 from pybsm import otf
 from pybsm.simulation import Sensor, Scenario
@@ -843,3 +844,503 @@ class TestOTF:
         """
         output = otf.commonOTFs(sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime)
         self.check_OTF(output, **expected)
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, alpha", [
+        (np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0),
+    ])
+    def test_turbulence_OTF_empty_array(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        alpha: float
+    ) -> None:
+        """
+        Test turbulenceOTF with empty input
+        """
+        output = otf.turbulenceOTF(u, v, lambda0, D, r0, alpha)
+        assert output.size == 0
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, alpha", [
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 1.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 1.0),
+    ])
+    def test_turbulence_OTF_nan(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        alpha: float
+    ) -> None:
+        """
+        Test turbulenceOTF where output is nan
+        """
+        output = otf.turbulenceOTF(u, v, lambda0, D, r0, alpha)
+        assert np.isnan(output).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, alpha", [
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0),
+    ])
+    def test_turbulence_OTF_inf(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        alpha: float
+    ) -> None:
+        """
+        Test turbulenceOTF where output is inf
+        """
+        output = otf.turbulenceOTF(u, v, lambda0, D, r0, alpha)
+        assert np.isinf(output).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, alpha, expected", [
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0, np.array([0.0])),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0, np.array([1.0])),
+        (np.array([1.0, 1.0]), np.array([1.0, 1.0]), 1.0, 1.0, 1.0, 1.0, np.array([2.11830623, 2.11830623])),
+    ])
+    def test_turbulence_OTF(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        alpha: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test turbulenceOTF with normal inputs and expected outputs
+        """
+        output = otf.turbulenceOTF(u, v, lambda0, D, r0, alpha)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, td, vel", [
+        (np.array([]), np.array([]), 0.0, 0.0, 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([]), 0.0, 0.0, 1.0, 0.0, 0.0),
+        (np.array([]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 0.0),
+        (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0, 1.0),
+    ])
+    def test_windspeed_turbulence_OTF_empty_array(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        td: float,
+        vel: float
+    ) -> None:
+        """
+        Test windspeedTurbulenceOTF with empty input
+        """
+        output = otf.windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel)
+        assert output.size == 0
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, td, vel", [
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 1.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0, 1.0),
+    ])
+    def test_windspeed_turbulence_OTF_nan(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        td: float,
+        vel: float
+    ) -> None:
+        """
+        Test windspeedTurbulenceOTF where output is nan
+        """
+        output = otf.windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel)
+        assert np.isnan(output).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, td, vel", [
+        (np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 1.0, 1.0),
+    ])
+    def test_coherence_diameter_zero_division(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        td: float,
+        vel: float
+    ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
+        with pytest.raises(ZeroDivisionError):
+            otf.windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel)
+
+    @pytest.mark.parametrize("u, v, lambda0, D, r0, td, vel, expected", [
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0, 0.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0, 0.0, np.array([1.0])),
+        (np.array([1.0, 1.0]), np.array([1.0, 1.0]), 1.0, 1.0, 1.0, 1.0, 1.0, np.array([0.02636412, 0.02636412])),
+    ])
+    def test_windspeed_turbulence_OTF(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        r0: float,
+        td: float,
+        vel: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test windspeedTurbulenceOTF with normal inputs and expected outputs
+        """
+        output = otf.windspeedTurbulenceOTF(u, v, lambda0, D, r0, td, vel)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, pv, Lx, Ly", [
+        (np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0),
+    ])
+    def test_wavefront_OTF_empty_array(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        pv: float,
+        Lx: float,
+        Ly: float
+    ) -> None:
+        """
+        Test wavefrontOTF with empty input
+        """
+        output = otf.wavefrontOTF(u, v, lambda0, pv, Lx, Ly)
+        assert output.size == 0
+
+    @pytest.mark.parametrize("u, v, lambda0, pv, Lx, Ly", [
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0),
+    ])
+    def test_wavefront_OTF_nan(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        pv: float,
+        Lx: float,
+        Ly: float
+    ) -> None:
+        """
+        Cover cases where nan output occurs
+        """
+        output = otf.wavefrontOTF(u, v, lambda0, pv, Lx, Ly)
+        assert np.isnan(output).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, pv, Lx, Ly, expected", [
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0, np.array([0.36787944])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0, 0.0, np.array([0.36787944])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 1.0, np.array([0.36787944])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0, np.array([1.0])),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0, np.array([1.0])),
+        (np.array([1.0, 1.0]), np.array([1.0, 1.0]), 1.0, 1.0, 1.0, 1.0, np.array([0.42119275, 0.42119275])),
+    ])
+    def test_wavefront_OTF(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        pv: float,
+        Lx: float,
+        Ly: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test wavefrontOTF with normal inputs and expected outputs
+        """
+        output = otf.wavefrontOTF(u, v, lambda0, pv, Lx, Ly)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, eta", [
+        (np.array([]), np.array([]), 1.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([]), 1.0, 0.0, 0.0),
+        (np.array([]), np.array([1.0]), 1.0, 0.0, 0.0),
+        (np.array([]), np.array([]), 1.0, 1.0, 1.0),
+    ])
+    def test_wavefront_OTF_empty_array(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        eta: float
+    ) -> None:
+        """
+        Test wavefrontOTF with empty input
+        """
+        output = otf.circularApertureOTF(u, v, lambda0, D, eta)
+        assert output.size == 0
+
+    @pytest.mark.parametrize("u, v, lambda0, D, eta", [
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0),
+        (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0),
+    ])
+    def test_circular_aperture_otf_zero_division(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        eta: float
+    ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
+        with pytest.raises(ZeroDivisionError):
+            otf.circularApertureOTF(u, v, lambda0, D, eta)
+
+    @pytest.mark.parametrize("u, v, lambda0, D, eta", [
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0),
+    ])
+    def test_circular_aperture_OTF_nan(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        eta: float
+    ) -> None:
+        """
+        Cover cases where nan output occurs
+        """
+        output = otf.circularApertureOTF(u, v, lambda0, D, eta)
+        assert np.isnan(output).all()
+
+    @pytest.mark.parametrize("u, v, lambda0, D, eta, expected", [
+        (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, np.array([0.0])),
+        (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, np.array([0.0])),
+        (np.array([1.0, 1.0]), np.array([1.0, 1.0]), 1.0, 1.0, 0.0, np.array([0.0])),
+        (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 1.0, 1.0, 0.5, np.array([0.0, 0.0])),
+    ])
+    def test_circular_aperture_OTF(
+        self,
+        u: np.ndarray,
+        v: np.ndarray,
+        lambda0: float,
+        D: float,
+        eta: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test circularApertureOTF with normal inputs and expected outputs
+        """
+        output = otf.circularApertureOTF(u, v, lambda0, D, eta)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("otfValue, df, dxout", [
+        (np.array([]), 0.0, 0.0),
+        (np.array([0.0]), 0.0, 0.0),
+    ])
+    def test_otf2psf_index_error(
+        self,
+        otfValue: np.ndarray,
+        df: float,
+        dxout: float
+    ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
+        with pytest.raises(IndexError):
+            otf.otf2psf(otfValue, df, dxout)
+
+    @pytest.mark.parametrize("otfValue, df, dxout", [
+        (np.ones((10, 10)), 0.0, 0.0),
+        (np.ones((10, 10)), 0.0, 1.0),
+        (np.ones((10, 10)), 1.0, 0.0),
+    ])
+    def test_otf2psf_zero_division(
+        self,
+        otfValue: np.ndarray,
+        df: float,
+        dxout: float
+    ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
+        with pytest.raises(ZeroDivisionError):
+            otf.otf2psf(otfValue, df, dxout)
+
+    @pytest.mark.parametrize("otfValue, df, dxout, expected", [
+        (np.ones((15, 15)), 1.0, 1.0, np.array([1.0])),
+        (np.ones((100, 100)), 1.0, 1.0, np.array([1.0])),  
+    ])
+    def test_otf2psf(
+        self,
+        otfValue: np.ndarray,
+        df: float,
+        dxout: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test otf2psf with normal inputs and expected outputs
+        """
+        output = otf.otf2psf(otfValue, df, dxout)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("imgin, dxin, dxout", [
+        (np.array([]), 1.0, 1.0),
+        (np.array([1.0]), 1.0, 1.0),
+    ])
+    def test_resample2D_index_error(
+        self,
+        imgin: np.ndarray,
+        dxin: float,
+        dxout: float
+    ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
+        with pytest.raises(IndexError):
+            otf.resample2D(imgin, dxin, dxout)
+
+    @pytest.mark.parametrize("imgin, dxin, dxout", [
+        (np.ones((5, 5)), 0.0, 0.0),
+        (np.ones((5, 5)), 1.0, 0.0),
+    ])
+    def test_resample2D_zero_division(
+        self,
+        imgin: np.ndarray,
+        dxin: float,
+        dxout: float
+    ) -> None:
+        """
+        Cover cases where ZeroDivision occurs
+        """
+        with pytest.raises(ZeroDivisionError):
+            otf.resample2D(imgin, dxin, dxout)
+
+    @pytest.mark.parametrize("imgin, dxin, dxout", [
+        (np.ones((5, 5)), 0.0, 1.0),
+    ])
+    def test_resample2D_cv2_error(
+        self,
+        imgin: np.ndarray,
+        dxin: float,
+        dxout: float
+    ) -> None:
+        """
+        Cover cases where cv2.error occurs
+        """
+        with pytest.raises(cv2.error):
+            otf.resample2D(imgin, dxin, dxout)
+
+    @pytest.mark.parametrize("imgin, dxin, dxout, expected", [
+        (np.ones((5, 5)), 1.0, 1.0, np.ones((5, 5))),
+    ])
+    def test_resample2D(
+        self,
+        imgin: np.ndarray,
+        dxin: float,
+        dxout: float,
+        expected: np.ndarray
+    ) -> None:
+        """
+        Test resample2D with normal inputs and expected outputs
+        """
+        output = otf.resample2D(imgin, dxin, dxout)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+    @pytest.mark.parametrize("ref_img, ref_gsd, ref_range, otfValue, df, ifov", [
+        (np.array([]), 0.0, 0.0, np.array([]), 0.0, 0.0),
+        (np.array([]), 1.0, 0.0, np.array([]), 0.0, 0.0),
+        (np.array([]), 0.0, 0.0, np.array([]), 1.0, 0.0),
+        (np.array([]), 0.0, 0.0, np.array([]), 0.0, 1.0),
+        (np.array([]), 1.0, 0.0, np.array([]), 1.0, 0.0),
+        (np.array([]), 1.0, 0.0, np.array([]), 0.0, 1.0),
+        (np.array([]), 1.0, 0.0, np.array([]), 1.0, 1.0),
+        (np.ones((100, 100)), 0.0, 1.0, np.ones((100, 100)), 0.0, 0.0),
+        (np.ones((100, 100)), 1.0, 1.0, np.ones((100, 100)), 1.0, 0.0),
+    ])
+    def test_apply_otf_to_image_zero_division(
+        self,
+        ref_img: np.ndarray,
+        ref_gsd: float,
+        ref_range: float,
+        otfValue: np.ndarray,
+        df: float,
+        ifov: float
+    ) -> None:
+        """
+        Cover cases where ZeroDivisionError occurs
+        """
+        with pytest.raises(ZeroDivisionError):
+            otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otfValue, df, ifov)
+
+    @pytest.mark.parametrize("ref_img, ref_gsd, ref_range, otfValue, df, ifov", [
+        (np.array([]), 0.0, 1.0, np.array([]), 0.0, 0.0),
+        (np.array([1.0]), 0.0, 1.0, np.array([]), 0.0, 0.0),
+        (np.array([]), 0.0, 1.0, np.array([1.0]), 0.0, 0.0),
+    ])
+    def test_apply_otf_to_image_index_error(
+        self,
+        ref_img: np.ndarray,
+        ref_gsd: float,
+        ref_range: float,
+        otfValue: np.ndarray,
+        df: float,
+        ifov: float
+    ) -> None:
+        """
+        Cover cases where IndexError occurs
+        """
+        with pytest.raises(IndexError):
+            otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otfValue, df, ifov)
+
+    @pytest.mark.parametrize("ref_img, ref_gsd, ref_range, otfValue, df, ifov, expected", [
+        (np.ones((100, 100)), 1.0, 1.0, np.ones((100, 100)), 1.0, 1.0, (np.ones((100, 100)), np.array([1.0]))),
+    ])
+    def test_apply_otf_to_image(
+        self,
+        ref_img: np.ndarray,
+        ref_gsd: float,
+        ref_range: float,
+        otfValue: np.ndarray,
+        df: float,
+        ifov: float,
+        expected: Tuple[np.ndarray, np.ndarray], 
+    ) -> None:
+        """
+        Test apply_otf_to_image with normal inputs and expected outputs
+        """
+        output = otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otfValue, df, ifov)
+        assert np.isclose(output[0], expected[0], atol=5e-20).all()
+        assert np.isclose(output[1], expected[1], atol=5e-20).all()
