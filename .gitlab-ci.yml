@@ -109,7 +109,6 @@ default:
         - $POETRY_CACHE_DIR
   before_script:
     - !reference [.setup_poetry, before_script]
-    - apt update && apt install -y libgl1
     # Will make use of .cache/poetry
     - poetry install --sync
 
@@ -131,6 +130,22 @@ default:
     - export PATH=${HOME}/.local/bin:${PATH}
     - pip install --user coverage
 
+.test_headless:
+  extends: 
+    - .test_defaults
+  before_script:
+    - !reference [.test_defaults, before_script]
+    - |
+      VERSION="$(poetry run pip list --format=json | poetry run ./scripts/pycv2_installed_version.py)"
+      if [[ "$?" -eq 0 ]]
+      then
+        echo "OpenCV-Python installed, replacing with equivalent headless version."
+        poetry run pip uninstall -y opencv-python opencv-python-headless
+        poetry run pip install --no-deps opencv-python-headless=="$VERSION"
+      else
+        echo "OpenCV-Python NOT installed, skipping."
+      fi
+
 # Job to typecheck python code
 test-py-typecheck:
   extends: .test_defaults
@@ -138,7 +153,7 @@ test-py-typecheck:
     - poetry run mypy
 
 test-docs-build:
-  extends: .test_defaults
+  extends: .test_headless
   script:
     - cd docs
     - poetry run make html
@@ -153,7 +168,7 @@ test-py-lint:
 
 # Job to run unittests via pytest
 test-pytest:
-  extends: .test_defaults
+  extends: .test_headless
   parallel:
     matrix:
       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11" ]
