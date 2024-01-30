@@ -531,7 +531,7 @@ class TestOTF:
     )
     def test_drift_OTF_empty_array(self, u: np.ndarray, v: np.ndarray, ax: float, ay: float) -> None:
         """
-        Test detectorOTF with empty input
+        Test driftOTF with empty input
         """
         output = otf.driftOTF(u, v, ax, ay)
         assert output.size == 0
