@@ -534,7 +534,7 @@ class TestOTF:
     )
     def test_drift_OTF_empty_array(self, u: np.ndarray, v: np.ndarray, ax: float, ay: float) -> None:
         """
-        Test detectorOTF with empty input
+        Test driftOTF with empty input
         """
         output = otf.driftOTF(u, v, ax, ay)
         assert output.size == 0
@@ -963,7 +963,7 @@ class TestOTF:
             (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 1.0, 1.0),
         ],
     )
-    def test_coherence_diameter_zero_division(
+    def test_windspeed_turbulence_OTF_zero_division(
         self, u: np.ndarray, v: np.ndarray, lambda0: float, D: float, r0: float, td: float, vel: float
     ) -> None:
         """
@@ -1064,11 +1064,11 @@ class TestOTF:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0),
         ],
     )
-    def test_wavefront_OTF_empty_array(
+    def test_circular_aperture_OTF_empty_array(
         self, u: np.ndarray, v: np.ndarray, lambda0: float, D: float, eta: float
     ) -> None:
         """
-        Test wavefrontOTF with empty input
+        Test circularApertureOTF with empty input
         """
         output = otf.circularApertureOTF(u, v, lambda0, D, eta)
         assert output.size == 0
