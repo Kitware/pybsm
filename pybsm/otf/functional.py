@@ -693,9 +693,9 @@ def polychromaticTurbulenceOTF(
             the effective coherence diameter across the band (m)
 
     :raises:
-        ZeroDivisionError: 
+        ZeroDivisionError:
             if slantRange is 0
-        IndexError: 
+        IndexError:
             if weights or altitude if empty or the lengths of weights
             or altitude are not equal
     """
