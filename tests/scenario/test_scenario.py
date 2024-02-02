@@ -68,11 +68,7 @@ class TestScenario:
         new_ihaze: int
     ) -> None:
         """
-<<<<<<< HEAD
         Test that setting the ihaze attribute appropriately updates the internal value as
-=======
-         Test that setting the ihaze attribute appropriately updates the internal value as
->>>>>>> Add descriptions and test protected objects
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', original_ihaze, 0.0, 0.0)
@@ -93,11 +89,7 @@ class TestScenario:
         new_altitude: float
     ) -> None:
         """
-<<<<<<< HEAD
         Test that setting the altitude attribute appropriately updates the internal value as
-=======
-         Test that setting the altitude attribute appropriately updates the internal value as
->>>>>>> Add descriptions and test protected objects
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', 0, original_altitude, 0.0)
@@ -118,11 +110,7 @@ class TestScenario:
         new_ground_range: float,
     ) -> None:
         """
-<<<<<<< HEAD
         Test that setting the ground_range attribute appropriately updates the internal value as
-=======
-         Test that setting the ground_range attribute appropriately updates the internal value as
->>>>>>> Add descriptions and test protected objects
         well as clear the internal atm attribute.
         """
         scenario = Scenario('test', 0, 0.0, original_ground_range)
