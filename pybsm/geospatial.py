@@ -69,6 +69,10 @@ def altitudeAlongSlantPath(
         hPath:
             height above the earth along a slantpath defined by zPath. (m)
 
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
+
     """
 
     # this is simple law of cosines problem
@@ -130,6 +134,10 @@ def nadirAngle(
     :return:
         nadir:
             the sensor nadir angle. (rad)
+
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
     """
 
     a = rEarth + hSensor

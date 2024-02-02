@@ -107,6 +107,8 @@ class TestOTF:
         "wavelengths, weights, myFunction",
         [
             (np.array([]), np.array([]), lambda wavelengths: wavelengths),
+            (np.array([]), np.array([0.0]), lambda wavelengths: wavelengths),
+            (np.array([0.0]), np.array([]), lambda wavelengths: wavelengths),
             (np.array([1.0, 2.0]), np.array([1.0]), lambda wavelengths: wavelengths),
         ],
     )
@@ -634,7 +636,7 @@ class TestOTF:
         assert np.isclose(otf.systemOTF, systemOTF).all()
 
     @pytest.mark.parametrize(
-        "sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange," "intTime",
+        "sensor, scenario, uu, vv, mtfwavelengths, mtfweights, slantRange, intTime",
         [
             (
                 Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
@@ -681,10 +683,50 @@ class TestOTF:
             (
                 Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
                 Scenario("test_scenario", 1, 1.0, 1.0),
+                np.array([]),
+                np.array([]),
+                np.array([]),
+                np.array([]),
+                1.0,
+                1.0,
+            ),
+            (
+                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                Scenario("test_scenario", 1, 1.0, 1.0),
                 np.array([1.0]),
                 np.array([]),
                 np.array([]),
                 np.array([]),
+                1.0,
+                1.0,
+            ),
+            (
+                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                Scenario("test_scenario", 1, 1.0, 1.0),
+                np.array([]),
+                np.array([1.0]),
+                np.array([]),
+                np.array([]),
+                1.0,
+                1.0,
+            ),
+            (
+                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                Scenario("test_scenario", 1, 1.0, 1.0),
+                np.array([]),
+                np.array([]),
+                np.array([1.0]),
+                np.array([]),
+                1.0,
+                1.0,
+            ),
+            (
+                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                Scenario("test_scenario", 1, 1.0, 1.0),
+                np.array([]),
+                np.array([]),
+                np.array([]),
+                np.array([1.0]),
                 1.0,
                 1.0,
             ),
@@ -705,6 +747,16 @@ class TestOTF:
                 np.array([1.0]),
                 np.array([]),
                 np.array([1.0]),
+                1.0,
+                1.0,
+            ),
+            (
+                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                Scenario("test_scenario", 1, 1.0, 1.0),
+                np.array([1.0]),
+                np.array([1.0]),
+                np.array([1.0]),
+                np.array([]),
                 1.0,
                 1.0,
             ),
