@@ -120,7 +120,12 @@ def img2reflectance(
     :type refl_values: np.array
 
     :return:
-        refImg - the image in reflectance space
+        refImg - the image in reflectance space. WARNING: output can be
+        nan if all input arrays have the same values
+
+    :raises:
+        ValueError:
+            if img, pix_values, or refl_values have a length < 2
     """
     f = interpolate.interp1d(
         pix_values,

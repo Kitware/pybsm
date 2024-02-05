@@ -28,6 +28,7 @@ class TestSimulation:
         "img, pix_values, refl_values",
         [
             (np.array([0.0, 0.0]), np.array([0.0, 0.0]), np.array([0.0, 0.0])),
+            (np.array([1.0, 1.0]), np.array([1.0, 1.0]), np.array([1.0, 1.0])),
         ],
     )
     def test_img2reflectance_nan(self, img: np.ndarray, pix_values: np.ndarray, refl_values: np.ndarray) -> None:

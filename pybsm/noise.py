@@ -71,7 +71,9 @@ def quantizationNoise(
 
     :return:
         sigmaq :
-            quantization noise given as a photoelectron standard deviation (e-)
+            quantization noise given as a photoelectron standard deviation (e-).
+            WARNING: output can be nan if peRange is 0
+            WARNING: output can be inf if bitdepth is 0
     """
     sigmaq = peRange / (np.sqrt(12) * (2.0**bitdepth - 1.0))
     return sigmaq

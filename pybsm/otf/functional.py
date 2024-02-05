@@ -126,7 +126,12 @@ def circularApertureOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless)
+            OTF at spatial frequency (u,v) (unitless). WARNING: output can be
+            nan if eta is 1
+
+    :raises:
+        ZeroDivisionError:
+            if lambda0 is 0
 
     :NOTE:
         You will see several runtime warnings when this code is first accessed.
@@ -826,7 +831,9 @@ def turbulenceOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless)
+            OTF at spatial frequency (u,v) (unitless). WARNING output
+            can be inf if D is 0 and output can be nan if lambda0 and
+            alpha are 0.
     """
     rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
     H = np.exp(
@@ -919,7 +926,8 @@ def wavefrontOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless)
+            OTF at spatial frequency (u,v) (unitless). WARNING: output can be
+            nan if lambda0 is 0
 
     """
     autoc = np.exp(-(lambda0**2) * ((u / Lx) ** 2 + (v / Ly) ** 2))
@@ -995,7 +1003,12 @@ def windspeedTurbulenceOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless)
+            OTF at spatial frequency (u,v) (unitless) WARNING:
+            return nan is D is 0.
+
+    :raises:
+        ZeroDivisionError:
+            if r0 is 0
     """
     weight = np.exp(-vel * td / r0)
     H = weight * turbulenceOTF(u, v, lambda0, D, r0, 0.5) + (
@@ -1113,6 +1126,12 @@ def otf2psf(
     :return:
         psf:
             blur kernel
+
+    :raises:
+        IndexError:
+            if otf is not a 2D array
+        ZeroDivisionError:
+            if df or dxout are 0
 
     """
     # transform the psf
@@ -1459,6 +1478,12 @@ def apply_otf_to_image(
             the resampled blur kernel (useful for checking the health of the
             simulation)
 
+    :raises:
+        ZeroDivisionError:
+            if ref_range is 0 or ifov is 0
+        IndexError:
+            if ref_img or otf are not 2D arrays
+
     :WARNING:
         ref_gsd must be small enough to properly sample the blur kernel! As a
         guide, if the image system transfer function goes to zero at angular
@@ -1632,6 +1657,14 @@ def resample2D(
     :return:
         imgout:
             output image
+
+    :raises:
+        IndexError:
+            if imigin is not a 2D array
+        ZeroDivisionError:
+            if dxout is 0
+        cv2.error:
+            if dxin is 0
 
     """
 
