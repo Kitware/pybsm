@@ -369,7 +369,7 @@ def detectorOTF(
 
     :return:
         H:
-            detector OTF
+            detector OTF. WARNRING: output can be NaN if f is 0
     """
 
     H = np.sinc(wx * u / f) * np.sinc(wy * v / f)
@@ -691,6 +691,13 @@ def polychromaticTurbulenceOTF(
             turbulence OTF (unitless)
         r0band:
             the effective coherence diameter across the band (m)
+
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
+        IndexError:
+            if weights or altitude if empty or the lengths of weights
+            or altitude are not equal
     """
     # calculate the Structure constant along the slant path
     (zPath, hPath) = altitudeAlongSlantPath(0.0, altitude, slantRange)
@@ -1169,7 +1176,13 @@ def weightedByWavelength(
 
     :return:
         weightedfcn:
-            the weighted function
+            the weighted function. WARNING: output can be nan if all weights
+            are 0
+
+    :raises:
+        IndexError:
+            if wavelengths or weights is empty or length of weights
+            and wavelengths are not equal
     """
     weights = weights / weights.sum()
     weightedfcn = weights[0] * myFunction(wavelengths[0])
@@ -1185,8 +1198,8 @@ def weightedByWavelength(
 def coherenceDiameter(
     lambda0: float,
     zPath: np.ndarray,
-    cn2: float
-) -> np.ndarray:
+    cn2: np.ndarray
+) -> float:
     """
     This is an improvement / replacement for IBSM Equation 3-5: calculation of
     Fried's coherence diameter (m) for spherical wave propagation.
@@ -1215,7 +1228,14 @@ def coherenceDiameter(
 
     :return:
         r0:
-            correlation diameter (m) at wavelength lambda0
+            correlation diameter (m) at wavelength lambda0. WARNING: r0 can be
+            infinite if zPath is one element or if cn2 is one element and 0.
+
+    :raises:
+        ValueError:
+            if zPath is empty
+        ZeroDivisionError:
+            if lambda0 is 0
     """
     # the path integral of the structure parameter term
     spIntegral = np.trapz(cn2 * (zPath / zPath.max()) ** (5.0 / 3.0), zPath)
@@ -1226,10 +1246,10 @@ def coherenceDiameter(
 
 
 def hufnagelValleyTurbulenceProfile(
-    h: float,
+    h: np.ndarray,
     v: float,
     cn2at1m: float
-) -> float:
+) -> np.ndarray:
     """Replaces IBSM Equations 3-6 through 3-8.  The Hufnagel-Valley Turbulence
     profile (i.e. a profile of the refractive index structure parameter as a
     function of altitude).  I suggest the HV profile because it seems to be in
@@ -1509,6 +1529,12 @@ def commonOTFs(
             an object containing results of the OTF calculations along with
             many intermediate calculations.  The full system OTF is contained
             in otf.systemOTF.
+
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
+        IndexError:
+            if uu or vv are empty
     """
 
     otf = OTF()
