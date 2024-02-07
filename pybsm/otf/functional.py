@@ -126,12 +126,14 @@ def circularApertureOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless). WARNING: output can be
-            nan if eta is 1
+            OTF at spatial frequency (u,v) (unitless)
 
     :raises:
         ZeroDivisionError:
             if lambda0 is 0
+
+    :WARNING:
+        output can be nan if eta is 1
 
     :NOTE:
         You will see several runtime warnings when this code is first accessed.
@@ -831,9 +833,11 @@ def turbulenceOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless). WARNING output
-            can be inf if D is 0 and output can be nan if lambda0 and
-            alpha are 0.
+            OTF at spatial frequency (u,v) (unitless)
+
+    :WARNING:
+            output can be inf if D is 0
+            output can be nan if lambda0 andalpha are 0
     """
     rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
     H = np.exp(
@@ -926,8 +930,10 @@ def wavefrontOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless). WARNING: output can be
-            nan if lambda0 is 0
+            OTF at spatial frequency (u,v) (unitless)
+
+    :WARNING:
+        output can be nan if lambda0 is 0
 
     """
     autoc = np.exp(-(lambda0**2) * ((u / Lx) ** 2 + (v / Ly) ** 2))
@@ -1003,12 +1009,14 @@ def windspeedTurbulenceOTF(
 
     :return:
         H:
-            OTF at spatial frequency (u,v) (unitless) WARNING:
-            return nan is D is 0.
+            OTF at spatial frequency (u,v) (unitless)
 
     :raises:
         ZeroDivisionError:
             if r0 is 0
+
+    :WARNING:
+        Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * td / r0)
     H = weight * turbulenceOTF(u, v, lambda0, D, r0, 0.5) + (
@@ -1195,13 +1203,15 @@ def weightedByWavelength(
 
     :return:
         weightedfcn:
-            the weighted function. WARNING: output can be nan if all weights
-            are 0
+            the weighted function
 
     :raises:
         IndexError:
             if wavelengths or weights is empty or length of weights
             and wavelengths are not equal
+
+    :WARNING:
+        output can be nan if all weights are 0
     """
     weights = weights / weights.sum()
     weightedfcn = weights[0] * myFunction(wavelengths[0])
@@ -1247,14 +1257,16 @@ def coherenceDiameter(
 
     :return:
         r0:
-            correlation diameter (m) at wavelength lambda0. WARNING: r0 can be
-            infinite if zPath is one element or if cn2 is one element and 0.
+            correlation diameter (m) at wavelength lambda0
 
     :raises:
         ValueError:
             if zPath is empty
         ZeroDivisionError:
             if lambda0 is 0
+
+    :WARNING:
+        r0 can be infinite if zPath is one element or if cn2 is one element and 0
     """
     # the path integral of the structure parameter term
     spIntegral = np.trapz(cn2 * (zPath / zPath.max()) ** (5.0 / 3.0), zPath)
