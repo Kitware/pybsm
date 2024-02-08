@@ -82,6 +82,10 @@ def atFocalPlaneIrradiance(
         E: total irradiance (W/m^2) or spectral irradiance (W/m^2 m) at the
         focal plane
 
+    :raises:
+        ZeroDivisionError:
+            if D is 0
+
     """
     if L.size == 0:
         warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
@@ -167,6 +171,10 @@ def coldshieldSelfEmission(
     :return:
         coldshieldE:
             cold shield spectral irradiance at the FPA (W / m^2 m)
+
+    :raises:
+        ZeroDivisionError:
+            if D is 0
     """
     if wavelengths.size == 0:
         warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
@@ -204,6 +212,10 @@ def coldstopSelfEmission(
     :return:
         coldstopE:
             optics emitted irradiance on to the FPA (W / m^2 m)
+
+    :raises:
+        ZeroDivisionError:
+            if D is 0
     """
     if wavelengths.size == 0:
         warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
@@ -297,6 +309,10 @@ def opticsSelfEmission(
     :return:
         opticsE:
             optics emitted irradiance on to the FPA (W / m^2 m)
+
+    :raises:
+        ZeroDivisionError:
+            if D is 0
     """
     if wavelengths.size == 0:
         warnings.warn(UserWarning("Input array is empty. Expect output to be empty"))
@@ -549,6 +565,10 @@ def reflectance2photoelectrons(
             The first row is the wavelength (m) and the second row is the
             relative contribution to the signal from the associated
             column-paired wavelength.
+
+    :raises:
+        IndexError:
+            if atm is not a 2D array
     """
 
     ref = np.linspace(0.0, 1.0, 100)
@@ -681,6 +701,10 @@ def signalRate(
         tgtdN:
             spectral photoelectrons (e-/s m)
 
+    :raises:
+        ZeroDivisionError:
+            if D is 0
+
     """
     if wavelengths.size == 0 or targetRadiance.size == 0 or opticalTransmission.size == 0 or otherIrradiance.size == 0:
         warnings.warn(UserWarning("Input array(s) are empty. Expect output to be empty"))
@@ -719,6 +743,10 @@ def totalRadiance(
         radiance:
             radiance = path thermal + surface emission + solar scattering +
             ground reflected (W/m^2 sr m)
+
+    :raises:
+        IndexError:
+            if atm is not a 2D array
 
     :NOTE:
         In the emissive infrared region (e.g. >= 3 micrometers), the nighttime
@@ -818,6 +846,11 @@ def resampleByWavelength(
     :return:
         newValues: array of values resampled to match newWavelengths.
         Extrapolated values are set to 0.
+
+    :raises:
+        ValueError:
+            if the length of wavelengths array and values array are
+            not equal
     """
     newValues = np.interp(newWavelengths, wavelengths, values, 0.0, 0.0)
     return newValues

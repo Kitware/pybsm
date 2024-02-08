@@ -601,6 +601,7 @@ class TestReflectance2Photoelectrons:
         [
             (np.array([]), 0.0, 0.0),
             (np.array([]), 1.0, 1.0),
+            (np.array([1.0]), 1.0, 1.0),
         ],
     )
     def test_total_radiance_index_error(self, atm: np.ndarray, reflectance: float, temperature: float) -> None:
@@ -662,6 +663,7 @@ class TestReflectance2Photoelectrons:
         [
             (np.array([]), Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 0.0, 0),
             (np.array([]), Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 1.0, 1),
+            (np.array([1.0]), Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])), 1.0, 1),
         ],
     )
     def test_reflectance_2_photoelectrons_index_error(

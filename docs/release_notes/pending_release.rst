@@ -23,4 +23,6 @@ CI/CD
 
 Tests
 
-* Add tests for `reflectance2photoelectrons` and its downstream functions
+* Add tests for `reflectance2photoelectrons` and its downstream functions.
+
+* Documented exceptions for `reflectance2photoelectrons` and its downstream functions.
