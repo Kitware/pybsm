@@ -1,5 +1,7 @@
-Table of Contents for pybsm Code Documentation
+Code Documentation
 ==============================================
+
+The following sections provide documentation of the pyBSM functions:
 
 .. toctree::
    :maxdepth: 2

@@ -6,16 +6,17 @@ Updates / New Features
 
 Documentation
 
-* Added baseline documentation for all pybsm functionality and instruction pages for
-  package installation, the review process, and the release process
+* Added baseline documentation for all pyBSM functionality and instruction pages for package installation, the review process, and the release process.
 
-* Added Read the Docs configuration files
+* Added Read the Docs configuration files.
 
-* Added Apache license file
+* Added Apache license file.
+
+* Added a style sheet to guide future documentation and text updates.
 
 CI/CD
 
-* Add pytest and coverage reports to CI
+* Added pytest and coverage reports to CI.
 
 * Added a conditional case of ``opencv-python-headless`` installation
 
@@ -25,6 +26,6 @@ CI/CD
 
 Tests
 
-* Add tests for `reflectance2photoelectrons` and its downstream functions.
-
 * Documented exceptions for `reflectance2photoelectrons` and its downstream functions.
+
+* Added tests for `reflectance2photoelectrons` and its downstream functions.
