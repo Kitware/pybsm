@@ -1,12 +1,12 @@
 Review Process
 **************
 
-The process for reviewing and integrating branches into ``pybsm`` is described
+The process for reviewing and integrating branches into pybsm is described
 below.
 
-For guidelines on contributing to ``pybsm``, see ``CONTRIBUTING.md``.
+For guidelines on contributing, see ``CONTRIBUTING.md``.
 
-For guidelines on the release process for ``pybsm``, see `Release Process and
+For guidelines on the release process, see `Release Process and
 Notes`_.
 
 .. _`Release Process and Notes`: release_process.html
@@ -18,13 +18,13 @@ Merge Request (MR)
 ==================
 An MR is initiated by a user intending to integrate a branch from their forked
 repository.
-Before the branch is integrated into the ``pybsm`` master branch, it must
+Before the branch is integrated into the pybsm master branch, it must
 first go through a series of checks and a review to ensure that the branch is
 consistent with the rest of the repository and doesn't contain any issues.
 
 Workflow Status
 ---------------
-The submitter must set the status of their MR.
+The submitter must set the status of their MR:
 
 Draft
 ^^^^^
@@ -35,7 +35,7 @@ for merger, they may set the status to ``Open``.
 
 Open
 ^^^^
-Indicates that a MR is ready for review and that the submitter of the MR thinks
+Indicates that an MR is ready for review and that the submitter of the MR thinks
 that the branch is ready to be merged.
 If a review is received that requests substantial changes to the contributed
 content, effectively returning the task at hand into a "development" phase, the
@@ -53,7 +53,7 @@ Indicates that the MR is resolved or discarded.
 Continuous Integration
 ======================
 The following checks are included in the automated portion of the review
-process, and are triggered whenever a merge-request is made or changes, a tag is
+process, and are triggered whenever an MR is made or changes, a tag is
 created, or when the ``main`` branch is updated.
 These are run as part of the CI/CD pipeline driven by GitLab CI pipelines, and
 defined by the :file:`.gitlab-ci.yml` file.
@@ -78,7 +78,7 @@ Passage of this check is strictly required.
 
 Documentation Build (``test-docs-build``)
 -----------------------------------------
-Performs a build of our sphinx documentation.
+Performs a build of our Sphinx documentation.
 
 Passage of this check is strictly required.
 
@@ -130,7 +130,7 @@ be marked as a ``Draft``.
 Once the MR is in a mergeable state, it will need to undergo a final review to
 ensure that there are no outstanding issues.
 
-If a MR is not a draft and has an appropriate amount of approving reviews, it
+If an MR is not a draft and has an appropriate amount of approving reviews, it
 may be merged at any time.
 
 Notebooks
@@ -149,12 +149,12 @@ Resolving a Branch
 
 Merge
 -----
-Once a MR receives an approving review and is no longer marked as a ``Draft``,
+Once an MR receives an approving review and is no longer marked as a ``Draft``,
 the repository maintainers can merge it, closing the merge request.
 It is recommended that the submitter delete their branch after the MR is
 merged.
 
 Close
 -----
-If it is decided that the MR will not be integrated into ``pybsm``, then
+If it is decided that the MR will not be integrated into pybsm, then
 it can be closed through GitLab.

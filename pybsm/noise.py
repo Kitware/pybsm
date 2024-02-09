@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Use the following citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -12,9 +12,9 @@ Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
 
-contact: daniel.lemaster@us.af.mil
+Contact: daniel.lemaster@us.af.mil
 
-version 0.2: CURRENTLY IN BETA!!
+Version 0.2: CURRENTLY IN BETA!!
 """
 # standard library imports
 import os
@@ -44,7 +44,7 @@ def noiseGain(kernel: np.ndarray) -> float:
     Vol. 36, No. 32 10 November 1997.
 
     :param kernel:
-         the 2-D image sharpening kernel.  Note that
+         the 2D image sharpening kernel.  Note that
          the kernel is assumed to sum to one.
 
     :return:
@@ -65,7 +65,7 @@ def quantizationNoise(
 
     :param peRange:
         the difference between the maximum and minimum number of photoelectrons
-        that may be sampled by the read out electronics (e-)
+        that may be sampled by the readout electronics (e-)
     :param bitdepth:
         number of bits in the analog to digital converter (unitless)
 
