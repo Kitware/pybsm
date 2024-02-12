@@ -617,7 +617,7 @@ def reflectance2photoelectrons(
     if sat > 1:
         print(
             f"Reducing integration time from {intTime} to {intTime/sat}"
-            "to avoid overexposure"
+            " to avoid overexposure"
         )
         pe = pe / sat
 
