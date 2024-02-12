@@ -1,6 +1,6 @@
 # pyBSM
 
-This is a placeholder for a potential future release of pyBSM. For now, this repo can be used on internal imports to the JATIC repos.
+pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems.
 
 This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems [[1]](#1) as well as LeMaster, et al. in their work in validating the pyBSM package [[2]](#2).
 
