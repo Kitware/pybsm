@@ -28,7 +28,7 @@ default:
 #
 # REMINDER: The "." prefix causes the "job" to be hidden (does not get run),
 # but can still be used for inheritance.
-# 
+#
 # Run rules to activate at the major junction points: merge requests, tag
 # pipelines and branch pipelines for main.
 .run_automatically:
@@ -131,7 +131,7 @@ default:
     - pip install --user coverage
 
 .test_headless:
-  extends: 
+  extends:
     - .test_defaults
   before_script:
     - !reference [.test_defaults, before_script]
@@ -219,6 +219,25 @@ test-coverage-percent:
     # TODO: Read required percentages from config file?
     - coverage report --include 'pybsm/*' --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
+
+# Job to check the release notes folder
+#
+# We only want to run this when a "run_automatically" rule is true, except for
+# when the latest commit is a merge commit (assuming standard merge commit
+# text).
+#
+test-release-notes-check:
+  extends: .test_preamble
+  allow_failure: true
+  script:
+    - git fetch
+    - scripts/check_for_release_notes.sh origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TITLE =~ /Merge branch.*/
+      when: never
+    - if: $CI_COMMIT_BRANCH == "release" && $CI_COMMIT_TITLE =~ /Merge branch.*/
+      when: never
+    - !reference [.run_automatically, rules] # Don't overwrite normal rules
 
 # # Job to ensure the provided example script still runs
 # NOTE: this version of tests was to confirm the original pybsm_example.py

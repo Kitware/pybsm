@@ -17,8 +17,10 @@ CI/CD
 
 * Add pytest and coverage reports to CI
 
-* Added a conditional case of ``opencv-python-headless`` installation.
+* Added a conditional case of ``opencv-python-headless`` installation
+
+* Add release notes modification check
 
 Tests
 
-* Add tests for `reflectance2photoelectrons` and its downstream functions.
+* Add tests for `reflectance2photoelectrons` and its downstream functions
