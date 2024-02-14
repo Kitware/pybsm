@@ -128,6 +128,13 @@ def circularApertureOTF(
         H:
             OTF at spatial frequency (u,v) (unitless)
 
+    :raises:
+        ZeroDivisionError:
+            if lambda0 is 0
+
+    :WARNING:
+        output can be nan if eta is 1
+
     :NOTE:
         You will see several runtime warnings when this code is first accessed.
         The issue (calculating arccos and sqrt outside of their domains) is
@@ -369,7 +376,7 @@ def detectorOTF(
 
     :return:
         H:
-            detector OTF
+            detector OTF. WARNRING: output can be NaN if f is 0
     """
 
     H = np.sinc(wx * u / f) * np.sinc(wy * v / f)
@@ -691,6 +698,13 @@ def polychromaticTurbulenceOTF(
             turbulence OTF (unitless)
         r0band:
             the effective coherence diameter across the band (m)
+
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
+        IndexError:
+            if weights or altitude if empty or the lengths of weights
+            or altitude are not equal
     """
     # calculate the Structure constant along the slant path
     (zPath, hPath) = altitudeAlongSlantPath(0.0, altitude, slantRange)
@@ -820,6 +834,10 @@ def turbulenceOTF(
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
+
+    :WARNING:
+            output can be inf if D is 0
+            output can be nan if lambda0 andalpha are 0
     """
     rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
     H = np.exp(
@@ -914,6 +932,9 @@ def wavefrontOTF(
         H:
             OTF at spatial frequency (u,v) (unitless)
 
+    :WARNING:
+        output can be nan if lambda0 is 0
+
     """
     autoc = np.exp(-(lambda0**2) * ((u / Lx) ** 2 + (v / Ly) ** 2))
     H = np.exp(-pv * (1 - autoc))
@@ -989,6 +1010,13 @@ def windspeedTurbulenceOTF(
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
+
+    :raises:
+        ZeroDivisionError:
+            if r0 is 0
+
+    :WARNING:
+        Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * td / r0)
     H = weight * turbulenceOTF(u, v, lambda0, D, r0, 0.5) + (
@@ -1107,6 +1135,12 @@ def otf2psf(
         psf:
             blur kernel
 
+    :raises:
+        IndexError:
+            if otf is not a 2D array
+        ZeroDivisionError:
+            if df or dxout are 0
+
     """
     # transform the psf
     psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
@@ -1170,6 +1204,14 @@ def weightedByWavelength(
     :return:
         weightedfcn:
             the weighted function
+
+    :raises:
+        IndexError:
+            if wavelengths or weights is empty or length of weights
+            and wavelengths are not equal
+
+    :WARNING:
+        output can be nan if all weights are 0
     """
     weights = weights / weights.sum()
     weightedfcn = weights[0] * myFunction(wavelengths[0])
@@ -1185,8 +1227,8 @@ def weightedByWavelength(
 def coherenceDiameter(
     lambda0: float,
     zPath: np.ndarray,
-    cn2: float
-) -> np.ndarray:
+    cn2: np.ndarray
+) -> float:
     """
     This is an improvement / replacement for IBSM Equation 3-5: calculation of
     Fried's coherence diameter (m) for spherical wave propagation.
@@ -1216,6 +1258,15 @@ def coherenceDiameter(
     :return:
         r0:
             correlation diameter (m) at wavelength lambda0
+
+    :raises:
+        ValueError:
+            if zPath is empty
+        ZeroDivisionError:
+            if lambda0 is 0
+
+    :WARNING:
+        r0 can be infinite if zPath is one element or if cn2 is one element and 0
     """
     # the path integral of the structure parameter term
     spIntegral = np.trapz(cn2 * (zPath / zPath.max()) ** (5.0 / 3.0), zPath)
@@ -1226,10 +1277,10 @@ def coherenceDiameter(
 
 
 def hufnagelValleyTurbulenceProfile(
-    h: float,
+    h: np.ndarray,
     v: float,
     cn2at1m: float
-) -> float:
+) -> np.ndarray:
     """Replaces IBSM Equations 3-6 through 3-8.  The Hufnagel-Valley Turbulence
     profile (i.e. a profile of the refractive index structure parameter as a
     function of altitude).  I suggest the HV profile because it seems to be in
@@ -1439,6 +1490,12 @@ def apply_otf_to_image(
             the resampled blur kernel (useful for checking the health of the
             simulation)
 
+    :raises:
+        ZeroDivisionError:
+            if ref_range is 0 or ifov is 0
+        IndexError:
+            if ref_img or otf are not 2D arrays
+
     :WARNING:
         ref_gsd must be small enough to properly sample the blur kernel! As a
         guide, if the image system transfer function goes to zero at angular
@@ -1509,6 +1566,12 @@ def commonOTFs(
             an object containing results of the OTF calculations along with
             many intermediate calculations.  The full system OTF is contained
             in otf.systemOTF.
+
+    :raises:
+        ZeroDivisionError:
+            if slantRange is 0
+        IndexError:
+            if uu or vv are empty
     """
 
     otf = OTF()
@@ -1606,6 +1669,14 @@ def resample2D(
     :return:
         imgout:
             output image
+
+    :raises:
+        IndexError:
+            if imigin is not a 2D array
+        ZeroDivisionError:
+            if dxout is 0
+        cv2.error:
+            if dxin is 0
 
     """
 

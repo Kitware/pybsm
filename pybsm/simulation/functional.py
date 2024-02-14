@@ -121,6 +121,13 @@ def img2reflectance(
 
     :return:
         refImg - the image in reflectance space
+
+    :raises:
+        ValueError:
+            if img, pix_values, or refl_values have a length < 2
+
+    :WARNING:
+        output can be nan if all input arrays have the same values
     """
     f = interpolate.interp1d(
         pix_values,
