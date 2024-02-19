@@ -21,6 +21,8 @@ CI/CD
 
 * Add release notes modification check
 
+* Add python3.12 to test matrix
+
 Tests
 
 * Add tests for `reflectance2photoelectrons` and its downstream functions.
