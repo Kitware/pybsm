@@ -1,4 +1,4 @@
-Steps of the pybsm Release Process
+Steps of the pyBSM Release Process
 ==================================
 Three types of releases are expected to occur:
   - major
@@ -15,6 +15,8 @@ number occurs.
 
 Create and Merge Version Update Branch
 --------------------------------------
+
+This step of the release process depends on whether the release is considered to be major or minor, or if it is a patch release.
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -52,7 +54,7 @@ and functionalities.
 5. Merge the pull/merge request into the ``release`` branch.
 
 6. Tag the resulting merge commit.
-   See `Tag new version`_ below for how to do this.
+   See `Tag New Version`_ below for how to do this.
 
 7. As a repository administrator, merge the ``release`` branch into ``main``
    locally and push the updated ``main`` to upstream. (Replace "upstream"
@@ -108,7 +110,7 @@ If a patch release for an older release version is being created, see the
 5. Merge the pull/merge request into the ``release`` branch.
 
 6. Tag the resulting merge commit.
-   See `Tag new version`_ below for how to do this.
+   See `Tag New Version`_ below for how to do this.
 
 7. As a repository administrator, merge the ``release`` branch into ``main``
    locally and push the updated ``main`` to upstream. (Replace "upstream"
@@ -140,7 +142,7 @@ first, and *then* ``release`` into ``main``, if applicable (some exceptional
 patches may only make sense for specific versions and don't warrant integration
 into upstream main).
 
-Tag new version
+Tag New Version
 ---------------
 Release branches are tagged in order to record where in the git tree a
 particular release refers to.
@@ -164,27 +166,27 @@ current, just-updated package version.
    $ git tag -a "$VERSION" -F docs/release_notes/"$VERSION".rst
    $ git push UPSTREAM "$VERSION"
 
-Draft a new release on GitLab
+Draft a New Release on GitLab
 -----------------------------
 After creating and pushing a new version tag, a GitLab "release" should be
 made.
 
-a. Navigate to the GitLab `Releases page`_ for the pytbsm repository.
+1. Navigate to the GitLab `Releases page`_ for the pybsm repository.
 
-b. Click the "Create a new release" button (or go `here
+2. Click the "Create a new release" button (or go `here
    <gitlab-new-release-page_>`_).
 
-c. Select from the "Tag name" dropdown the tag version just created and
+3. Select from the "Tag name" dropdown the tag version just created and
    pushed
 
-d. Enter the version number as the title, e.g. "v1.2.3".
+4. Enter the version number as the title, e.g. "v1.2.3".
 
-e. Select the release date.
+5. Select the release date.
 
-f. Copy and paste the release notes for this version into the release notes
+6. Copy and paste the release notes for this version into the release notes
    field.
 
-g. Click the "Create Release" button to create the GitLab release!
+7. Click the "Create Release" button to create the GitLab release!
 
 In the future, this may be automated.
 See the `appropriate GitLab documentation <gitlab-release-using-cicd_>`_ for

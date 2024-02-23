@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Use the following citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -12,9 +12,9 @@ Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
 
-contact: daniel.lemaster@us.af.mil
+Contact: daniel.lemaster@us.af.mil
 
-version 0.2: CURRENTLY IN BETA!!
+Version 0.2: CURRENTLY IN BETA!!
 """
 # standard library imports
 import os
@@ -51,16 +51,12 @@ def altitudeAlongSlantPath(
     target (zPath=0) to the sensor (zPath.max()).  This is primarily useful for
     calculating the atmospheric coherence diameter, r0.
 
-    Calculate the height above the curved earth at points along a path from
-    the target (zPath=0) to the sensor (zPath.max()).  This is primarily useful
-    for calculating the atmospheric coherence diameter, r0.
-
     :param hTarget:
-        height of the target above sea level (m).
+        height of the target above sea level (m)
     :param hSensor:
-        height of the sensor above sea level (m).
+        height of the sensor above sea level (m)
     :param slantRange:
-        distance between the target and sensor (m).
+        distance between the target and sensor (m)
 
     :return:
         zPath:
@@ -125,11 +121,11 @@ def nadirAngle(
     slant path).
 
     :param hTarget:
-        height of the target above sea level (m).
+        height of the target above sea level (m)
     :param hSensor:
-        height of the sensor above sea level (m).
+        height of the sensor above sea level (m)
     :param slantRange:
-        distance between the target and sensor (m).
+        distance between the target and sensor (m)
 
     :return:
         nadir:
