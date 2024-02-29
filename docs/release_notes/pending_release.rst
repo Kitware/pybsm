@@ -14,15 +14,17 @@ Documentation
 
 * Added a style sheet to guide future documentation and text updates.
 
+* Completed the code documentation sections and updated citations.
+
 CI/CD
 
 * Added pytest and coverage reports to CI.
 
-* Added a conditional case of ``opencv-python-headless`` installation
+* Added a conditional case of ``opencv-python-headless`` installation.
 
-* Add release notes modification check
+* Added release notes modification check.
 
-* Add python3.12 to test matrix
+* Added python3.12 to test matrix.
 
 Tests
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,10 +11,7 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-contact: daniel.lemaster@us.af.mil
-
-version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # standard library imports
 import os
@@ -51,7 +48,7 @@ def instantaneousFOV(
     w: int,
     f: int
 ) -> float:
-    """The instantaneous field-of-view, i.e. the angular footprint of a single
+    """The instantaneous field of view; i.e., the angular footprint of a single
     detector in object space.
 
     :param w:
@@ -62,13 +59,14 @@ def instantaneousFOV(
     :type f: int
 
     :return:
-        ifov - detector instantaneous field-of-view (radians)
+        ifov:
+            detector instantaneous field-of-view (radians)
     """
     ifov = w / f
     return ifov
 
 
-def wienerFiler(
+def wienerFilter(
     otf: np.ndarray,
     noiseToSignalPS: float
 ) -> np.ndarray:
@@ -84,15 +82,16 @@ def wienerFiler(
     appropriately.
 
     :param otf:
-        System optical transfer function.
+        system optical transfer function
     :type otf: list
     :param noiseTosignalPS:
-        Ratio of the noise power spectrum to the signal power spectrum.  This
-        may be a function of spatial frequency (same size as otf) or an scalar.
+        ratio of the noise power spectrum to the signal power spectrum; this
+        may be a function of spatial frequency (same size as otf) or a scalar
     :type noiseTosignalPS: float
 
     :return:
-        WF - Frequency space representation of the Wienerfilter.
+        WF:
+            frequency space representation of the Wienerfilter
     """
     WF = np.conj(otf) / (np.abs(otf) ** 2 + noiseToSignalPS)
 
@@ -106,7 +105,7 @@ def img2reflectance(
 ) -> np.ndarray:
     """Maps pixel values to reflectance values with linear interpolation
     between points. Pixel values that map below zero reflectance or above
-    unity reflectance are truncated. Implicitly, reflectance is contast
+    unity reflectance are truncated. Implicitly, reflectance is contrast
     across the camera bandpass.
 
     :param img:
@@ -120,14 +119,15 @@ def img2reflectance(
     :type refl_values: np.array
 
     :return:
-        refImg - the image in reflectance space
+        refImg:
+            the image in reflectance space
 
     :raises:
         ValueError:
             if img, pix_values, or refl_values have a length < 2
 
     :WARNING:
-        output can be nan if all input arrays have the same values
+        Output can be nan if all input arrays have the same values.
     """
     f = interpolate.interp1d(
         pix_values,
@@ -152,8 +152,8 @@ def simulate_image(
     We start with a notionally ideal reference image 'img', which captures a
     view of the world of which we would like to simulate a degraded view that
     would be collected from another imaging system. Our framework for image
-    simulation requires that this reference image is of higher-quality and
-    ideally higher-resolution than the view we would like to simulate as we can
+    simulation requires that this reference image is of higher quality and
+    ideally higher resolution than the view we would like to simulate as we can
     only model further degradation of image quality.
 
 
@@ -170,17 +170,17 @@ def simulate_image(
         relative to the target.
 
     :return:
-        trueImg: Numpy float64 array
-        The true image in units of photoelectrons.
-        blurImg: Numpy float64 array
-        The image after blurring and resampling is applied to trueImg (still
-        units of photoelectrons).
-        noisyImg: Numpy float64 array
-        The blur image with photon (Poisson) noise and gaussian noise applied
-        (still units of photoelectrons).
+        trueImg:
+            Numpy float64 array; the true image in units of photoelectrons
+        blurImg:
+            Numpy float64 array; the image after blurring and resampling is applied to trueImg
+            (still units of photoelectrons)
+        noisyImg:
+            Numpy float64 array; the blur image with photon (Poisson) noise and gaussian noise
+            applied (still units of photoelectrons)
 
     :WARNING:
-        imggsd must be small enough to properly sample the blur kernel! As a
+        imggsd must be small enough to properly sample the blur kernel. As a
         guide, if the image system transfer function goes to zero at angular
         spatial frequency, coff, then the sampling requirement will be readily
         met if imggsd <= rng/(4*coff). In practice this is easily done by

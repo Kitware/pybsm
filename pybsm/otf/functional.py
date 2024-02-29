@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,10 +11,7 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-contact: daniel.lemaster@us.af.mil
-
-version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 
 This module contains a library of functions implementing the optical transfer
 function (OTF) for various modes of sharpness degradation in an optical system.
@@ -26,7 +23,7 @@ by this our modeled imaging system.
 
 Such a treatment is based on the premise that we can model an optical system as
 a linear spatial-invariant system completely defined by a system-level OTF.
-Here, spatial-invariance is refering to the fact that we assume the OTF is
+Here, spatial-invariance is referring to the fact that we assume the OTF is
 constant across the field of view. This framework is motivated by the field of
 Fourier optics.
 
@@ -59,7 +56,7 @@ All of the functions in this module that end with OTF are of the form
 
 where u and v are the horizontal and vertical angular spatial frequency
 coordinates (rad^-1) and 'extra_parameters' captures all of relevant parameters
-of the imaging system dictacting the particular mode of OTF. The return, H, is
+of the imaging system dictating the particular mode of OTF. The return, H, is
 the OTF response (unitless) for that those spatial frequencies.
 """
 # standard library imports
@@ -133,7 +130,7 @@ def circularApertureOTF(
             if lambda0 is 0
 
     :WARNING:
-        output can be nan if eta is 1
+        Output can be nan if eta is 1.
 
     :NOTE:
         You will see several runtime warnings when this code is first accessed.
@@ -278,7 +275,7 @@ def cteOTF(
     :param cteNy:
         number of change transfers in the y direction (unitless)
     :param phasesN:
-        number of clock phases per transer (unitless)
+        number of clock phases per transfer (unitless)
     :param beta:
         ratio of TDI clocking rate to image motion rate (unitless)
     :param cteEff:
@@ -457,8 +454,8 @@ def diffusionOTF(
     :param v:
         spatial frequency coordinates (rad^-1)
     :param alpha:
-        carrier spectral diffusion coefficient (m^-1). Note that IBSM Table 3-4
-        contains aplpha values as a function of wavelength for silicon
+        carrier spectral diffusion coefficient (m^-1); note that IBSM Table 3-4
+        contains alpha values as a function of wavelength for silicon
     :param ald:
         depletion layer width (m)
     :param al0:
@@ -500,10 +497,10 @@ def driftOTF(
         angular spatial frequency coordinates (rad^-1)
     :param ax:
         line-of-sight angular drift during one integration time in the x
-        direction respectively. (rad)
+        direction respectively (rad)
     :param ay:
         line-of-sight angular drift during one integration time in the y
-        direction respectively. (rad)
+        direction respectively (rad)
 
     :return:
         H:
@@ -530,8 +527,8 @@ def filterOTF(
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param kernel:
-         the 2-D image sharpening kernel.  Note that
-         the kernel is assumed to sum to one.
+         the 2-D image sharpening kernel; note that
+         the kernel is assumed to sum to one
     :param ifov:
         instantaneous field-of-view of a detector (radians)
 
@@ -550,7 +547,7 @@ def filterOTF(
 
     nyquist = 0.5 / ifov
 
-    # spatial freuqency coordinates for the transformed filter
+    # spatial frequency coordinates for the transformed filter
     urng = np.linspace(-nyquist, nyquist, xferfcn.shape[0])
     vrng = np.linspace(nyquist, -nyquist, xferfcn.shape[1])
     nu, nv = np.meshgrid(urng, vrng)
@@ -598,7 +595,7 @@ def gaussianOTF(
 
     :return:
         H:
-            gaussian optical transfer function.
+            gaussian optical transfer function
 
     :NOTE:
         The cutoff frequencies (where the MTF falls to .043 cycles/radian)
@@ -684,14 +681,14 @@ def polychromaticTurbulenceOTF(
     :param intTime:
         dwell (i.e. integration) time (seconds)
     :param aircraftSpeed:
-        apparent atmospheric velocity (m/s).  This can just be the windspeed at
-        the sensor position if the sensor is stationary.
+        apparent atmospheric velocity (m/s); this can just be the windspeed at
+        the sensor position if the sensor is stationary
     :param haWindspeed:
-        the high altitude windspeed (m/s).  Used to calculate the turbulence
-        profile.
+        the high altitude windspeed (m/s); used to calculate the turbulence
+        profile
     :param cn2at1m:
         the refractive index structure parameter "near the ground" (e.g. at
-        h = 1 m). Used to calculate the turbulence profile.
+        h = 1 m); used to calculate the turbulence profile
 
     :return:
         turbulenceOTF:
@@ -743,7 +740,7 @@ def radialUserOTF(
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param fname:
-        filename and path to the radial OTF data.
+        filename and path to the radial OTF data
 
     :return:
         H:
@@ -801,7 +798,7 @@ def tdiOTF(
     # the code
 
     expsum = 0.0
-    iind = np.arange(0, ntdi * phasesN)  # goes from 0 to tdiN*phasessN-1
+    iind = np.arange(0, ntdi * phasesN)  # goes from 0 to tdiN*phasesN-1
     for ii in iind:
         expsum = expsum + np.exp(-2.0j * np.pi * xx * (beta - 1.0) * ii)
     H = np.sinc(xx) * expsum / (ntdi * phasesN)
@@ -836,8 +833,8 @@ def turbulenceOTF(
             OTF at spatial frequency (u,v) (unitless)
 
     :WARNING:
-            output can be inf if D is 0
-            output can be nan if lambda0 andalpha are 0
+            Output can be inf if D is 0.
+            Output can be nan if lambda0 and alpha are 0.
     """
     rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
     H = np.exp(
@@ -866,10 +863,10 @@ def userOTF2D(
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param fname:
-        filename and path to the OTF data.  Must include the .npy extension.
+        filename and path to the OTF data; must include the .npy extension
     :param nyquist:
-        the Nyquist (i.e. maximum) frequency of the OFT file.  The support
-        of the OTF is assumed to extend from -nyquist to nyquist. (rad^-1)
+        the Nyquist (i.e. maximum) frequency of the OFT file; support
+        of the OTF is assumed to extend from -nyquist to nyquist (rad^-1)
 
     :return:
         H:
@@ -905,7 +902,7 @@ def wavefrontOTF(
     Ly: float
 ) -> np.ndarray:
     """IBSM Equation 3-31.  Blur due to small random wavefront errors in the
-    pupil. Use with the caution that this function assumes a specifc phase
+    pupil. Use with the caution that this function assumes a specific phase
     autocorrelation function.  Refer to the discussion on random phase screens
     in Goodman, "Statistical Optics" for a full explanation (this is also the
     source cited in the IBSM documentation). As an alternative, see
@@ -918,22 +915,22 @@ def wavefrontOTF(
     :param lambda0:
         wavelength (m)
     :param pv:
-        phase variance (rad^2) - tip: write as (2*pi*waves of error)^2.
-        pv is often defined at a specific wavelength (e.g. 633 nm) so scale
-        appropriately.
+        phase variance (rad^2) -- tip: write as (2*pi*waves of error)^2
+        (pv is often defined at a specific wavelength (e.g. 633 nm), so scale
+        appropriately)
     :param Lx:
-        correlation lengths of the phase autocorrelation function.  Apparently,
-        it is common to set Lx to the aperture diameter.  (m)
+        correlation lengths of the phase autocorrelation function; apparently,
+        it is common to set Lx to the aperture diameter (m)
     :param Ly:
-        correlation lengths of the phase autocorrelation function.  Apparently,
-        it is common to set Ly to the aperture diameter.  (m)
+        correlation lengths of the phase autocorrelation function; apparently,
+        it is common to set Ly to the aperture diameter (m)
 
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
 
     :WARNING:
-        output can be nan if lambda0 is 0
+        Output can be nan if lambda0 is 0.
 
     """
     autoc = np.exp(-(lambda0**2) * ((u / Lx) ** 2 + (v / Ly) ** 2))
@@ -965,7 +962,7 @@ def wavefrontOTF2(
         spatial frequency cutoff due to diffraction, i.e. aperture
         diameter / wavelength (rad^-1)
     :param wrms:
-        root mean square wavefront error (waves of error).
+        root mean square wavefront error (waves of error)
 
 
     :return:
@@ -1043,7 +1040,7 @@ def xandyUserOTF(
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param fname:
-        filename and path to the x and y OTF data.
+        filename and path to the x and y OTF data
 
     :return:
         H:
@@ -1088,7 +1085,7 @@ def xandyUserOTF2(
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param fname:
-        filename and path to the x and y OTF data.
+        filename and path to the x and y OTF data
 
     :return:
         H:
@@ -1123,13 +1120,13 @@ def otf2psf(
 
 
     :param otf:
-        Complex optical transfer function (OTF).
+        Complex optical transfer function (OTF)
     :param df:
         Sample spacing for the optical transfer function (radians^-1)
     :param dxout:
-        desired sample spacing of the point spread function (radians).
+        desired sample spacing of the point spread function (radians);
         WARNING: dxout must be small enough to properly sample the blur
-        kernel!!!
+        kernel
 
     :return:
         psf:
@@ -1194,12 +1191,12 @@ def weightedByWavelength(
     :param wavelengths:
         array of wavelengths (m)
     :param weights:
-        array of weights corresponding to the "wavelengths" array.
-        Weights are normalized within this function so that weights.sum()==1
+        array of weights corresponding to the "wavelengths" array;
+        weights are normalized within this function so that weights.sum()==1
     :param myFunction:
-        a lambda function parameterized by wavelength, e.g.
-        otfFunction = lambda wavelengths: pybsm.circularApertureOTF
-        (uu,vv,wavelengths,D,eta).
+        a lambda function parameterized by wavelength; e.g.
+        otfFunction = lambda wavelengths: pybsm.otf.functional.circularApertureOTF
+        (uu,vv,wavelengths,D,eta)
 
     :return:
         weightedfcn:
@@ -1211,7 +1208,7 @@ def weightedByWavelength(
             and wavelengths are not equal
 
     :WARNING:
-        output can be nan if all weights are 0
+        Output can be nan if all weights are 0.
     """
     weights = weights / weights.sum()
     weightedfcn = weights[0] * myFunction(wavelengths[0])
@@ -1241,18 +1238,16 @@ def coherenceDiameter(
 
 
     :param lambda0:
-        wavelength (m).  As an implementation note, r0 can be calculated at a
-        1e-6 m and then multiplied by lambda^6/5 to scale to other
-        wavelengths.  This saves the time lost to needlessly evaluating extra
-        integrals.
+        wavelength (m); to save time evaluating extra integrals, calculate r0
+        at 1e-6 m then multiply by lambda^6/5 to scale to other wavelengths
     :param zPatH:
         array of samples along the path from the target (zPath = 0) to the
-        sensor. (m) WARNING: trapz will FAIL if you give it a two element path,
+        sensor (m) -- WARNING: trapz will FAIL if you give it a two-element path;
         use a long zPath array, even if cn2 is constant
     :param cn2:
         refractive index structure parameter values at the sample locations in
-        zPath (m^(-2/3)).  Typically Cn2 is a function of height so, as an
-        intermediate step, heights should be calculated at each point along
+        zPath (m^(-2/3)); typically Cn2 is a function of height so, as an
+        intermediate step, calculate heights at each point along
         zPath (see altitudeAlongSlantPath)
 
     :return:
@@ -1266,7 +1261,7 @@ def coherenceDiameter(
             if lambda0 is 0
 
     :WARNING:
-        r0 can be infinite if zPath is one element or if cn2 is one element and 0
+        r0 can be infinite if zPath is one element or if cn2 is one element and 0.
     """
     # the path integral of the structure parameter term
     spIntegral = np.trapz(cn2 * (zPath / zPath.max()) ** (5.0 / 3.0), zPath)
@@ -1356,8 +1351,8 @@ def darkCurrentFromDensity(
 
     :return:
         jde :
-            dark current electron rate (e-/s).  For TDI systems, just multiply
-            the result by the number of TDI stages.
+            dark current electron rate (e-/s); for TDI systems, just multiply
+            the result by the number of TDI stages
     """
     jde = (
         jd * wx * wy / qc
@@ -1398,11 +1393,11 @@ def sliceotf(
     :param otf:
         OTF defined by spatial frequencies (u,v) (unitless)
     :param ang:
-        slice angle (radians) A 0 radian slice is along the u axis.  The
+        slice angle (radians); a 0 radian slice is along the u axis.  The
         angle rotates counterclockwise. Angle pi/2 is along the v axis.
     :return:
         oslice:
-            One dimensional OTF in the direction of angle.  The sample spacing
+            one-dimensional OTF in the direction of angle; the sample spacing
             of oslice is the same as the original otf
     """
     u = np.linspace(-1.0, 1.0, otf.shape[0])
@@ -1439,49 +1434,49 @@ def apply_otf_to_image(
     The geometric assumptions employed by this process fall into several
     regimes of accuracy:
 
-    (One) If our modeled virtual camera's assumed distance 'ref_range' matches
+    (1) If our modeled virtual camera's assumed distance 'ref_range' matches
     that of the camera that actually acquired 'ref_img', then our geometric
     assumptions of this process hold up perfectly.
 
-    (Two) In cases where we are modeling a virtual camera at a different range,
+    (2) In cases where we are modeling a virtual camera at a different range,
     if the ranges are both large relative to the depth variation of the scene,
     then our approximations hold well. For remote sensing, particularly
     satellite imagery, this is a very good assumption because the depth
     variation of the world surface is inconsequential in comparison to the
     camera distance, which could be hundreds to thousands of kilometers away.
 
-    (Three) The remaining cases, such as ground-level imagery, where the scene
+    (3) The remaining cases, such as ground-level imagery, where the scene
     depth variation could be sizable relative to the camera range, changing
     'ref_range' from that of the camera that actually captured 'ref_img' will
     result in unmodeled changes in perspective distortion. For example, you
     might have a foreground to your image, your object-of-interest at a mid-
-    range, and then a background that goess off to the horizon. The best thing
+    range, and then a background that goes off to the horizon. The best thing
     to do in this case is set 'ref_gsd' to that on the object-of-interest
     (since GSD will be different in the foreground and background) and
     interpret 'ref_range' is the distance from the virtual camera to the
     object-of-interest.
 
     :param ref_img:
-        An ideal image of a view of the world that we want to emulate what it
+        an ideal image of a view of the world that we want to emulate what it
         would look like from the imaging system defined by the remaining
-        parameters.
+        parameters
     :param ref_gsd:
-        Spatial sampling for 'ref_img' in meters. Each pixel in 'ref_img' is
+        spatial sampling for 'ref_img' in meters; each pixel in 'ref_img' is
         assumed to capture a 'ref_gsd' x 'ref_gsd' square of some world
         surface. We assume the sampling is isotropic (x and y sampling are
         identical) and uniform across the whole field of view. This is
         generally a valid assumption for remote sensing imagery.
     :param ref_range:
-        The assumed line of sight range from the virtual camera being simulated
-        to the world surface or object-of-interest within 'ref_img'.
+        the assumed line of sight range from the virtual camera being simulated
+        to the world surface or object-of-interest within 'ref_img'
     :param otf:
-        The complex optical transfer function (OTF) of the imaging system as
-        returned by the functions of pybsm.otf.
+        the complex optical transfer function (OTF) of the imaging system as
+        returned by the functions of pybsm.otf
     :param df:
-        The spatial frequency sampling assocatied with 'otf' (radians^-1).
+        the spatial frequency sampling associated with 'otf' (radians^-1)
     :param ifov:
-        Instantaneous field of view (iFOV) of the virtual imaging system that
-        we are modeling (radians).
+        instantaneous field of view (iFOV) of the virtual imaging system that
+        we are modeling (radians)
 
     :return:
         sim_img:
@@ -1497,7 +1492,7 @@ def apply_otf_to_image(
             if ref_img or otf are not 2D arrays
 
     :WARNING:
-        ref_gsd must be small enough to properly sample the blur kernel! As a
+        ref_gsd *must* be small enough to properly sample the blur kernel. As a
         guide, if the image system transfer function goes to zero at angular
         spatial frequency, coff, then the sampling requirement will be readily
         met if ref_gsd <= ref_range/(4*coff).
@@ -1510,7 +1505,7 @@ def apply_otf_to_image(
     # each pixel). So, we imagine that the actual camera that collected
     # 'ref_img' was at a range of 'ref_range', same as the virtual camera we
     # are modeling. There are caveats to this discussed in the docstring for
-    # this function. Therefore, we can calculate the instantenous field of view
+    # this function. Therefore, we can calculate the instantaneous field of view
     # (iFOV) of the assumed real camera, which is
     # 2*arctan(ref_gsd/2/ref_range).
     psf = otf2psf(otf, df, 2 * np.arctan(ref_gsd / 2 / ref_range))
@@ -1540,7 +1535,7 @@ def commonOTFs(
     """Returns optical transfer functions for the most common sources.  This
     code originally served the NIIRS model but has been abstracted for other
     uses. OTFs for the aperture, detector, turbulence, jitter, drift, wavefront
-    errors, and image filtering are all explicity considered.
+    errors, and image filtering are all explicitly considered.
 
     :param sensor:
         an object from the class sensor
@@ -1564,8 +1559,8 @@ def commonOTFs(
     :return:
         otf:
             an object containing results of the OTF calculations along with
-            many intermediate calculations.  The full system OTF is contained
-            in otf.systemOTF.
+            many intermediate calculations; the full system OTF is contained
+            in otf.systemOTF
 
     :raises:
         ZeroDivisionError:
