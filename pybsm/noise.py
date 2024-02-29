@@ -3,7 +3,7 @@
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,10 +11,7 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-Contact: daniel.lemaster@us.af.mil
-
-Version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # standard library imports
 import os
@@ -44,8 +41,8 @@ def noiseGain(kernel: np.ndarray) -> float:
     Vol. 36, No. 32 10 November 1997.
 
     :param kernel:
-         the 2D image sharpening kernel.  Note that
-         the kernel is assumed to sum to one.
+         the 2D image sharpening kernel; note that
+         the kernel is assumed to sum to one
 
     :return:
         ng:
@@ -71,7 +68,7 @@ def quantizationNoise(
 
     :return:
         sigmaq :
-            quantization noise given as a photoelectron standard deviation (e-).
+            quantization noise given as a photoelectron standard deviation (e-)
 
     :WARNING:
         output can be nan if peRange is 0

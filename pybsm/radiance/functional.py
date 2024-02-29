@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,15 +11,12 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-contact: daniel.lemaster@us.af.mil
-
-version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 
 This module deals with all things related to radiance, including black body
-spectral emmission calculations, spectral atmospheric absortion, and conversion
-of radiance to photons. Anything material with a non-zero temperature emmits
-electromagnetic radiation according to Planck's law and its tempreature,
+spectral emission calculations, spectral atmospheric absorption, and conversion
+of radiance to photons. Anything material with a non-zero temperature emits
+electromagnetic radiation according to Planck's law and its temperature,
 spectral emissivity.
 """
 # standard library imports
@@ -61,7 +58,7 @@ def atFocalPlaneIrradiance(
     L: np.ndarray
 ) -> np.ndarray:
     """Converts pupil plane radiance to focal plane irradiance for an extended
-    source.This is a variation on part of IBSM Equation 3-34.  There is one
+    source. This is a variation on part of IBSM Equation 3-34.  There is one
     modification: the IBSM conversion factor pi/(4(f/#)^2) is replaced with
     pi/(1+ 4(f/#)^2), which is valid over a wider range of f-numbers (source:
     John Schott,"Remote Sensing: The Image Chain Approach," Oxford University
@@ -79,8 +76,8 @@ def atFocalPlaneIrradiance(
     :type L: float
 
     :return:
-        E: total irradiance (W/m^2) or spectral irradiance (W/m^2 m) at the
-        focal plane
+        E:
+            total irradiance (W/m^2) or spectral irradiance (W/m^2 m) at the focal plane
 
     :raises:
         ZeroDivisionError:
@@ -135,7 +132,7 @@ def checkWellFill(
         array of wavelengths (m)
     :type totalPhotelectrons: np.array
     :param maxFill:
-        desired well fill, i.e. Maximum well size x Desired fill fraction
+        desired well fill; i.e., maximum well size x desired fill fraction
     :type maxFill: float
 
     :return:
@@ -160,9 +157,9 @@ def coldshieldSelfEmission(
     :param wavelengths:
         wavelength array (m)
     :param coldshieldTemperature:
-        temperature of the cold shield (K).  It is a common approximation to
+        temperature of the cold shield (K); it is a common approximation to
         assume that the coldshield is at the same temperature as the detector
-        array.
+        array
     :param D:
         effective aperture diameter (m)
     :param f:
@@ -199,11 +196,11 @@ def coldstopSelfEmission(
     :param wavelengths:
         wavelength array (m)
     :param coldfilterTemperature:
-        temperature of the cold filter.  It is a common approximation to assume
-        that the filter is at the same temperature as the detector array.
+        temperature of the cold filter; it is a common approximation to assume
+        that the filter is at the same temperature as the detector array
     :param coldfilterEmissivity:
-        emissivity through the cold filter (unitless).  A common approximation
-        is 1-cold filter transmission.
+        emissivity through the cold filter (unitless); a common approximation
+        is 1-cold filter transmission
     :param D:
         effective aperture diameter (m)
     :param f:
@@ -250,12 +247,12 @@ def focalplaneIntegratedIrradiance(
         band integrated stray radiance from sources other than self emission
         (W/m^2 sr)
     :param topt:
-        full system in-band optical transmission (unitless).  If the telescope
+        full system in-band optical transmission (unitless); if the telescope
         is obscured, topt is further reduced by 1-eta**2, where
         eta is the relative linear obscuration
     :param eopt:
-        full system in-band optical emissivity (unitless).  1-topt is a good
-        approximation.
+        full system in-band optical emissivity (unitless); 1-topt is a good
+        approximation
     :param lambda0:
         wavelength at the center of the system bandpass (m)
     :param dlambda:
@@ -297,8 +294,8 @@ def opticsSelfEmission(
     :param opticsTemperature:
         temperature of the optics (K)
     :param opticsEmissivity:
-        emissivity of the optics (unitless) except for the cold filter.
-        A common approximation is 1-optics transmissivity.
+        emissivity of the optics (unitless) except for the cold filter;
+        a common approximation is 1-optics transmissivity
     :param coldfilterTransmission:
         transmission through the cold filter (unitless)
     :param D:
@@ -356,7 +353,7 @@ def photonDetectionRate(
     :NOTE:
         To calculate total integrated photoelectrons, N = td*ntdi*np.trapz(dN,
         wavelens) where td is integration time (s) and ntdi is the number of
-        tdi stages (optional)
+        tdi stages (optional).
     """
     if E.size == 0 or wavelengths.size == 0 or qe.size == 0:
         warnings.warn(UserWarning("Input array(s) are empty. Expect output to be empty"))
@@ -392,7 +389,7 @@ def photonDetectorSNR(
     :return:
         snr:
             an object containing results of the SNR calculation along with many
-            intermediate calculations.  The SNR value is contained in snr.snr
+            intermediate calculations; the SNR value is contained in snr.snr
     """
     snr = SNRMetrics("signal-to-noise calculation")
 
@@ -544,14 +541,14 @@ def reflectance2photoelectrons(
     is included.
 
     :param atm:
-        atmospheric data as defined in utils.loadDatabaseAtmosphere.  The slant
-        range between the target and sensor are implied by this choice.
+        atmospheric data as defined in utils.loadDatabaseAtmosphere; the slant
+        range between the target and sensor are implied by this choice
     :param sensor:
         sensor parameters as defined in the pybsm sensor class
     :param intTime:
-        camera integration time (s).
+        camera integration time (s)
     :param target_temp: float
-        Temperature of the target (Kelvin).
+        Temperature of the target (Kelvin)
 
     :return:
         ref :
@@ -559,12 +556,12 @@ def reflectance2photoelectrons(
         pe :
             photoelectrons generated during the integration time corresponding
             to the reflectance values in ref
-        spectral_weights : 2xN arraylike
-            Details of the relative spectral contributions to the collected
-            signal, which is useful for wavelength-weighted OTF calculations.
-            The first row is the wavelength (m) and the second row is the
+        spectral_weights :
+            2xN arraylike details of the relative spectral contributions to the collected
+            signal, which is useful for wavelength-weighted OTF calculations;
+            the first row is the wavelength (m) and the second row is the
             relative contribution to the signal from the associated
-            column-paired wavelength.
+            column-paired wavelength
 
     :raises:
         IndexError:
@@ -687,9 +684,9 @@ def signalRate(
     :param qe:
         quantum efficiency as a function of wavelength (e-/photon)
     :param otherIrradiance:
-        spectral irradiance from other sources (W/m^2 m).
-        This is particularly useful for self emission in infrared cameras.
-        It may also represent stray light.
+        spectral irradiance from other sources (W/m^2 m);
+        particularly useful for self emission in infrared cameras
+        and may also represent stray light
     :param darkCurrent:
         detector dark current (e-/s)
 
@@ -751,7 +748,7 @@ def totalRadiance(
     :NOTE:
         In the emissive infrared region (e.g. >= 3 micrometers), the nighttime
         case is very well approximated by subtracting off atm[:,4] from the
-        total spectral radiance
+        total spectral radiance.
     """
 
     dbreflectance = 0.15  # object reflectance used in the database
@@ -778,22 +775,22 @@ def giqeRadiance(
         an array containing the following data:
         atm[:,0] - wavelengths from .3 to 14 x 10^-6 m in 0.01x10^-6 m steps
 
-        atm[:,1] - (TRANS) total transmission through the defined path.
+        atm[:,1] - (TRANS) total transmission through the defined path
 
         atm[:,2] - (PTH THRML) radiance component due to atmospheric emission
-        and scattering received at the observer.
+        and scattering received at the observer
 
         atm[:,3] - (SURF EMIS) component of radiance due to surface emission
-        received at the observer.
+        received at the observer
 
         atm[:,4] - (SOL SCAT) component of scattered solar radiance received
-        at the observer.
+        at the observer
 
-        atm[:,5] - (GRND RFLT) is the total solar flux impingent on the
+        atm[:,5] - (GRND RFLT) is the total solar flux impingement on the
         ground and reflected directly to the sensor from the ground. (direct
         radiance + diffuse radiance) * surface reflectance
 
-        NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
+        NOTE: Units for columns 1 through 5 are in radiance W/(sr m^2 m).
     :param isEmissive:
         isEmissive = 1 for thermal emissive band NIIRS, otherwise
         isEmissive = 0
@@ -844,8 +841,9 @@ def resampleByWavelength(
         the desired wavelength range and step size (m)
 
     :return:
-        newValues: array of values resampled to match newWavelengths.
-        Extrapolated values are set to 0.
+        newValues
+            array of values resampled to match newWavelengths;
+            extrapolated values are set to 0
 
     :raises:
         ValueError:

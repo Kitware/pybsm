@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,10 +11,7 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-contact: daniel.lemaster@us.af.mil
-
-version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # 3rd party imports
 import numpy as np
@@ -24,95 +21,94 @@ from typing import Optional
 class Sensor:
     """Example details of the camera system.  This is not intended to be a
     complete list but is more than adequate for the NIIRS demo (see
-    pybsm.niirs).
+    pybsm.metrics.functional.niirs).
 
     :param name:
-        Name of the sensor
+        name of the sensor
     :param D:
-        Effective aperture diameter (m)
+        effective aperture diameter (m)
     :param f:
-        Focal length (m)
+        focal length (m)
     :param px:
-        Detector center-to-center spacings (pitch) in the x and y directions
-        (meters). IF py is not provided, it is assumed equal to px.
+        detector center-to-center spacings (pitch) in the x and y directions
+        (meters); if py is not provided, it is assumed equal to px
     :param optTransWavelengths:
-        Specifies the spectral bandpass of the camera (m).  At minimum, and
-        start and end wavelength should be specified.
+        specifies the spectral bandpass of the camera (m); at minimum, specify
+        a start and end wavelength
     :param opticsTransmission:
-        Full system in-band optical transmission (unitless).  Loss due to any
-        telescope obscuration should *not* be included in with this optical
-        transmission array.
+        full system in-band optical transmission (unitless); do not include loss
+        due to any telescope obscuration in this optical transmission array
     :param eta:
-        Relative linear obscuration (unitless). Obscuration of the aperture
+        relative linear obscuration (unitless); obscuration of the aperture
         commonly occurs within telescopes due to secondary mirror or spider
-        supports.
+        supports
     :param py:
-        Detector center-to-center spacings (pitch) in the x and y directions
-        (meters). IF py is not provided, it is assumed equal to px.
+        detector center-to-center spacings (pitch) in the x and y directions
+        (meters); if py is not provided, it is assumed equal to px
     :param wx:
-        Detector width in the x and y directions (m). If set equal to px and
+        detector width in the x and y directions (m); if set equal to px and
         py, this corresponds to an assumed full pixel fill factor. In general,
         wx and wy are less than px and py due to non-photo-sensitive area
         (typically transistors) around each pixel.
     :param wy:
-        Detector width in the x and y directions (m). If set equal to px and
+        detector width in the x and y directions (m); if set equal to px and
         py, this corresponds to an assumed full pixel fill factor. In general,
         wx and wy are less than px and py due to non-photo-sensitive area
         (typically transistors) around each pixel.
     :param qe:
-        Quantum efficiency as a function of wavelength (e-/photon).
+        quantum efficiency as a function of wavelength (e-/photon)
     :param qewavelengths:
-        Wavelengths corresponding to the array qe (m).
+        wavelengths corresponding to the array qe (m)
     :param otherIrradiance:
-        Spectral irradiance from other sources (W/m^2 m). This is particularly
-        useful for self emission in infrared cameras.  It may also represent
+        spectral irradiance from other sources (W/m^2 m); this is particularly
+        useful for self emission in infrared cameras and may also represent
         stray light.
     :param darkCurrent:
-        Detector dark current (e-/s). Dark current is the relatively small
+        detector dark current (e-/s); dark current is the relatively small
         electric current that flows through photosensitive devices even when no
-        photons enter the device.
+        photons enter the device
     :param maxN:
-        Detector electron well capacity (e-). The default 100 million,
+        detector electron well capacity (e-); the default 100 million
         initializes to a large number so that, in the absence of better
-        information, it doesn't affect outcomes.
+        information, it doesn't affect outcomes
     :param bitdepth:
-        Resolution of the detector ADC in bits (unitless). Default of 100 is
-        sufficiently large number so that in the absense of better information,
-        it doesn't affect outcomes.
+        resolution of the detector ADC in bits (unitless); default of 100 is a
+        sufficiently large number so that in the absence of better information,
+        it doesn't affect outcomes
     :param ntdi:
-        Number of TDI stages (unitless).
+        number of TDI stages (unitless)
     :param coldshieldTemperature:
-        Temperature of the cold shield (K).  It is a common approximation to
+        temperature of the cold shield (K); it is a common approximation to
         assume that the coldshield is at the same temperature as the detector
-        array.
+        array
     :param opticsTemperature:
-        Temperature of the optics (K)
+        temperature of the optics (K)
     :param opticsEmissivity:
-        Emissivity of the optics (unitless) except for the cold filter.
-        A common approximation is 1-optics transmissivity.
+        emissivity of the optics (unitless) except for the cold filter;
+        a common approximation is 1-optics transmissivity
     :param coldfilterTransmission:
-        Transmission through the cold filter (unitless)
+        transmission through the cold filter (unitless)
     :param coldfilterTemperature:
-        Temperature of the cold filter.  It is a common approximation to assume
-        that the filter is at the same temperature as the detector array.
+        temperature of the cold filter; it is a common approximation to assume
+        that the filter is at the same temperature as the detector array
     :param coldfilterEmissivity:
-        Emissivity through the cold filter (unitless).  A common approximation
+        emissivity through the cold filter (unitless); a common approximation
         is 1-cold filter transmission
     :param sx:
-        Root-mean-squared jitter amplitudes in the x direction. (rad)
+        root-mean-squared jitter amplitudes in the x direction (rad)
     :param sy:
-        Root-mean-squared jitter amplitudes in the y direction. (rad)
+        root-mean-squared jitter amplitudes in the y direction (rad)
     :param dax:
-        Line-of-sight angular drift rate during one integration time in the x
-        direction. (rad/s)
+        line-of-sight angular drift rate during one integration time in the x
+        direction (rad/s)
     :param day:
-        Line-of-sight angular drift rate during one integration time in the y
-        direction. (rad/s)
+        line-of-sight angular drift rate during one integration time in the y
+        direction (rad/s)
     :param pv:
-        Wavefront error phase variance (rad^2) - tip: write as (2*pi*waves of
+        wavefront error phase variance (rad^2) -- tip: write as (2*pi*waves of
         error)^2
     :param pvwavelength:
-        Wavelength at which pv is obtained (m)
+        wavelength at which pv is obtained (m)
 
     """
 
@@ -209,7 +205,7 @@ class Sensor:
         self.qe = np.ones(optTransWavelengths.shape[0])  # placeholder
 
         # TODO I don't think these automatically get used everywhere they
-        # should, some functions overridde by assuming different temperatures.
+        # should, some functions override by assuming different temperatures.
         self.coldshieldTemperature = coldshieldTemperature
         self.opticsTemperature = opticsTemperature
         self.opticsEmissivity = opticsEmissivity

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""The python Based Sensor Model (pyBSM) is a collection of electro-optical
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
 camera modeling functions developed by the Air Force Research Laboratory,
 Sensors Directorate.
 
-Please use the following citation:
+Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
 imaging systems", Proc. SPIE 10204 (2017)
 
@@ -11,10 +11,7 @@ Distribution A.  Approved for public release.
 Public release approval for version 0.0: 88ABW-2017-3101
 Public release approval for version 0.1: 88ABW-2018-5226
 
-
-contact: daniel.lemaster@us.af.mil
-
-version 0.2: CURRENTLY IN BETA!!
+Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
 # standard library imports
@@ -69,8 +66,8 @@ def giqe3(
     :param eho:
         geometric mean edge height overshoot (unitless)
     :param ng:
-        noises gain, i.e. increase in noise due to sharpening (unitless). If no
-        sharpening is applied then ng = 1
+        noises gain, i.e. increase in noise due to sharpening (unitless); if no
+        sharpening is applied, then ng = 1
     :param snr:
         contrast signal-to-noise ratio (unitless)
 
@@ -96,7 +93,7 @@ def giqe4(
 ) -> Tuple[float, float]:
     """General Image Quality Equation version 4 from Leachtenauer, et al.,
     "General Image Quality Equation: GIQE," Applied Optics, Vol 36, No 32,
-    1997. I don't endorse the use of GIQE 4 but it is added to pyBSM for
+    1997. The use of GIQE 4 is not endorsed but it is added to pyBSM for
     historical completeness.
 
     :param rer:
@@ -107,15 +104,15 @@ def giqe4(
     :param eho:
         geometric mean edge height overshoot (unitless)
     :param ng:
-        noises gain, i.e. increase in noise due to sharpening (unitless). If no
+        noises gain, i.e. increase in noise due to sharpening (unitless); if no
         sharpening is applied then ng = 1
     :param snr:
         contrast signal-to-noise ratio (unitless)
     :param elevangle:
-        sensor elevation angle as measured from the target (rad), i.e.,
-        pi/2-nadirAngle. See pybsm.nadirAngle for more information. Note that
+        sensor elevation angle as measured from the target (rad), i.e.
+        pi/2-nadirAngle. See pybsm.geospatial.nadirAngle for more information. Note that
         the GIQE4 paper defines this angle differently but we stick with this
-        version to be consisent with the GIQE 5 code. The outcome is the same
+        version to be consistent with the GIQE 5 code. The outcome is the same
         either way.
 
     :return:
@@ -131,7 +128,7 @@ def giqe4(
 
     gsdgp = gsd / (
         np.sin(elevAngle) ** (0.5)
-    )  # note that the expondent captures the
+    )  # note that the exponent captures the
     # fact that only one direction in the gsd is distorted by projection into
     # the ground plane
 
@@ -156,33 +153,33 @@ def giqe5(
 ) -> Tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015
     https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
-    This version of the GIQE replaces the ealier versions and should be used
+    This version of the GIQE replaces the earlier versions and should be used
     in all future analyses.  See also "Airborne Validation of the General Image
     Quality Equation 5"
     https://www.osapublishing.org/ao/abstract.cfm?uri=ao-59-32-9978
 
     :param rer1:
         relative edge response in two directions (e.g., along- and across-
-        scan, horizontal and vertical, etc.) See also pybsm.giqe5RER.
+        scan, horizontal and vertical, etc.); see also pybsm.metrics.functional.giqe5RER.
         (unitless)
     :param rer2:
         relative edge response in two directions (e.g., along- and across-
-        scan, horizontal and vertical, etc.) See also pybsm.giqe5RER.
+        scan, horizontal and vertical, etc.); see also pybsm.metrics.functional.giqe5RER.
         (unitless)
     :param gsd:
         image plane geometric mean ground sample distance (m), as defined for
-        GIQE3. The GIQE 5 version of GSD is calculated within this function
+        GIQE3; the GIQE 5 version of GSD is calculated within this function
     :param snr:
         contrast signal-to-noise ratio (unitless), as defined for GIQE3
     :param elevangle:
-        sensor elevation angle as measured from the target (rad), i.e.,
-        pi/2-nadirAngle. See pybsm.nadirAngle for more information
+        sensor elevation angle as measured from the target (rad), i.e.
+        pi/2-nadirAngle; see pybsm.geospatial.nadirAngle for more information
 
     :return:
         niirs :
             a National Image Interpretability Rating Scale value (unitless)
         gsdw :
-            elevlation angle weighted GSD (m)
+            elevation angle weighted GSD (m)
         rer :
             weighted relative edge response (rer)
     :NOTE:
@@ -216,11 +213,11 @@ def giqe5RER(
 ) -> Tuple[float, float]:
     """Calculates the relative edge response from a 2-D MTF.  This function is
     primarily for use with the GIQE 5. It implements IBSM equations 3-57 and
-    3-58.  See pybsm.giqeEdgeTerms for the GIQE 3 version.
+    3-58.  See pybsm.metrics.functional.giqeEdgeTerms for the GIQE 3 version.
 
     :param mtf:
-        2-dimensional full system modulation transfer function (unitless).
-        MTF is the magnitude of the OTF.
+        2-dimensional full system modulation transfer function (unitless);
+        MTF is the magnitude of the OTF
     :param df:
         spatial frequency step size (cycles/radian)
     :param ifovx:
@@ -254,8 +251,8 @@ def giqeEdgeTerms(
     implements IBSM equations 3-57 and 3-58.
 
     :param mtf:
-        2-dimensional full system modulation transfer function (unitless).
-        MTF is the magnitude of the OTF.
+        2-dimensional full system modulation transfer function (unitless);
+        MTF is the magnitude of the OTF
     :param df:
         spatial frequency step size (cycles/radian)
     :param ifovx:
@@ -305,9 +302,10 @@ def groundResolvedDistance(
     :param ifov:
         instantaneous field-of-view of a detector (radians)
     :param slantRange:
-
+        distance between the target and sensor (m)
     :return:
-        grd : ground resolved distance (m)
+        grd:
+            ground resolved distance (m)
     """
     w = df * np.arange(1.0 * mtfslice.size)
     ur = (
@@ -325,8 +323,8 @@ def niirs(
     sensor: Sensor,
     scenario: Scenario
 ) -> Metrics:
-    """Returns NIIRS values and all intermetiate calculations.  This function
-    implements the original MATLAB based NIIRS model and can serve as a
+    """Returns NIIRS values and all intermediate calculations.  This function
+    implements the original MATLAB-based NIIRS model and can serve as a
     template for building other sensor models.
 
     :param sensor:
@@ -372,7 +370,7 @@ def niirs(
         nm.scenario.targetReflectance = 0.15
         nm.scenario.backgroundReflectance = 0.07
 
-    # get at aperture radiances for reflective target and background with GIQE
+    # get aperture radiances for reflective target and background with GIQE
     # type target parameters
     nm.tgtRadiance, nm.bkgRadiance = radiance.giqeRadiance(nm.atm, isEmissive)
     nm.radianceWavelengths = nm.atm[:, 0]
@@ -488,7 +486,7 @@ def niirs(
         np.sqrt(sensor.framestacks) * nm.snr.snr,
         nm.elevAngle,
     )
-    # see pybsm.niir5 for GIQE 5
+    # see pybsm.metrics.functional.niir5 for GIQE 5
 
     return nm
 
@@ -497,9 +495,9 @@ def niirs5(
     sensor: Sensor,
     scenario: Scenario
 ) -> Metrics:
-    """Returns NIIRS values calculate using GIQE 5 and all intermetiate
-    calculations.  See pybsm.niirs for the GIQE 3 version.  This version of the
-    GIQE replaces the ealier versions and should be used in all future
+    """Returns NIIRS values calculate using GIQE 5 and all intermediate
+    calculations.  See pybsm.metrics.functional.niirs for the GIQE 3 version.  This version of the
+    GIQE replaces the earlier versions and should be used in all future
     analyses.
 
 
@@ -546,7 +544,7 @@ def niirs5(
         nm.scenario.targetReflectance = 0.15
         nm.scenario.backgroundReflectance = 0.07
 
-    # get at aperture radiances for reflective target and background with GIQE
+    # get aperture radiances for reflective target and background with GIQE
     # type target parameters
     nm.tgtRadiance, nm.bkgRadiance = radiance.giqeRadiance(nm.atm, isEmissive)
     nm.radianceWavelengths = nm.atm[:, 0]
@@ -620,7 +618,7 @@ def niirs5(
 
     sensor.filterKernel = np.array(
         [1]
-    )  # ensures that shapening is turned off.  Not valid for GIQE5
+    )  # ensures that sharpening is turned off.  Not valid for GIQE5
     nm.otf = otf.functional.commonOTFs(
         sensor,
         scenario,
@@ -766,20 +764,20 @@ def plotCommonMTFs(
     metrics: Metrics,
     orientationAngle: float = 0.0
 ) -> int:
-    """Generates a plot of common MTF components: aperture,turbulence,detector,
-    jitter,drift,wavefront,image processing,system.  The Nyquist frequency is
+    """Generates a plot of common MTF components: aperture, turbulence, detector,
+    jitter, drift, wavefront, image processing, system.  The Nyquist frequency is
     annotated on the plot with a black arrow.  Spatial frequencies are
     converted to image plane units (cycles/mm).
 
     :param metrics:
-        the object output of (for instance) pybsm.niirs or equivalent
+        the object output of (for instance) pybsm.metrics.functional.niirs or equivalent
 
     :param orientationAngle:
         angle to slice the MTF (radians).  A 0 radian slice is along the u
         axis. The angle rotates counterclockwise. Angle pi/2 is along the v
         axis. The default value is 0 radians.
     :return:
-        A plot.
+        a plot
     """
 
     # spatial frequencies in the image plane in (cycles/mm)
@@ -848,18 +846,18 @@ def plotNoiseTerms(
     maxval: int = 0
 ) -> int:
     """Generates a plot of common noise components in units of equivalent
-    photoelectrons.  Components Total, Scene photons, Path photons, Emission /
-    Stray photons, Dark Current, Quantization, Readout.
+    photoelectrons: components total, scene photons, path photons, emission /
+    stray photons, dark Current, quantization, readout.
 
     :param metrics:
-        the object output of (for instance) pybsm.niirs or equivalent
+        the object output of (for instance) pybsm.metrics.functional.niirs or equivalent
 
     :param maxval:
         (optional) sets the y-axis limit on photoelectrons.  Useful when
-        comparing across plots.Default value of 0 allows matplotlib to
+        comparing across plots. Default value of 0 allows matplotlib to
         automatically select the scale.
     :return:
-        A plot.
+        a plot
     """
     fig, ax = plt.subplots()
     ms = metrics.snr

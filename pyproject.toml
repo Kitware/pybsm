@@ -7,7 +7,7 @@ build-backend = "poetry.core.masonry.api"
 name = "pybsm"
 version = "0.1.1"
 description = ""
-authors = ["TODO"]
+authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
 packages = [{include = "pybsm"}]
 documentation = "https://pybsm.readthedocs.io/"
