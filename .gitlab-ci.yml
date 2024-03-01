@@ -358,3 +358,28 @@ publish-on-tag:
     - |
       export POETRY_PYPI_TOKEN_PYPI="${PYPI_PUBLISH_TOKEN}"
       poetry publish --build
+
+###############################################################################
+# The mirror-lfs job is used to ensure the lfs objects are mirrored properly 
+# to the GitHub pyBSM repository. This job should not be run unless there are 
+# new lfs files. The git push --mirror git@github.com:Kitware/pyBSM.git will
+# fail since it tries to push ALL protected branches to GitHub; however, it
+# pushes the lfs files before it fails. As a result, this job will remain
+# commented out and will only be ran manually.
+
+# mirror-lfs:
+#   stage: publish
+#   before_script:
+#     - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh
+#     - apt-get update
+#     - apt-get install git-lfs
+#     - eval $(ssh-agent -s)
+#     - echo "${SSH_PRIVATE_KEY_BASE64}" |  tr -d ' ' | base64 --decode | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#     - ssh-keyscan github.com >> ~/.ssh/known_hosts
+#   script:
+#     - git lfs install
+#     - git lfs fetch --all
+#     - git push --mirror git@github.com:Kitware/pyBSM.git
+#     - git lfs push --all git@github.com:Kitware/pyBSM.git
