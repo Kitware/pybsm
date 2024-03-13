@@ -16,7 +16,8 @@ img_fname = (
 
 img = plt.imread(img_fname)  # cv2.imread(img_fname)[:, :, ::-1]
 
-ref_img = simulation.RefImage(img, 0.3)
+# the width of the tank is 319 cm and it spans ~160 pixels in the image
+ref_img = simulation.RefImage(img, gsd=(3.19 / 160.0))
 ref_img.show()
 
 
@@ -57,7 +58,6 @@ ground_range = np.arange(0, 101e3, 10e3)
 
 ref_img.pix_values = np.array([ref_img.img.min(), ref_img.img.max()])
 ref_img.refl_values = np.array([0.05, 0.5])
-ref_img.gsd = 3.19 / 160.0
 idx = 1
 plt.subplot(2, 4, 1)
 plt.title("Input image", fontdict={"fontsize": 8})
@@ -69,17 +69,11 @@ for ii in np.arange(4, ground_range.shape[0]):
         "ihaze-" + str(ihaze) + "_altitude-" + str(altitude), fontsize=10
     )
     plt.title(
-        "groundRange: " + str(ground_range[ii]) + " km",
+        "groundRange: " + str(ground_range[ii]/1000) + " km",
         fontdict={"fontsize": 6},
     )
     scenario.ground_range = ground_range[ii]
     img_out = simulation.simulate_image(ref_img, sensor, scenario)[2]
     img_out = simulation.stretch_contrast_convert_8bit(img_out)
     plt.imshow(img_out, cmap="gray")
-plt.savefig(
-    "./examples/refactor_branch/fig_ihaze-"
-    + str(ihaze)
-    + "_alt-"
-    + str(altitude)
-    + ".png"
-)
+plt.show()
