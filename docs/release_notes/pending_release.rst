@@ -29,6 +29,8 @@ CI/CD
 
 * Added python3.12 to test matrix.
 
+* Added CI functionality to run a manual job for LFS mirroring (but currently commented out)
+
 Tests
 
 * Documented exceptions for `reflectance2photoelectrons` and its downstream functions.
