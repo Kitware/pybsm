@@ -6,7 +6,8 @@ Updates / New Features
 
 Documentation
 
-* Added baseline documentation for all pyBSM functionality and instruction pages for package installation, the review process, and the release process.
+* Added baseline documentation for all pyBSM functionality and instruction pages
+  for package installation, the review process, and the release process.
 
 * Added Read the Docs configuration files.
 
@@ -33,3 +34,9 @@ Tests
 * Documented exceptions for `reflectance2photoelectrons` and its downstream functions.
 
 * Added tests for `reflectance2photoelectrons` and its downstream functions.
+
+Fixes
+-----
+
+* Minor ``pybsm_example.py`` fixes: properly display ground range in kilometers,
+  initialize GSD correctly, remove save operation at non-existent path.
