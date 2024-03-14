@@ -9,6 +9,7 @@ Welcome to pyBSM's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction
    installation
    functionality
    review_process

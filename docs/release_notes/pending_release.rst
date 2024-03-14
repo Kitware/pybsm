@@ -16,6 +16,8 @@ Documentation
 
 * Completed the code documentation sections and updated citations.
 
+* Added an introduction section.
+
 CI/CD
 
 * Added pytest and coverage reports to CI.
