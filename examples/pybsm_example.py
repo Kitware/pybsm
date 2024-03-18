@@ -5,12 +5,14 @@ This script also includes an example of using pyBSM to simulate imagery.
 Be sure that the test image is in the same folder as this script.
 """
 import numpy as np
+from pathlib import Path
 import matplotlib.pyplot as plt
 import pybsm.simulation as simulation
 
+asset_dir = Path(__file__).parent
 
 img_fname = (
-    "./data/M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+    str(asset_dir / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff")
 )
 
 
