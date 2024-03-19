@@ -243,20 +243,15 @@ test-release-notes-check:
 # NOTE: this version of tests was to confirm the original pybsm_example.py
 # functioned properly, just as a dummy placeholder for unit testing. Until
 # we've updated this and/or the unit tests, we're using the notebook below.
-# test-pytest:
-#   extends: .test_defaults
-#   parallel:
-#     matrix:
-#       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11" ]
-#   image: python:${PY_VERSION}
-#   script:
-#     - poetry run pip uninstall -qy opencv-python opencv-python-headless
-#     - poetry run pip install -q opencv-python-headless
-#     - poetry run python examples/pybsm_example.py
-#     - ls examples/fig_2.png
-#     - ls examples/fig_4a.png
-#     - ls examples/fig_5a.png
-#     - ls examples/fig_showcase.png
+
+test-pytest-unittest:
+  extends: .test_headless
+  parallel:
+    matrix:
+      - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+  image: python:${PY_VERSION}
+  script:
+    - poetry run python examples/pybsm_example.py
 
 # Job to test-run the example jupyter notebooks
 #
