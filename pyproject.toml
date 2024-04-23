@@ -5,11 +5,12 @@ build-backend = "poetry.core.masonry.api"
 ###############################################################################
 [tool.poetry]
 name = "pybsm"
-version = "0.1.1"
+version = "0.2.0"
 description = ""
-authors = ["TODO"]
+authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
 packages = [{include = "pybsm"}]
+documentation = "https://pybsm.readthedocs.io/"
 classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
@@ -21,13 +22,59 @@ classifiers = [
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
-numpy = "^1.23.1"
-matplotlib = "^3.5.2"
-scipy = "^1.8.1"
-opencv-python = "^4.6.0"
+python = ">=3.8.1"
+numpy = [
+    {version = ">=1.23.1,<1.25", python = ">=3.8,<3.12"},
+    {version = ">=1.26", python = "^3.12"}
+]
+matplotlib = ">=3.5.2"
+scipy = [
+    {version = ">=1.8.1,<1.9", python = ">=3.8,<3.11"},
+    {version = ">=1.9", python = "^3.11"}
+]
+opencv-python = ">=4.6"
+setuptools = ">=65.6.1"
 
 [tool.poetry.group.dev.dependencies]
+# Linting
+flake8 = ">=6"
+flake8-mutable = ">=1.2.0"
+# Docs
+Sphinx = ">=5.3.0"
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-prompt = ">=1.5.0"
+livereload = ">=2.6.3"
+# Type checking
+mypy = ">=0.991"
+types-setuptools = ">=65.6.0.1"
+# Jupyter notebook testing
+jupyter = ">=1.0.0"
+papermill = ">=2.4.0"
+# Testing
+coverage = ">=7.4.0"
+pytest = ">=7.2"
+pytest-cov = ">=4"
+
+###############################################################################
+[tool.pytest.ini_options]
+addopts = [
+    "-lv",                              # Show local in trace-backs.
+    "--doctest-modules",                # Increased verbosity.
+    "--tb=long",                        # Trace-back print mode.
+    "--cov=./pybsm",                    # Cover our package specifically
+    "--cov=./tests",                    # Also cover our tests for dead spots
+    "--cov-report=term",                # Coverage report to terminal
+    "--cov-report=xml:coverage.xml",    # for external tool reporting
+]
+testpaths = [
+    "tests",
+    "pybsm",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+]
