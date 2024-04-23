@@ -37,6 +37,10 @@ Tests
 
 * Added tests for `reflectance2photoelectrons` and its downstream functions.
 
+Release Process
+
+* Added update & release script to scripts folder.
+
 Fixes
 -----
 
