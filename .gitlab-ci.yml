@@ -339,6 +339,25 @@ pages:
     # Only run this rule if on main branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+branch_pages:
+    extends: 
+      - .run_automatically
+    stage: docs
+    needs:
+      - test-docs-build
+    artifacts:
+        paths:
+          - docs/_build/html/
+    environment:
+        name: Sphinx
+        url: "https://jatic.pages.jatic.net/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/index.html"
+    script: |
+      # Just need something for script 
+    variables:
+        PUBLIC_URL: "/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/"
+    tags:
+      - kitware
+
 ###############################################################################
 # Jobs -- Publishing
 #
