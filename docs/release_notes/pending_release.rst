@@ -8,6 +8,9 @@ CI/CD
 
 * Added SAST scanning to CI/CD.
 
+* Added Sphinx document rendering for MRs. The docs pages can be accessed by clicking the "View App"
+  button located in the merge request page under the test pipeline section.
+
 Security
 
 * Updated `jupyter` to `notebook>=7.0.7`
