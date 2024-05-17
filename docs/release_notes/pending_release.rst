@@ -19,3 +19,5 @@ Fixes
 -----
 
 * Improve Fourier sampling by increasing the number of samples and averaging differences in both x and y directions.
+
+* Fix incorrect version range for `numpy`. 
