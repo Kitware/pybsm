@@ -52,8 +52,7 @@ class RefImage:
         gsd: float,
         pix_values: Optional[np.ndarray] = None,
         refl_values: Optional[np.ndarray] = None,
-        name: str = 'ref_image',
-        orthophoto: bool = True
+        name: str = 'ref_image'
     ) -> None:
         self.img = img
         self.gsd = gsd
