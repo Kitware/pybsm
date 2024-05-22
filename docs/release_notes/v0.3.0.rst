@@ -1,6 +1,8 @@
 v0.3.0
 ======
 
+Improved Furier sampling technique and addressed dependency vulnerabilities.
+
 Updates / New Features
 ----------------------
 
