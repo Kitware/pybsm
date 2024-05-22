@@ -44,6 +44,7 @@ class RefImage:
         spectral reflectance of the scene being viewed.
     :param name:    Name of the image.
 
+    :raises: ValueError if pix_values is provided, but refl_values is missing
     """
     def __init__(
         self,
@@ -67,9 +68,8 @@ class RefImage:
             )
             refl_values = np.array([0.05, 0.95])
         else:
-            assert (
-                refl_values is not None
-            ), "if 'pix_values' is provided, 'refl_values' must be as well"
+            if not refl_values:
+                raise ValueError("If 'pix_values' is provided, 'refl_values' must be as well.")
 
         self.pix_values = pix_values
         self.refl_values = refl_values

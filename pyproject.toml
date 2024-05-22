@@ -5,8 +5,8 @@ build-backend = "poetry.core.masonry.api"
 ###############################################################################
 [tool.poetry]
 name = "pybsm"
-version = "0.2.0"
-description = ""
+version = "0.3.0"
+description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
 packages = [{include = "pybsm"}]
@@ -28,7 +28,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.8.1"
 numpy = [
-    {version = ">=1.23.1,<1.25", python = ">=3.8,<3.12"},
+    {version = ">=1.23.1,<1.26", python = ">=3.8,<3.12"},
     {version = ">=1.26", python = "^3.12"}
 ]
 matplotlib = ">=3.5.2"
@@ -52,7 +52,7 @@ livereload = ">=2.6.3"
 mypy = ">=0.991"
 types-setuptools = ">=65.6.0.1"
 # Jupyter notebook testing
-jupyter = ">=1.0.0"
+notebook = ">=7.0.7"
 papermill = ">=2.4.0"
 # Testing
 coverage = ">=7.4.0"

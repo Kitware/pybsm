@@ -185,6 +185,9 @@ def simulate_image(
         spatial frequency, coff, then the sampling requirement will be readily
         met if imggsd <= rng/(4*coff). In practice this is easily done by
         upsampling imgin.
+
+    :raises: ValueError if cutoff Frequency matrix urng is not monotonically
+             increasing
     """
     # integration time (s)
     intTime = sensor.intTime
@@ -208,8 +211,8 @@ def simulate_image(
     # for spatial frequency that the imaging system can resolve (1/rad).
     cutoffFrequency = sensor.D / np.min(mtfwavelengths)
 
-    urng = np.linspace(-1.0, 1.0, 101) * cutoffFrequency
-    vrng = np.linspace(1.0, -1.0, 101) * cutoffFrequency
+    urng = np.linspace(-1.0, 1.0, 1501) * cutoffFrequency
+    vrng = np.linspace(1.0, -1.0, 1501) * cutoffFrequency
 
     # meshgrid of spatial frequencies out to the optics cutoff
     uu, vv = np.meshgrid(urng, vrng)
@@ -225,9 +228,10 @@ def simulate_image(
         intTime,
     ).systemOTF
 
-    df = urng[1] - urng[0]
+    df = (abs(urng[1] - urng[0]) + abs(vrng[0] - vrng[1]))/2
 
-    assert df > 0
+    if df <= 0:
+        raise ValueError("Cutoff frequency values must be increasing.")
 
     ifov = (sensor.px + sensor.py) / 2 / sensor.f
 
