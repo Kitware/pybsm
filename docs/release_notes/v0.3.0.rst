@@ -1,0 +1,25 @@
+v0.3.0
+======
+
+Improved Furier sampling technique and addressed dependency vulnerabilities.
+
+Updates / New Features
+----------------------
+
+CI/CD
+
+* Added SAST scanning to CI/CD.
+
+* Added Sphinx document rendering for MRs. The docs pages can be accessed by clicking the "View App"
+  button located in the merge request page under the test pipeline section.
+
+Security
+
+* Updated `jupyter` to `notebook>=7.0.7`
+
+Fixes
+-----
+
+* Improve Fourier sampling by increasing the number of samples and averaging differences in both x and y directions.
+
+* Fix incorrect version range for `numpy`. 
