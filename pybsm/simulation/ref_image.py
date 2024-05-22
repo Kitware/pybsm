@@ -68,7 +68,7 @@ class RefImage:
             )
             refl_values = np.array([0.05, 0.95])
         else:
-            if not refl_values:
+            if refl_values is None:
                 raise ValueError("If 'pix_values' is provided, 'refl_values' must be as well.")
 
         self.pix_values = pix_values
