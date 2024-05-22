@@ -15,6 +15,7 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # standard library imports
 import os
+import logging
 import inspect
 import warnings
 
@@ -261,8 +262,8 @@ def simulate_image(
     noisyImg = np.random.normal(poisson_noisy_img, gnoise)
 
     if noisyImg.shape[0] > ref_img.img.shape[0]:
-        print(
-            "Warning!  The simulated image has oversampled the"
+        logging.warn(
+            "The simulated image has oversampled the"
             " reference image!  This result should not be"
             " trusted!!"
         )

@@ -21,6 +21,7 @@ spectral emissivity.
 """
 # standard library imports
 import os
+import logging
 import inspect
 import warnings
 
@@ -632,7 +633,7 @@ def reflectance2photoelectrons(
 
     sat = pe.max() / sensor.maxN
     if sat > 1:
-        print(
+        logging.info(
             f"Reducing integration time from {intTime} to {intTime/sat}"
             " to avoid overexposure"
         )
