@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 ###############################################################################
 [tool.poetry]
 name = "pybsm"
-version = "0.3.1"
+version = "0.4.0"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
@@ -26,15 +26,18 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1"
+python = "^3.8.1"
+# https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.23.1,<1.26", python = ">=3.8,<3.12"},
-    {version = ">=1.26", python = "^3.12"}
+    {version = ">=1.23.1,<1.26", python = "~3.8.1"},
+    {version = ">=1.26", python = ">=3.9,<3.13"}
 ]
 matplotlib = ">=3.5.2"
+# simulation.img2reflectance currently uses interpolate.interp1d but was removed in scipy==1.14.0
+# https://github.com/scipy/scipy/blob/44e4ebaac992fde33f04638b99629d23973cb9b2/scipy/interpolate/_interpolate.py#L118
 scipy = [
-    {version = ">=1.8.1,<1.9", python = ">=3.8,<3.11"},
-    {version = ">=1.9", python = "^3.11"}
+    {version = ">=1.8.1,<1.14", python = "~3.8.1"},
+    {version = ">=1.12,<1.14", python = "^3.9"}
 ]
 opencv-python = ">=4.6"
 setuptools = ">=65.6.1"
