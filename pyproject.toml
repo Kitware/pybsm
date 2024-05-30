@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 ###############################################################################
 [tool.poetry]
 name = "pybsm"
-version = "0.3.1"
+version = "0.4.0"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
