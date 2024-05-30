@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import sys
 
 from pybsm import simulation
 
@@ -13,10 +12,6 @@ class TestSimulation:
             (np.array([0.0]), np.array([]), np.array([])),
             (np.array([]), np.array([0.0]), np.array([])),
             (np.array([]), np.array([]), np.array([0.0])),
-            pytest.param(
-                np.array([0.0]), np.array([0.0]), np.array([0.0]),
-                marks=pytest.mark.skipif(sys.version_info >= (3, 11), reason="fixed in 3.11 or higher"),
-            ),
         ],
     )
     def test_img2reflectance_value_error(

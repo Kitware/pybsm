@@ -1148,7 +1148,7 @@ def otf2psf(
     # resample to the desired sample size
     newx = max([1, int(psf.shape[1] * dxin / dxout)])
     newy = max([1, int(psf.shape[0] * dxin / dxout)])
-    psf = cv2.resize(psf, (newx, newy))
+    psf = cv2.resize(psf, (newx, newy)).astype(np.float64)
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
