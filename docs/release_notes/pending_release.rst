@@ -4,11 +4,5 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
-* Lowered the minimum `numpy` allowed to `1.22`.
-
-* Lowered the minimum `scipy` allowed to `1.10` for `python>=3.9`.
-
-* Removed the lower bound `scipy` allowed for `python==~3.8.1`.
-
 Fixes
 -----
