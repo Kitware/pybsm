@@ -14,3 +14,5 @@ Fixes
 * Fixed an incorrect unit test which required specific Python versions.
 
 * Fixed an incorrect type hinting type.
+
+* Fixed Python to `^3.8.1` to prevent future Python 4 issues.
