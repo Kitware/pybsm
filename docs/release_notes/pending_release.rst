@@ -6,3 +6,5 @@ Updates / New Features
 
 Fixes
 -----
+
+* Expands the `scipy` dependency allowed.
