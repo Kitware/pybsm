@@ -2,3 +2,4 @@
    release_notes/v0.3.0
    release_notes/v0.3.1
    release_notes/v0.4.0
+   release_notes/v0.4.1

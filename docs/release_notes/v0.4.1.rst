@@ -1,0 +1,14 @@
+v0.4.1
+======
+
+A couple minor dependency fixes.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Expands the `scipy` dependency allowed.
+
+* Fixes an incorrect `numpy` dependency hinge.
