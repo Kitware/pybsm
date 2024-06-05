@@ -1,0 +1,14 @@
+v0.4.3
+======
+
+Minor dependencies resolution fix and add a missing docstring.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Added missing docstring for ``intTime``
+
+* Updated the `numpy` hinge for `Python 3.12`

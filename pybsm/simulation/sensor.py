@@ -55,6 +55,8 @@ class Sensor:
         py, this corresponds to an assumed full pixel fill factor. In general,
         wx and wy are less than px and py due to non-photo-sensitive area
         (typically transistors) around each pixel.
+    :param intTime:
+        maximum integration time (s)
     :param qe:
         quantum efficiency as a function of wavelength (e-/photon)
     :param qewavelengths:
