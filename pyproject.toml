@@ -30,8 +30,9 @@ python = "^3.8.1"
 # Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.22,<1.25", python = "~3.8.1"}, # CVE-2021-34141
-    {version = ">=1.22,^1.25", python = ">=3.9,<3.13" } # CVE-2021-34141
+    {version = ">=1.22,<1.25", python = "~3.8"}, # CVE-2021-34141
+    {version = ">=1.22,^1.25", python = ">=3.9,<3.12" }, # CVE-2021-34141
+    {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
 matplotlib = ">=3.5.2"
 # simulation.img2reflectance currently uses interpolate.interp1d but will be removed in scipy==1.14.0
