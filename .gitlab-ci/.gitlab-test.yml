@@ -106,3 +106,19 @@ coverage:
         coverage_format: cobertura
         path: coverage.xml
     expire_in: 1 day
+
+# Job to ensure the provided example script still runs
+# NOTE: this version of tests was to confirm the original pybsm_example.py
+# functioned properly, just as a dummy placeholder for unit testing. Until
+# we've updated this and/or the unit tests, we're using the notebook below.
+original-example:
+  extends: .test-setup
+  parallel:
+    matrix:
+      - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+  image: python:${PY_VERSION}
+  before_script:
+    - !reference [.test-setup, before_script]
+    - !reference [.needs-headless-opencv, before_script]
+  script:
+    - poetry run python examples/pybsm_example.py
