@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 ###############################################################################
@@ -44,18 +44,31 @@ scipy = [
 opencv-python = ">=4.6"
 setuptools = ">=65.6.1"
 
-[tool.poetry.group.dev.dependencies]
 # Linting
+[tool.poetry.group.dev-linting]
+optional = true
+
+[tool.poetry.group.dev-linting.dependencies]
 flake8 = ">=6"
 flake8-mutable = ">=1.2.0"
+mypy = ">=0.991"
+types-setuptools = ">=65.6.0.1"
+
 # Docs
+[tool.poetry.group.dev-docs]
+optional = true
+
+[tool.poetry.group.dev-docs.dependencies]
 Sphinx = ">=5.3.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
-# Type checking
-mypy = ">=0.991"
-types-setuptools = ">=65.6.0.1"
+
+# Testing
+[tool.poetry.group.dev-testing]
+optional = true
+
+[tool.poetry.group.dev-testing.dependencies]
 # Jupyter notebook testing
 notebook = ">=7.0.7"
 papermill = ">=2.4.0"
@@ -83,3 +96,7 @@ doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
 ]
+
+###############################################################################
+[tool.ruff]
+line-length = 15
