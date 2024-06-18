@@ -32,7 +32,10 @@ class RefImage:
         capture a 'gsd' x 'gsd' square of some world surface. We assume the
         sampling is isotropic (x and y sampling are identical) and uniform
         across the whole field of view. This is generally a valid assumption
-        for remote sensing imagery.
+        for remote sensing imagery. Additionally, the following relationship
+        should generally be true: gsd = A * p/f where A is altitude (m), p is
+        pixel pitch (m/pixel), and f is focal length (m). This relationship should
+        hold upon initialization, but may be broken during simulation.
     :param pix_values:
         Pixel count values within 'img' that should be associated with the
         corresponding reflectance values in 'refl_values' by linear
