@@ -8,6 +8,8 @@ CI/CD
 
 * Major overhaul of pipeline to improve efficiency and `yml` readability.
 
+* Fixed a typo in the `coverage` location job.
+
 Documentation
 
 * Added additional documentation on the relationships between GSD/altitude/pixel pitch/focal length and
