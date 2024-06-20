@@ -102,16 +102,10 @@ class Sensor:
         root-mean-squared jitter amplitudes in the y direction (rad)
     :param dax:
         line-of-sight angular drift rate during one integration time in the x
-        direction (rad/s). In cases where the scene is stationary (e.g overhead
-        drone imagery, typically), the following relationship should hold:
-        dax = tan^-1[vehicle_speed_x (m/s) / altitude (m)]. This relationship should
-        hold upon initialization, but may be broken during simulation.
+        direction (rad/s)
     :param day:
         line-of-sight angular drift rate during one integration time in the y
-        direction (rad/s). In cases where the scene is stationary (e.g overhead
-        drone imagery, typically), the following relationship should hold:
-        day = tan^-1[vehicle_speed_y (m/s) / altitude (m)]. This relationship should
-        hold upon initialization, but may be broken during simulation.
+        direction (rad/s)
     :param pv:
         wavefront error phase variance (rad^2) -- tip: write as (2*pi*waves of
         error)^2

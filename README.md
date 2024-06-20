@@ -13,7 +13,7 @@ The Sphinx-based documentation may also be built locally for the most
 up-to-date reference:
 ```bash
 # Install dependencies
-poetry install
+poetry install --sync --with dev-linting,dev-testing,dev-docs
 # Navigate to the documentation root.
 cd docs
 # Build the docs.
