@@ -57,7 +57,7 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 .. prompt:: bash
 
-    poetry install
+    poetry install --sync --with dev-linting,dev-testing,dev-docs
 
 
 Building the Documentation

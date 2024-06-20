@@ -18,12 +18,10 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 import os
 import inspect
 import warnings
-
 # 3rd party imports
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Any, Tuple
-
 # local imports
 import pybsm.otf as otf
 import pybsm.radiance as radiance

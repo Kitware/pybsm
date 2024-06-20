@@ -9,7 +9,7 @@ version = "0.4.3"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 readme = "README.md"
-packages = [{include = "pybsm"}]
+packages = [{include = "pybsm", from="src"}]
 documentation = "https://pybsm.readthedocs.io/"
 classifiers = [
     'Development Status :: 3 - Alpha',
@@ -53,6 +53,9 @@ flake8 = ">=6"
 flake8-mutable = ">=1.2.0"
 mypy = ">=0.991"
 types-setuptools = ">=65.6.0.1"
+pre-commit = ">=2.20"
+ruff = "^0.1.0"
+black = ">=24.3.0"
 
 # Docs
 [tool.poetry.group.dev-docs]
@@ -98,5 +101,32 @@ doctest_optionflags = [
 ]
 
 ###############################################################################
+[tool.black]
+# The regular expression pattern must be written as a single line;
+# otherwise pytest-black fails to exclude the folders. For details see
+# https://github.com/shopkeep/pytest-black/issues/36
+exclude = '(/(\.git|.venv|.eggs|docs$)/)'
+
+
 [tool.ruff]
-line-length = 15
+select = ["E", "W", "F", "I", "D", "A", "B", "N", "YTT", "C4", "PT"]
+line-length = 120
+
+ignore = [
+    # -- Ignore these rules, since they contradict our coding standards
+    "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
+    "C416",  # JATIC guidelines prefer "dict()", rather than "{}", to create an empty dict
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.pycodestyle]
+max-doc-length = 120
+
+[tool.ruff.isort]
+known-first-party = ["pybsm"]
+
+[tool.ruff.per-file-ignores]
+# Add any files to be ignored here e.g. 
+# "src/*.py" = ["D100"] # Missing docstring in public module

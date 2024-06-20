@@ -95,7 +95,7 @@ coverage:
     # `coverage.xml` file
     - coverage xml
     # TODO: Read required percentages from config file?
-    - coverage report --include 'pybsm/*' --precision=2 --fail-under=99
+    - coverage report --include 'src/pybsm/*' --precision=2 --fail-under=99
     - coverage report --include 'tests/*' --precision=2 --fail-under=100
   artifacts:
     when: always
@@ -113,6 +113,8 @@ coverage:
 # we've updated this and/or the unit tests, we're using the notebook below.
 original-example:
   extends: .test-setup
+  needs: [pytest] # if unit tests don't pass, don't run the original script
+  dependencies: []
   parallel:
     matrix:
       - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
