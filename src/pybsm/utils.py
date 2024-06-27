@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -14,8 +14,8 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # standard library imports
-import os
 import inspect
+import os
 import warnings
 
 # 3rd party imports
@@ -30,26 +30,24 @@ warnings.filterwarnings("ignore", r"invalid value encountered in true_divide")
 warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
-# dirpath = os.path.dirname(os.path.abspath(__file__))
-dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+# dir_path = os.path.dirname(os.path.abspath(__file__))
+dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def loadDatabaseAtmosphere_nointerp(
-    altitude: float,
-    groundRange: float,
-    ihaze: int
+def load_database_atmosphere_no_interp(
+    altitude: float, ground_range: float, ihaze: int
 ) -> np.ndarray:
-    """Loads a precalculated MODTRAN 5.2.1 Tape 7 atmosphere over a wavelength
-    range of 0.3 to 14 micrometers.  All screnario details are in
-    'atmosphere_README.txt'. NOTE: the _nointerp suffix was added for version
-    0.2. See pybsm.loadDatabaseAtmosphere for more information.
+    """Loads a precalculated MODTRAN 5.2.1 Tape 7 atmosphere over a wavelength range of 0.3 to 14 micrometers.
+
+    All screnario details are in 'atmosphere_README.txt'. NOTE: the _no_interp suffix was added for version
+    0.2. See pybsm.load_database_atmosphere for more information.
 
     :param altitude:
         sensor height above ground level in meters.  The database includes the
         following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
         12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
         24500 meters
-    :param groundRange:
+    :param ground_range:
         distance *on the ground* between the target and sensor in meters.
         The following ground ranges are included in the database at each
         altitude until the ground range exceeds the distance to the spherical
@@ -81,47 +79,43 @@ def loadDatabaseAtmosphere_nointerp(
             + diffuse radiance) * surface reflectance
     :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
     """
-
     # decoder maps filenames to atmospheric attributes
-    atmpath = os.path.join(dirpath, "atms", "fileDecoder.csv")
-    decoder = np.genfromtxt(atmpath, delimiter=",", skip_header=1)
+    atm_path = os.path.join(dir_path, "atms", "fileDecoder.csv")
+    decoder = np.genfromtxt(atm_path, delimiter=",", skip_header=1)
 
-    decoder = decoder[
-        decoder[:, 3] == ihaze
-    ]  # downselects to the right ihaze mode
+    decoder = decoder[decoder[:, 3] == ihaze]  # downselects to the right ihaze mode
     decoder = decoder[
         decoder[:, 1] == altitude / 1000.0
     ]  # downselects to the right altitude
     decoder = decoder[
-        decoder[:, 2] == groundRange / 1000.0
+        decoder[:, 2] == ground_range / 1000.0
     ]  # downselects to the right ground range
 
-    rawdata = np.fromfile(
-        dirpath + "/atms/" + str(int(decoder[0, 0])) + ".bin",
+    raw_data = np.fromfile(
+        dir_path + "/atms/" + str(int(decoder[0, 0])) + ".bin",
         dtype=np.float32,
         count=-1,
     )
 
-    rawdata = rawdata.reshape((1371, 5), order="F")
-    rawdata[:, 1:5] = (
-        rawdata[:, 1:5] / 1e-10
+    raw_data = raw_data.reshape((1371, 5), order="F")
+    raw_data[:, 1:5] = (
+        raw_data[:, 1:5] / 1e-10
     )  # convert radiance columns to W/(sr m^2 m)
 
     # append wavelength as first column
-    wavl = 1e-6 * np.linspace(0.3, 14.0, 1371)
-    wavl = np.expand_dims(wavl, axis=1)
-    atm = np.hstack((wavl, rawdata))
+    wavelength = 1e-6 * np.linspace(0.3, 14.0, 1371)
+    wavelength = np.expand_dims(wavelength, axis=1)
+    atm = np.hstack((wavelength, raw_data))
 
     return atm
 
 
-def loadDatabaseAtmosphere(
-    altitude: float,
-    groundRange: float,
-    ihaze: int
+def load_database_atmosphere(
+    altitude: float, ground_range: float, ihaze: int
 ) -> np.ndarray:
-    """linear interpolation of the pre-calculated MODTRAN atmospheres.
-    See the original 'loadDatabaseAtmosphere' (now commented out) for more
+    """Linear interpolation of the pre-calculated MODTRAN atmospheres.
+
+    See the original 'load_database_atmosphere' (now commented out) for more
     details on the outputs.
     NOTE: This is experimental code.  Linear interpolation between atmospheres
     may not be a good approximation in every case!!!!
@@ -129,7 +123,7 @@ def loadDatabaseAtmosphere(
 
     :param altitude:
         sensor height above ground level in meters
-    :param groundRange:
+    :param ground_range:
         distance *on the ground* between the target and sensor in meters.
         The following ground ranges are included in the database at each
         altitude until the ground range exceeds the distance to the spherical
@@ -161,47 +155,44 @@ def loadDatabaseAtmosphere(
     :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
     """
 
-    def getGroundRangeArray(maxGroundRange: float) -> np.ndarray:
-        """Returns an array of ground ranges that are valid in the
-        precalculated MODTRAN database.
+    def get_ground_range_array(max_ground_range: float) -> np.ndarray:
+        """Returns an array of ground ranges that are valid in the precalculated MODTRAN database.
 
-        :param maxGroundRange:
+        :param max_ground_range:
             largest ground Range of interest (m)
 
         :return:
-            G:
-                array of ground ranges less than maxGroundRange (m)
+            g:
+                array of ground ranges less than max_ground_range (m)
         """
-        G = np.array([0.0, 100.0, 500.0])
-        G = np.append(G, np.arange(1000.0, 20000.01, 1000.0))
-        G = np.append(G, np.arange(22000.0, 80000.01, 2000.0))
-        G = np.append(G, np.arange(85000.0, 300000.01, 5000.0))
-        G = G[G <= maxGroundRange]
-        return G
+        g = np.array([0.0, 100.0, 500.0])
+        g = np.append(g, np.arange(1000.0, 20000.01, 1000.0))
+        g = np.append(g, np.arange(22000.0, 80000.01, 2000.0))
+        g = np.append(g, np.arange(85000.0, 300000.01, 5000.0))
+        g = g[g <= max_ground_range]
+        return g
 
-    def altAtmInterp(
-        lowalt: float,
-        highalt: float,
+    def alt_atm_interp(
+        low_alt: float,
+        high_alt: float,
         altitude: float,
-        groundRange: float,
-        ihaze: int
+        ground_range: float,
+        ihaze: int,
     ) -> np.ndarray:
         # this is an internal function for interpolating atmospheres across
         # altitudes
-        lowatm = loadDatabaseAtmosphere_nointerp(lowalt, groundRange, ihaze)
-        if lowalt != highalt:
-            highatm = loadDatabaseAtmosphere_nointerp(
-                highalt, groundRange, ihaze
-            )
-            lowweight = 1 - ((altitude - lowalt) / (highalt - lowalt))
-            highweight = (altitude - lowalt) / (highalt - lowalt)
-            atm = lowweight * lowatm + highweight * highatm
+        low_atm = load_database_atmosphere_no_interp(low_alt, ground_range, ihaze)
+        if low_alt != high_alt:
+            high_atm = load_database_atmosphere_no_interp(high_alt, ground_range, ihaze)
+            low_weight = 1 - ((altitude - low_alt) / (high_alt - low_alt))
+            high_weight = (altitude - low_alt) / (high_alt - low_alt)
+            atm = low_weight * low_atm + high_weight * high_atm
         else:
-            atm = lowatm
+            atm = low_atm
         return atm
 
     # define arrays of all possible altitude and ground ranges
-    altarray = np.array(
+    altitude_array = np.array(
         [
             2,
             32.55,
@@ -227,24 +218,24 @@ def loadDatabaseAtmosphere(
             20000,
         ]
     )
-    grangearray = getGroundRangeArray(301e3)
+    ground_ranges = get_ground_range_array(301e3)
 
     # find the database altitudes and ground ranges that bound the values of
     # interest
-    lowalt = altarray[altarray <= altitude][-1]
-    highalt = altarray[altarray >= altitude][0]
-    lowrng = grangearray[grangearray <= groundRange][-1]
-    highrng = grangearray[grangearray >= groundRange][0]
+    low_alt = altitude_array[altitude_array <= altitude][-1]
+    high_alt = altitude_array[altitude_array >= altitude][0]
+    low_range = ground_ranges[ground_ranges <= ground_range][-1]
+    high_range = ground_ranges[ground_ranges >= ground_range][0]
 
     # first interpolate across the low and high altitudes
     # then interpolate across ground range
-    atm_lowrng = altAtmInterp(lowalt, highalt, altitude, lowrng, ihaze)
-    if lowrng != highrng:
-        atm_highrng = altAtmInterp(lowalt, highalt, altitude, highrng, ihaze)
-        lowweight = 1 - ((groundRange - lowrng) / (highrng - lowrng))
-        highweight = (groundRange - lowrng) / (highrng - lowrng)
-        atm = lowweight * atm_lowrng + highweight * atm_highrng
+    atm_low_range = alt_atm_interp(low_alt, high_alt, altitude, low_range, ihaze)
+    if low_range != high_range:
+        atm_high_range = alt_atm_interp(low_alt, high_alt, altitude, high_range, ihaze)
+        low_weight = 1 - ((ground_range - low_range) / (high_range - low_range))
+        high_weight = (ground_range - low_range) / (high_range - low_range)
+        atm = low_weight * atm_low_range + high_weight * atm_high_range
     else:
-        atm = atm_lowrng
+        atm = atm_low_range
 
     return atm

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -14,8 +14,9 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # 3rd party imports
-import numpy as np
 from typing import Optional
+
+import numpy as np
 
 # local imports
 from pybsm import utils
@@ -45,20 +46,20 @@ class Scenario:
         altitude until the ground range exceeds the distance to the spherical
         earth horizon: 0 100 500 1000 to 20000 in 1000 meter steps, 22000 to
         80000 in 2000 m steps, and  85000 to 300000 in 5000 meter steps.
-    :parameter aircraftSpeed:
+    :parameter aircraft_speed:
         ground speed of the aircraft (m/s)
-    :parameter targetReflectance:
+    :parameter target_reflectance:
         object reflectance (unitless); the default 0.15 is the giqe standard
-    :parameter targetTemperature:
+    :parameter target_temperature:
         object temperature (Kelvin); 282 K is used for GIQE calculation
-    :parameter backgroundReflectance:
+    :parameter background_reflectance:
         background reflectance (unitless)
-    :parameter backgroundTemperature:
+    :parameter background_temperature:
         background temperature (Kelvin); 280 K used for GIQE calculation
-    :parameter haWindspeed:
-        the high altitude windspeed (m/s) used to calculate the turbulence
+    :parameter ha_wind_speed:
+        the high altitude wind speed (m/s) used to calculate the turbulence
         profile; the default, 21.0, is the HV 5/7 profile value
-    :parameter cn2at1m:
+    :parameter cn2_at_1m:
         the refractive index structure parameter "near the ground"
         (e.g. at h = 1 m) used to calculate the turbulence profile; the
         default, 1.7e-14, is the HV 5/7 profile value
@@ -71,25 +72,25 @@ class Scenario:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        aircraftSpeed: float = 0,
-        targetReflectance: float = 0.15,
-        targetTemperature: float = 295,
-        backgroundReflectance: float = 0.07,
-        backgroundTemperature: float = 293,
-        haWindspeed: float = 21,
-        cn2at1m: float = 1.7e-14
+        aircraft_speed: float = 0,
+        target_reflectance: float = 0.15,
+        target_temperature: float = 295,
+        background_reflectance: float = 0.07,
+        background_temperature: float = 293,
+        ha_wind_speed: float = 21,
+        cn2_at_1m: float = 1.7e-14,
     ) -> None:
         self.name = name
         self._ihaze = ihaze
         self._altitude = altitude
         self._ground_range = ground_range
-        self.aircraftSpeed = aircraftSpeed
-        self.targetReflectance = targetReflectance
-        self.targetTemperature = targetTemperature
-        self.backgroundReflectance = backgroundReflectance
-        self.backgroundTemperature = backgroundTemperature
-        self.haWindspeed = haWindspeed
-        self.cn2at1m = cn2at1m
+        self.aircraft_speed = aircraft_speed
+        self.target_reflectance = target_reflectance
+        self.target_temperature = target_temperature
+        self.background_reflectance = background_reflectance
+        self.background_temperature = background_temperature
+        self.ha_wind_speed = ha_wind_speed
+        self.cn2_at_1m = cn2_at_1m
 
         # Will be loaded on demand for a particular altitude.
         self._atm: Optional[np.ndarray] = None
@@ -150,7 +151,7 @@ class Scenario:
         """
         if self._atm is None:
             # Read in and cache results.
-            self._atm = utils.loadDatabaseAtmosphere(
+            self._atm = utils.load_database_atmosphere(
                 self.altitude, self.ground_range, self.ihaze
             )
 

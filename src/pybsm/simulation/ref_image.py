@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -14,13 +14,15 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # 3rd party imports
+from typing import Optional, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Optional, Tuple
+
+from .scenario import Scenario
 
 # local imports
 from .sensor import Sensor
-from .scenario import Scenario
 
 
 class RefImage:
@@ -46,13 +48,14 @@ class RefImage:
 
     :raises: ValueError if pix_values is provided, but refl_values is missing
     """
+
     def __init__(
         self,
         img: np.ndarray,
         gsd: float,
         pix_values: Optional[np.ndarray] = None,
         refl_values: Optional[np.ndarray] = None,
-        name: str = 'ref_image'
+        name: str = "ref_image",
     ) -> None:
         self.img = img
         self.gsd = gsd
@@ -68,32 +71,32 @@ class RefImage:
             refl_values = np.array([0.05, 0.95])
         else:
             if refl_values is None:
-                raise ValueError("If 'pix_values' is provided, 'refl_values' must be as well.")
+                raise ValueError(
+                    "If 'pix_values' is provided, 'refl_values' must be as well."
+                )
 
         self.pix_values = pix_values
         self.refl_values = refl_values
 
     def estimate_capture_parameters(
-        self,
-        altitude: float = 2000000
+        self, altitude: float = 2000000
     ) -> Tuple[Sensor, Scenario]:
-        """Estimate the scenario and sensor parameters that are consistent
-        with this image.
+        """Estimate the scenario and sensor parameters that are consistent with this image.
 
         This provides a no-degradation baseline from which to alter parameters
         to explore further degradation.
         """
         # Let's assume the full visible spectrum.
-        optTransWavelengths = np.array([380, 700]) * 1.0e-9  # m
+        opt_trans_wavelengths = np.array([380, 700]) * 1.0e-9  # m
 
         scenario = Scenario(
             self.name,
             1,
             altitude,
             ground_range=0,
-            aircraftSpeed=0,
-            haWindspeed=0,
-            cn2at1m=0,
+            aircraft_speed=0,
+            ha_wind_speed=0,
+            cn2_at_1m=0,
         )
 
         # Guess at a relatively large pixel pitch, which should have a large
@@ -112,9 +115,9 @@ class RefImage:
         # diffraction limited angular resolution (where on Airy disk sits in
         # the first ring of another Airy disk) is 1.22*lambda/D. But, let's use
         # a coefficient of 4 for safety.
-        D = 4 * np.median(optTransWavelengths) / ifov
+        D = 4 * np.median(opt_trans_wavelengths) / ifov  # noqa: N806
 
-        sensor = Sensor(self.name, D, f, p, optTransWavelengths)
+        sensor = Sensor(self.name, D, f, p, opt_trans_wavelengths)
         return sensor, scenario
 
     def show(self) -> None:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -14,23 +14,24 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # standard library imports
-import os
-import logging
 import inspect
+import logging
+import os
 import warnings
+from typing import List, Optional, Tuple
 
 # 3rd party imports
 import numpy as np
 from scipy import interpolate
-from typing import List, Tuple
 
 # local imports
 import pybsm.otf as otf
 import pybsm.radiance as radiance
 from pybsm import noise
-from .sensor import Sensor
-from .scenario import Scenario
+
 from .ref_image import RefImage
+from .scenario import Scenario
+from .sensor import Sensor
 
 # new in version 0.2.  We filter warnings associated with calculations in the
 # function circularApertureOTF.  These invalid values are caught as NaNs and
@@ -41,16 +42,12 @@ warnings.filterwarnings("ignore", r"invalid value encountered in true_divide")
 warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
-# dirpath = os.path.dirname(os.path.abspath(__file__))
-dirpath = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+# dir_path = os.path.dirname(os.path.abspath(__file__))
+dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def instantaneousFOV(
-    w: int,
-    f: int
-) -> float:
-    """The instantaneous field of view; i.e., the angular footprint of a single
-    detector in object space.
+def instantaneous_FOV(w: int, f: int) -> float:  # noqa: N802
+    """The instantaneous field of view; i.e., the angular footprint of a single detector in object space.
 
     :param w:
         detector size (width) in the x and y directions (m)
@@ -67,14 +64,14 @@ def instantaneousFOV(
     return ifov
 
 
-def wienerFilter(
-    otf: np.ndarray,
-    noiseToSignalPS: float
-) -> np.ndarray:
-    """An image restoration transfer function based on the Wiener Filter.  See
-    from Gonzalex and Woods, "Digital Image Processing," 3 ed.  Note that the
+def wiener_filter(
+    otf: np.ndarray, noise_to_signal_power_spectrum: float
+) -> np.ndarray:  # noqa: N803
+    """An image restoration transfer function based on the Wiener Filter.
+
+    See from Gonzalex and Woods, "Digital Image Processing," 3 ed.  Note that the
     filter is not normalized so that WF = 1 at 0 spatial frequency.  This is
-    easily fixed for the case where noiseToSignalPS is a
+    easily fixed for the case where noise_to_signal_power_spectrum is a
     scalar: (1.0+noisetosignalPS)*WF = 1 at 0 spatial frequency.
     This is noteworthy because, without normalization of some kind, system
     MTF * WF is not a proper MTF. Also, for any frequency space sharpening
@@ -92,22 +89,22 @@ def wienerFilter(
 
     :return:
         WF:
-            frequency space representation of the Wienerfilter
+            frequency space representation of the wiener_filter
     """
-    WF = np.conj(otf) / (np.abs(otf) ** 2 + noiseToSignalPS)
+    WF = np.conj(otf) / (  # noqa: N806
+        np.abs(otf) ** 2 + noise_to_signal_power_spectrum
+    )
 
     return WF
 
 
-def img2reflectance(
-    img: np.ndarray,
-    pix_values: np.ndarray,
-    refl_values: np.ndarray
+def img_to_reflectance(
+    img: np.ndarray, pix_values: np.ndarray, refl_values: np.ndarray
 ) -> np.ndarray:
-    """Maps pixel values to reflectance values with linear interpolation
-    between points. Pixel values that map below zero reflectance or above
-    unity reflectance are truncated. Implicitly, reflectance is contrast
-    across the camera bandpass.
+    """Maps pixel values to reflectance values with linear interpolation between points.
+
+    Pixel values that map below zero reflectance or above unity reflectance are truncated.
+    Implicitly, reflectance is contrast across the camera bandpass.
 
     :param img:
         the image that will be transformed into reflectance (counts)
@@ -120,7 +117,7 @@ def img2reflectance(
     :type refl_values: np.array
 
     :return:
-        refImg:
+        ref_img:
             the image in reflectance space
 
     :raises:
@@ -136,17 +133,15 @@ def img2reflectance(
         fill_value="extrapolate",
         assume_sorted=0,
     )
-    refImg = f(img)
-    refImg[refImg > 1.0] = 1.0
-    refImg[refImg < 0.0] = 0.0
+    ref_img = f(img)
+    ref_img[ref_img > 1.0] = 1.0
+    ref_img[ref_img < 0.0] = 0.0
 
-    return refImg
+    return ref_img
 
 
 def simulate_image(
-    ref_img: RefImage,
-    sensor: Sensor,
-    scenario: Scenario
+    ref_img: RefImage, sensor: Sensor, scenario: Scenario
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates radiometrically accurate imagery collected through a sensor.
 
@@ -171,12 +166,12 @@ def simulate_image(
         relative to the target.
 
     :return:
-        trueImg:
+        true_img:
             Numpy float64 array; the true image in units of photoelectrons
-        blurImg:
-            Numpy float64 array; the image after blurring and resampling is applied to trueImg
+        blur_img:
+            Numpy float64 array; the image after blurring and resampling is applied to true_img
             (still units of photoelectrons)
-        noisyImg:
+        noisy_img:
             Numpy float64 array; the blur image with photon (Poisson) noise and gaussian noise
             applied (still units of photoelectrons)
 
@@ -187,17 +182,17 @@ def simulate_image(
         met if imggsd <= rng/(4*coff). In practice this is easily done by
         upsampling imgin.
 
-    :raises: ValueError if cutoff Frequency matrix urng is not monotonically
+    :raises: ValueError if cutoff Frequency matrix u_rng is not monotonically
              increasing
     """
     # integration time (s)
-    intTime = sensor.intTime
+    int_time = sensor.int_time
 
     (
         ref,
         pe,
         spectral_weights,
-    ) = radiance.reflectance2photoelectrons(scenario.atm, sensor, intTime)
+    ) = radiance.reflectance_to_photoelectrons(scenario.atm, sensor, int_time)
 
     wavelengths = spectral_weights[0]
     weights = spectral_weights[1]
@@ -205,76 +200,77 @@ def simulate_image(
     slant_range = np.sqrt(scenario.altitude**2 + scenario.ground_range**2)
 
     # cut down the wavelength range to only the regions of interest
-    mtfwavelengths = wavelengths[weights > 0.0]
-    mtfweights = weights[weights > 0.0]
+    mtf_wavelengths = wavelengths[weights > 0.0]
+    mtf_weights = weights[weights > 0.0]
 
     # Assume if nothing else cuts us off first, diffraction will set the limit
     # for spatial frequency that the imaging system can resolve (1/rad).
-    cutoffFrequency = sensor.D / np.min(mtfwavelengths)
+    cutoff_frequency = sensor.D / np.min(mtf_wavelengths)
 
-    urng = np.linspace(-1.0, 1.0, 1501) * cutoffFrequency
-    vrng = np.linspace(1.0, -1.0, 1501) * cutoffFrequency
+    u_rng = np.linspace(-1.0, 1.0, 1501) * cutoff_frequency
+    v_rng = np.linspace(1.0, -1.0, 1501) * cutoff_frequency
 
     # meshgrid of spatial frequencies out to the optics cutoff
-    uu, vv = np.meshgrid(urng, vrng)
+    uu, vv = np.meshgrid(u_rng, v_rng)
 
-    system_otf = otf.commonOTFs(
+    system_otf = otf.common_OTFs(
         sensor,
         scenario,
         uu,
         vv,
-        mtfwavelengths,
-        mtfweights,
+        mtf_wavelengths,
+        mtf_weights,
         slant_range,
-        intTime,
-    ).systemOTF
+        int_time,
+    ).system_OTF
 
-    df = (abs(urng[1] - urng[0]) + abs(vrng[0] - vrng[1]))/2
+    df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
     if df <= 0:
         raise ValueError("Cutoff frequency values must be increasing.")
 
-    ifov = (sensor.px + sensor.py) / 2 / sensor.f
+    ifov = (sensor.p_x + sensor.p_y) / 2 / sensor.f
 
     # Standard deviation of additive Gaussian noise (e.g. read noise,
     # quantization). Should be the RSS value if multiple terms are combined.
     # This should not include photon noise.
-    quantizationNoise = noise.quantizationNoise(sensor.maxN, sensor.bitdepth)
-    gnoise = np.sqrt(quantizationNoise**2.0 + sensor.readNoise**2.0)
+    quantization_noise = noise.quantization_noise(sensor.max_n, sensor.bit_depth)
+    g_noise = np.sqrt(quantization_noise**2.0 + sensor.read_noise**2.0)
 
     # Convert to reference image into a floating point reflectance image.
-    refImg = img2reflectance(
+    reflectance_img = img_to_reflectance(
         ref_img.img, ref_img.pix_values, ref_img.refl_values
     )
 
     # Convert the reflectance image to photoelectrons.
     f = interpolate.interp1d(ref, pe)
-    trueImg = f(refImg)
+    true_img = f(reflectance_img)
 
     # blur and resample the image
-    blurImg, _ = otf.apply_otf_to_image(
-        trueImg, ref_img.gsd, slant_range, system_otf, df, ifov
+    blur_img, _ = otf.apply_otf_to_image(
+        true_img, ref_img.gsd, slant_range, system_otf, df, ifov
     )
 
     # add photon noise (all sources) and dark current noise
-    poisson_noisy_img = np.random.poisson(lam=blurImg)
-    # add any noise from Gaussian sources, e.g. readnoise, quantizaiton
-    noisyImg = np.random.normal(poisson_noisy_img, gnoise)
+    poisson_noisy_img = np.random.poisson(lam=blur_img)
+    # add any noise from Gaussian sources, e.g. read_noise, quantizaiton
+    noisy_img = np.random.normal(poisson_noisy_img, g_noise)
 
-    if noisyImg.shape[0] > ref_img.img.shape[0]:
+    if noisy_img.shape[0] > ref_img.img.shape[0]:
         logging.warn(
             "The simulated image has oversampled the"
             " reference image!  This result should not be"
             " trusted!!"
         )
 
-    return trueImg, blurImg, noisyImg
+    return true_img, blur_img, noisy_img
 
 
 def stretch_contrast_convert_8bit(
-    img: np.ndarray,
-    perc: List[float] = [0.1, 99.9]
+    img: np.ndarray, perc: Optional[List[float]] = None
 ) -> np.ndarray:
+    if perc is None:
+        perc = [0.1, 99.9]
     img = img.astype(float)
     img = img - np.percentile(img.ravel(), perc[0])
     img = img / (np.percentile(img.ravel(), perc[1]) / 255)
