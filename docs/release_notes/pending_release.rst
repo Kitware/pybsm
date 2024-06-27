@@ -19,6 +19,8 @@ Documentation
 
 * Updated documents to reflect new refactor.
 
+* Modified all code to be compliant with all `ruff` and `black` checks besides missing docstrings.
+
 Other
 
 * Added `git pre-hook` to assist in linting.

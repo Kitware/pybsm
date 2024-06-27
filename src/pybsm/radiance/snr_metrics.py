@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -19,33 +19,31 @@ import numpy as np
 
 class SNRMetrics:
     """A generic class to fill with any outputs of interest."""
-    optTrans: np.ndarray
+
+    opt_trans: np.ndarray
     qe: np.ndarray
-    otherIrradiance: np.ndarray
-    tgtNrate: float
-    tgtFPAirradiance: np.ndarray
+    other_irradiance: np.ndarray
+    tgt_n_rate: float
+    tgt_FPA_irradiance: np.ndarray  # noqa: N815
     weights: np.ndarray
-    tgtN: float
-    bkgNrate: float
-    bkgFPAirradiance: np.ndarray
-    bkgN: float
-    scalefactor: float
-    intTime: float
-    wellfraction: float
-    contrastSignal: float
-    signalNoise: float
-    darkcurrentNoise: float
-    quantizationNoise: float
-    selfEmissionNoise: float
-    totalNoise: float
+    tgt_n: float
+    bkg_n_rate: float
+    bkg_FPA_irradiance: np.ndarray  # noqa: N815
+    bkg_n: float
+    scale_factor: float
+    int_time: float
+    well_fraction: float
+    contrast_signal: float
+    signal_noise: float
+    dark_current_noise: float
+    quantization_noise: float
+    self_emission_noise: float
+    total_noise: float
     snr: float
 
-    pathNoise: float
-    sceneNoise: float
+    path_noise: float
+    scene_noise: float
 
-    def __init__(
-        self,
-        name: str
-    ) -> None:
-        """Returns a sensor object whose name is *name* """
+    def __init__(self, name: str) -> None:
+        """Returns a sensor object whose name is *name*."""
         self.name = name
