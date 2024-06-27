@@ -1,6 +1,8 @@
 v0.5.1
 ======
 
+A hotfix to fix documentation rendering as part of CI/CD.
+
 Updates / New Features
 ----------------------
 
