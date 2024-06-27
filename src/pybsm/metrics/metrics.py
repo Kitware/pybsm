@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical
-camera modeling functions developed by the Air Force Research Laboratory,
-Sensors Directorate.
+"""The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
+
+Developed by the Air Force Research Laboratory, Sensors Directorate.
 
 Author citation:
 LeMaster, Daniel A.; Eismann, Michael T., "pyBSM: A Python package for modeling
@@ -14,8 +14,9 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # 3rd party imports
-import numpy as np
 from typing import Optional
+
+import numpy as np
 
 # local imports
 import pybsm.otf as otf
@@ -28,39 +29,36 @@ class Metrics:
 
     sensor: Sensor
     scenario: Scenario
-    slantRange: float
+    slant_range: float
     atm: np.ndarray
-    tgtRadiance: np.ndarray
-    bkgRadiance: np.ndarray
-    radianceWavelengths: np.ndarray
+    tgt_radiance: np.ndarray
+    bkg_radiance: np.ndarray
+    radiance_wavelengths: np.ndarray
     snr: SNRMetrics
-    mtfwavelengths: np.ndarray
-    mtfweights: np.ndarray
-    cutoffFrequency: float
+    mtf_wavelengths: np.ndarray
+    mtf_weights: np.ndarray
+    cutoff_frequency: float
     uu: np.ndarray
     vv: np.ndarray
     df: float
     otf: otf.OTF
-    ifovx: float
-    ifovy: float
-    gsdx: float
-    gsdy: float
-    gsdgm: float
-    rergm: float
-    ehogm: float
+    ifov_x: float
+    ifov_y: float
+    gsd_x: float
+    gsd_y: float
+    gsd_gm: float
+    rer_gm: float
+    eho_gm: float
     ng: float
     niirs: float
-    elevAngle: float
-    niirs4: float
-    gsdgp: float
+    elev_angle: float
+    niirs_4: float
+    gsd_gp: float
     rer: float
-    rer0: float
-    rer90: float
-    gsdw: float
+    rer_0: float
+    rer_90: float
+    gsd_w: float
 
-    def __init__(
-        self,
-        name: Optional[str]
-    ) -> None:
-        """Returns a sensor object whose name is *name* """
+    def __init__(self, name: Optional[str]) -> None:
+        """Returns a sensor object whose name is *name*."""
         self.name = name

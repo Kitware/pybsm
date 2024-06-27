@@ -2,9 +2,9 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-from pathlib import Path
 import sys
-
+from pathlib import Path
+from typing import List
 
 # -- Path setup --------------------------------------------------------------
 
@@ -18,13 +18,12 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.absolute()))
 import pybsm  # noqa: E402
 
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'pybsm'
-copyright = '2023, Kitware, Inc.'
-author = 'Kitware, Inc.'
+project = "pybsm"
+copyright = "2023, Kitware, Inc."  # noqa: A001
+author = "Kitware, Inc."
 release = pybsm.__version__
 
 
@@ -44,12 +43,12 @@ suppress_warnings = [
     "autosectionlabel.*",
 ]
 
-templates_path = []  # ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path: List[str] = list()  # ['_templates']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = []  # ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path: List[str] = list()  # ['_static']

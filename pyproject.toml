@@ -93,7 +93,7 @@ addopts = [
 ]
 testpaths = [
     "tests",
-    "pybsm",
+    "src/pybsm",
 ]
 doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
@@ -116,6 +116,10 @@ ignore = [
     # -- Ignore these rules, since they contradict our coding standards
     "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
     "C416",  # JATIC guidelines prefer "dict()", rather than "{}", to create an empty dict
+    # -- Ignoring these "Missing Docstring" errors for now, we will fix later
+    "D100", "D101", "D102", "D103", "D104", "D105", "D107",
+    # -- Ignore this error, it does not contradict our coding standards
+    "E731"   # The lambda expressions that are used are rudimentary and not worthy of standalone fcn
 ]
 
 [tool.ruff.pydocstyle]
