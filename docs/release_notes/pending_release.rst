@@ -12,3 +12,5 @@ CI/CD
 
 Fixes
 -----
+
+* Updated `poetry.lock` file to remove a development environment vulnerability.
