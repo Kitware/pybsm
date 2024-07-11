@@ -12,10 +12,7 @@
 
 # Job to run unittests via pytest
 pytest:
-  extends: .test-setup
-  parallel:
-    matrix:
-      - PYTHON_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+  extends: [.test-setup, .python-versions]
   variables:
     COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}"
     JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
@@ -112,13 +109,10 @@ coverage:
 # functioned properly, just as a dummy placeholder for unit testing. Until
 # we've updated this and/or the unit tests, we're using the notebook below.
 original-example:
-  extends: .test-setup
+  extends: [.test-setup, .python-versions]
   needs: [pytest] # if unit tests don't pass, don't run the original script
   dependencies: []
-  parallel:
-    matrix:
-      - PY_VERSION: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
-  image: python:${PY_VERSION}
+  image: python:${PYTHON_VERSION}
   before_script:
     - !reference [.test-setup, before_script]
     - !reference [.needs-headless-opencv, before_script]
