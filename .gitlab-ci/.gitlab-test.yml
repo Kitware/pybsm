@@ -5,7 +5,6 @@
 .test-setup:
   extends: .shared-setup
   stage: test
-  needs: [] # Don't wait for previous stages/jobs
   before_script:
     - !reference [.shared-setup, before_script]
     - poetry install --sync --with dev-testing
@@ -13,6 +12,9 @@
 # Job to run unittests via pytest
 pytest:
   extends: [.test-setup, .python-versions]
+  needs:
+    - job: build:cache
+      artifacts: false
   variables:
     COVERAGE_TARGET: ".coverage-py${PYTHON_VERSION}"
     JUNIT_TARGET: ".junit-py${PYTHON_VERSION}.xml"
@@ -54,7 +56,11 @@ pytest:
 #   the associated "NOTEBOOK_DIR" to create a job parameterization instance.
 notebooks:
   extends: .test-setup
-  needs: [pytest] # if unit tests don't pass, don't run the notebooks
+  needs:
+    - job: build:cache
+      artifacts: false
+    - job: pytest
+      artifacts: false
   dependencies: []
   # Specifying the various notebooks that we want to be tested. Each invocation
   # of this job should try to execute only one notebook via papermill.
@@ -75,6 +81,8 @@ notebooks:
 coverage:
   extends: .test-setup
   needs:
+    - job: build:cache
+      artifacts: false
     - job: pytest
       artifacts: true
   allow_failure: true
