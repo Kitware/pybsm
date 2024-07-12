@@ -5,7 +5,7 @@
 .docs-setup:
   extends: .shared-setup
   stage: docs
-  needs: [] # Don't wait for previous stages/jobs
+  needs: [build:cache]
   before_script:
     - !reference [.shared-setup, before_script]
     - poetry install --sync --with dev-docs,dev-testing
