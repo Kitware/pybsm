@@ -761,7 +761,9 @@ class TestReflectanceToPhotoelectrons:
     ) -> None:
         """Cover cases where ZeroDivisionError occurs."""
         with pytest.raises(ZeroDivisionError):
-            radiance.cold_shield_self_emission(wavelengths, cold_shield_temperature, D, f)
+            radiance.cold_shield_self_emission(
+                wavelengths, cold_shield_temperature, D, f
+            )
 
     @pytest.mark.parametrize(
         ("wavelengths", "cold_shield_temperature", "D", "f"),
@@ -933,7 +935,9 @@ class TestReflectanceToPhotoelectrons:
         expected: Tuple[np.ndarray, np.ndarray, np.ndarray],
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
-        output = radiance.reflectance_to_photoelectrons(atm, sensor, int_time, target_temp)
+        output = radiance.reflectance_to_photoelectrons(
+            atm, sensor, int_time, target_temp
+        )
         assert np.isclose(output[0], expected[0]).all()
         assert np.isclose(output[1], expected[1]).all()
         assert np.isclose(output[2], expected[2]).all()
@@ -967,7 +971,9 @@ class TestReflectanceToPhotoelectrons:
         expected: Tuple[np.ndarray, np.ndarray, np.ndarray],
     ) -> None:
         """Cover cases with normal inputs, atm input, and expected outputs."""
-        output = radiance.reflectance_to_photoelectrons(atm, sensor, int_time, target_temp)
+        output = radiance.reflectance_to_photoelectrons(
+            atm, sensor, int_time, target_temp
+        )
         assert np.isclose(output[0], expected[0]).all()
         assert np.isclose(output[1], expected[1]).all()
         assert np.isclose(output[2], expected[2]).all()
