@@ -4,6 +4,12 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+Linting
+
+* Added `py.typed` to `src/pybsm`
+
+* Added a few `ignore_missing_imports = True` to `mypy` config.
+
 CI/CD
 
 * Optimized to not run anything but `publish` when `tag`.
@@ -32,3 +38,5 @@ Fixes
 * Updated `poetry.lock` file to remove a development environment vulnerability.
 
 * Modified security scanning to not use latest but instead the stable version.
+
+* Removed `examples` from `mypy` to prevent failure if there are no `.py` files.
