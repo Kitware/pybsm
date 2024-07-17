@@ -28,6 +28,10 @@ CI/CD
 
 * Added `jupyter` notebook extra to `black`.
 
+* Renamed `linting` job to `flake8`.
+
+* Renamed `typing` job to `mypy`.
+
 Documentation
 
 * Added a section to the README about using the pre-commit hooks
