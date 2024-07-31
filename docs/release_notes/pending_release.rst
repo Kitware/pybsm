@@ -32,6 +32,8 @@ CI/CD
 
 * Renamed `typing` job to `mypy`.
 
+* Swapped out pipeline to use a shared pipeline from `nrtk`.
+
 Documentation
 
 * Added a section to the README about using the pre-commit hooks
