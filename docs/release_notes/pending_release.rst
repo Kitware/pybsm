@@ -32,7 +32,7 @@ CI/CD
 
 * Renamed `typing` job to `mypy`.
 
-* Swapped out pipeline to use a shared pipeline from `nrtk`.
+* Swapped out pipeline to use a shared pipeline.
 
 Documentation
 
