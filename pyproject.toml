@@ -41,8 +41,16 @@ scipy = [
     {version = "<1.11.1", python = "~3.8.1"}, # Can't satisfy CVE-2023-25399 because it is too restrictive
     {version = ">=1.10.0,<1.14", python = ">=3.9"}, # CVE-2023-25399
 ]
-opencv-python = ">=4.6"
+
+opencv-python = {version = ">=4.6", optional=true}
+opencv-python-headless = {version = ">=4.6", optional=true}
+
 setuptools = ">=65.6.1"
+
+[tool.poetry.extras]
+
+cv2-graphics = ["opencv-python"] 
+cv2-headless = ["opencv-python-headless"] 
 
 # Linting
 [tool.poetry.group.dev-linting]
