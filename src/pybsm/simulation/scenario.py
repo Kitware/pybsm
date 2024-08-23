@@ -79,6 +79,7 @@ class Scenario:
         background_temperature: float = 293,
         ha_wind_speed: float = 21,
         cn2_at_1m: float = 1.7e-14,
+        interp: Optional[bool] = False
     ) -> None:
         self.name = name
         self._ihaze = ihaze
@@ -94,6 +95,7 @@ class Scenario:
 
         # Will be loaded on demand for a particular altitude.
         self._atm: Optional[np.ndarray] = None
+        self._interp = interp
 
     @property
     def ihaze(self) -> int:
@@ -151,8 +153,13 @@ class Scenario:
         """
         if self._atm is None:
             # Read in and cache results.
-            self._atm = utils.load_database_atmosphere(
-                self.altitude, self.ground_range, self.ihaze
-            )
+            if self._interp:
+                self._atm = utils.load_database_atmosphere(
+                    self.altitude, self.ground_range, self.ihaze
+                )
+            else:
+                self._atm = utils.load_database_atmosphere_no_interp(
+                    self.altitude, self.ground_range, self.ihaze
+                )
 
         return self._atm

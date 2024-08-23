@@ -91,6 +91,8 @@ def load_database_atmosphere_no_interp(
         decoder[:, 2] == ground_range / 1000.0
     ]  # downselects to the right ground range
 
+    if not os.path.isfile(dir_path + "/atms/" + str(int(decoder[0, 0])) + ".bin"):
+        raise IndexError("No atm file found for provided condition. Change values or use interpolation as necessary.")
     raw_data = np.fromfile(
         dir_path + "/atms/" + str(int(decoder[0, 0])) + ".bin",
         dtype=np.float32,
@@ -220,6 +222,10 @@ def load_database_atmosphere(
     )
     ground_ranges = get_ground_range_array(301e3)
 
+    if altitude < min(altitude_array) or altitude > max(altitude_array):
+        raise IndexError("Altitude not within range of acceptable values (2,20000)")
+    if ground_range < min(ground_ranges) or ground_range > max(ground_ranges):
+        raise IndexError("Ground Range not within range of acceptable values (0,300000)")
     # find the database altitudes and ground ranges that bound the values of
     # interest
     low_alt = altitude_array[altitude_array <= altitude][-1]

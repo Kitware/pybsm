@@ -10,6 +10,8 @@ Linting
 
 * Added a few `ignore_missing_imports = True` to `mypy` config.
 
+* Added option for using interpolation when using scenario.atm and niirs
+
 CI/CD
 
 * Optimized to not run anything but `publish` when `tag`.

@@ -18,7 +18,7 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 import inspect
 import os
 import warnings
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import matplotlib.pyplot as plt
 
@@ -294,7 +294,7 @@ def ground_resolved_distance(
     return grd
 
 
-def niirs(sensor: Sensor, scenario: Scenario) -> Metrics:
+def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
     """Returns NIIRS values and all intermediate calculations.
 
     This function implements the original MATLAB-based NIIRS model and can serve as a
@@ -320,10 +320,14 @@ def niirs(sensor: Sensor, scenario: Scenario) -> Metrics:
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
-    nm.atm = utils.load_database_atmosphere(
-        scenario.altitude, scenario.ground_range, scenario.ihaze
-    )
-
+    if interp:
+        nm.atm = utils.load_database_atmosphere(
+            scenario.altitude, scenario.ground_range, scenario.ihaze
+        )
+    else:
+        nm.atm = utils.load_database_atmosphere_no_interp(
+            scenario.altitude, scenario.ground_range, scenario.ihaze
+        )
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]
@@ -464,7 +468,7 @@ def niirs(sensor: Sensor, scenario: Scenario) -> Metrics:
     return nm
 
 
-def niirs5(sensor: Sensor, scenario: Scenario) -> Metrics:
+def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
     """Returns NIIRS values calculate using GIQE 5 and all intermediate calculations.
 
     See pybsm.metrics.functional.niirs for the GIQE 3 version.  This version of the
@@ -491,10 +495,14 @@ def niirs5(sensor: Sensor, scenario: Scenario) -> Metrics:
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
-    nm.atm = utils.load_database_atmosphere(
-        scenario.altitude, scenario.ground_range, scenario.ihaze
-    )
-
+    if interp:
+        nm.atm = utils.load_database_atmosphere(
+            scenario.altitude, scenario.ground_range, scenario.ihaze
+        )
+    else:
+        nm.atm = utils.load_database_atmosphere_no_interp(
+            scenario.altitude, scenario.ground_range, scenario.ihaze
+        )
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]

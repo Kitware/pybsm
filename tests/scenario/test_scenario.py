@@ -37,15 +37,16 @@ class TestScenario:
         assert scenario.cn2_at_1m == cn2_at_1m
 
     @pytest.mark.parametrize(
-        ("name", "ihaze", "altitude", "ground_range", "other_args"),
+        ("name", "ihaze", "altitude", "ground_range", "interp", "other_args"),
         [
-            ("", 0, 0.0, 0.0, {}),
-            ("test", 1, 1.0, 1.0, {}),
+            ("", 0, 0.0, 0.0, False, {}),
+            ("test", 1, 1.0, 1.0, True, {}),
             (
                 "test",
                 1,
                 1.0,
                 1.0,
+                True,
                 {
                     "aircraft_speed": 1.0,
                     "target_reflectance": 1.0,
@@ -64,10 +65,11 @@ class TestScenario:
         ihaze: int,
         altitude: float,
         ground_range: float,
+        interp: bool,
         other_args: Dict[str, float],
     ) -> None:
         """Test initialization with and without default parameters."""
-        scenario = Scenario(name, ihaze, altitude, ground_range, **other_args)
+        scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp, **other_args)
         self.check_scenario(scenario, name, ihaze, altitude, ground_range, **other_args)
 
     @pytest.mark.parametrize(
@@ -138,27 +140,34 @@ class TestScenario:
         self.check_scenario(scenario, "test", 0, 0.0, new_ground_range)
 
     @pytest.mark.parametrize(
-        ("name", "ihaze", "altitude", "ground_range"),
+        ("name", "ihaze", "altitude", "ground_range", "interp"),
         [
-            ("test", -1, 1000.0, 0.0),
-            ("test", 0, 1000.0, 0.0),
-            ("test", 1, 1.0, 1.0),
+            ("test", 0, 1.0, 0.0, True),
+            ("test", 0, 30000.0, 0.0, True),
+            ("test", 1, 2, -1.0, True),
+            ("test", 1, 2, 400000.0, True),
+            ("test", -1, 1000.0, 0.0, False),
+            ("test", 0, 1000.0, 0.0, False),
+            ("test", 1, 1.0, 1.0, False),
         ],
     )
     def test_atm_index_error(
-        self, name: str, ihaze: int, altitude: float, ground_range: float
+        self, name: str, ihaze: int, altitude: float, ground_range: float, interp: bool
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            Scenario(name, ihaze, altitude, ground_range).atm  # noqa: B018
+            Scenario(name, ihaze, altitude, ground_range, interp).atm  # noqa: B018
 
     @pytest.mark.parametrize(
-        ("name", "ihaze", "altitude", "ground_range", "expected"),
+        ("name", "ihaze", "altitude", "ground_range", "interp", "expected"),
         [
-            ("test", 2, 1000.0, 0.0, utils.load_database_atmosphere(1000.0, 0.0, 2)),
-            ("test", 1, 1000.0, 0.0, utils.load_database_atmosphere(1000.0, 0.0, 1)),
-            ("test", 1, 1000.0, 5.0, utils.load_database_atmosphere(1000.0, 5.0, 1)),
-            ("test", 1, 2000.0, 0.0, utils.load_database_atmosphere(2000.0, 0.0, 1)),
+            ("test", 2, 1000.0, 0.0, True, utils.load_database_atmosphere(1000.0, 0.0, 2)),
+            ("test", 1, 1000.0, 0.0, True, utils.load_database_atmosphere(1000.0, 0.0, 1)),
+            ("test", 1, 1000.0, 5.0, True, utils.load_database_atmosphere(1000.0, 5.0, 1)),
+            ("test", 1, 2000.0, 0.0, True, utils.load_database_atmosphere(2000.0, 0.0, 1)),
+            ("test", 2, 1000.0, 0.0, False, utils.load_database_atmosphere_no_interp(1000.0, 0.0, 2)),
+            ("test", 1, 1000.0, 0.0, False, utils.load_database_atmosphere_no_interp(1000.0, 0.0, 1)),
+            ("test", 1, 2000.0, 0.0, False, utils.load_database_atmosphere_no_interp(2000.0, 0.0, 1)),
         ],
     )
     def test_atm(
@@ -167,10 +176,11 @@ class TestScenario:
         ihaze: int,
         altitude: float,
         ground_range: float,
+        interp: bool,
         expected: np.ndarray,
     ) -> None:
         """Test atm with expected inputs and outputs as well as checking _atm attribute is set properly."""
-        scenario = Scenario(name, ihaze, altitude, ground_range)
+        scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp)
         assert scenario._atm is None
         atm = scenario.atm
         assert scenario._atm is not None
