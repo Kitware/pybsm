@@ -1,16 +1,21 @@
 v0.6.0
 ======
 
+Various improvements to the CI/CD, documentation, security, and a new
+option for interpolating atmospheric values.
+
 Updates / New Features
 ----------------------
+
+Features
+
+* Added option for using interpolation when using scenario.atm and niirs
 
 Linting
 
 * Added `py.typed` to `src/pybsm`
 
 * Added a few `ignore_missing_imports = True` to `mypy` config.
-
-* Added option for using interpolation when using scenario.atm and niirs
 
 CI/CD
 
