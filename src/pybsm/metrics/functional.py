@@ -18,7 +18,7 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 import inspect
 import os
 import warnings
-from typing import Any, Tuple, Optional
+from typing import Any, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
