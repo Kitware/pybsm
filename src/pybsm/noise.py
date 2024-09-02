@@ -48,7 +48,14 @@ def noise_gain(kernel: np.ndarray) -> float:
     :return:
         ng:
             noise gain (unitless)
+
+    :raises:
+        ValueError:
+            if values in kernel do not sum to 1
     """
+    if np.sum(kernel) != 1.0:
+        raise ValueError("Kernel does not sum to 1")
+
     ng = np.sqrt(np.sum(np.sum(kernel**2)))
     return ng
 
