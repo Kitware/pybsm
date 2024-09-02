@@ -1,0 +1,22 @@
+# serializer version: 1
+# name: TestGeospatial.test_curved_earth_slant_range[0.0-1.0-1.0]
+  1.4142135623730951
+# ---
+# name: TestGeospatial.test_curved_earth_slant_range[1.0-0.0-1.0]
+  1.4142135623730951
+# ---
+# name: TestGeospatial.test_curved_earth_slant_range[1.0-1.0-1.0]
+  1.0
+# ---
+# name: TestGeospatial.test_ground_sample_distance[0.0-1.0]
+  0.0
+# ---
+# name: TestGeospatial.test_ground_sample_distance[1.0-0.0]
+  0.0
+# ---
+# name: TestGeospatial.test_ground_sample_distance[1.0-1.0]
+  1.0
+# ---
+# name: TestGeospatial.test_ground_sample_distance[2.0-2.5]
+  5.0
+# ---
