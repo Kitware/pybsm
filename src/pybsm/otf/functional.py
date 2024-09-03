@@ -211,6 +211,10 @@ def circular_aperture_OTF_with_defocus(  # noqa: N802
         other words, this is the distance between the geometric focus and the
         actual focus.
 
+    :raises:
+        ZeroDivisionError:
+            if wavelength or D is 0
+
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
@@ -360,7 +364,7 @@ def detector_OTF(  # noqa: N802
 
     :return:
         H:
-            detector OTF. WARNRING: output can be NaN if f is 0
+            detector OTF. WARNING: output can be NaN if f is 0
     """
     H = np.sinc(w_x * u / f) * np.sinc(w_y * v / f)  # noqa: N806
 
@@ -971,45 +975,6 @@ def wind_speed_turbulence_OTF(  # noqa: N802
     H = weight * turbulence_OTF(u, v, lambda0, D, r0, 0.5) + (  # noqa: N806
         1 - weight
     ) * turbulence_OTF(u, v, lambda0, D, r0, 0.0)
-    return H
-
-
-def x_and_y_user_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, f_name: str
-) -> np.ndarray:
-    """USE x_and_y_user_OTF_2 INSTEAD!  The original pyBSM documentation contains an error.
-
-    IBSM Equation 3-32. Import user-defined, 1-dimensional x-direction and y-direction OTFs and interpolate them onto
-    a 2-dimensional spatial frequency grid.  Per ISBM Table. 3-3c, the OTF data are ASCII text, space delimited data.
-    (Note: There appears to be a typo in the IBSM documentation - Table 3-3c should represent the "x and y" case,
-    not "x or y".)
-
-    :param u:
-        angular spatial frequency coordinates (rad^-1)
-    :param v:
-        angular spatial frequency coordinates (rad^-1)
-    :param f_name:
-        filename and path to the x and y OTF data
-
-    :return:
-        H:
-            OTF at spatial frequency (u,v) (unitless)
-
-    """
-    x_and_y_data = np.genfromtxt(f_name)
-
-    H_x = (  # noqa: N806
-        np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 1])
-        + np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 2]) * 1.0j
-    )
-
-    H_y = (  # noqa: N806
-        np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 4])
-        + np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 5]) * 1.0j
-    )
-
-    H = H_x * H_y  # noqa: N806
-
     return H
 
 
