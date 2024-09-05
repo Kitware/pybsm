@@ -34,6 +34,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
     "sphinx-prompt",
+    "sphinx_copybutton",
 ]
 
 suppress_warnings = [

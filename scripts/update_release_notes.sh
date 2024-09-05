@@ -5,7 +5,7 @@
 # a non-empty value, we will only download the cache files and not execute
 # them.
 #
-# Script to help with the NRTK release process. Performs the following steps:
+# Script to help with the pyBSM release process. Performs the following steps:
 #   - Poetry version (major, minor, or patch)
 #   - Rename release_notes/pending_release file to release_notes/version
 #   - Add reference to new release notes file in release_notes.rst
