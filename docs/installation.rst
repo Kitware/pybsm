@@ -3,7 +3,9 @@ Installation
 
 There are two ways to obtain the pybsm package.
 The simplest is to install via the :command:`pip` command.
-Alternatively, you can use `Poetry`_ (`installation`_ and `usage`_) to acquire the source tree and develop locally.
+Alternatively, you can use `Poetry`_ (`installation`_ and `usage`_) to acquire the source tree and
+develop locally.
+
 
 .. _installation: Poetry-installation_
 .. _usage: Poetry-usage_
@@ -94,7 +96,7 @@ Within the :file:`docs/` directory is a small Python script called
     poetry run python sphinx_server.py
 
 This will run a small process that watches the :file:`docs/` folder contents,
-as well as the source files in :file:`pybsm/`, for changes.
+as well as the source files in :file:`src/pybsm/`, for changes.
 :command:`make html` is re-run automatically when changes are detected.
 This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date

@@ -49,6 +49,7 @@ scipy = [
 opencv-python = ">=4.6"
 setuptools = ">=65.6.1"
 
+# :auto dev-linting:
 # Linting
 [tool.poetry.group.dev-linting]
 optional = true
@@ -56,42 +57,49 @@ optional = true
 [tool.poetry.group.dev-linting.dependencies]
 flake8 = ">=6"
 flake8-mutable = ">=1.2.0"
-mypy = ">=0.991"
-types-setuptools = ">=65.6.0.1"
+pyproject-flake8 = ">=6"
+mypy = ">=0.991,!=1.11.0"
 pre-commit = ">=2.20"
 ruff = "^0.1.0"
+types-setuptools = ">=65.6.0.1"
 black = {version = ">=24.3.0", extras=["jupyter"]}
+# :auto dev-linting:
 
+# :auto dev-docs:
 # Docs
 [tool.poetry.group.dev-docs]
 optional = true
 
 [tool.poetry.group.dev-docs.dependencies]
 Sphinx = ">=5.3.0"
+sphinx-copybutton = "^0.5.2"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 livereload = ">=2.6.3"
+# :auto dev-docs:
 
+# :auto dev-testing:
 # Testing
 [tool.poetry.group.dev-testing]
 optional = true
 
 [tool.poetry.group.dev-testing.dependencies]
+coverage = ">=6.5.0"
+pytest = ">=7.2.0"
+pytest-cov = ">=4.0.0"
+syrupy = ">=4.0.0"
 # Jupyter notebook testing
 notebook = ">=7.0.7"
 papermill = ">=2.4.0"
-# Testing
-coverage = ">=7.4.0"
-pytest = ">=7.2"
-pytest-cov = ">=4"
+# :auto dev-testing:
 
-###############################################################################
+# :auto pytest:
 [tool.pytest.ini_options]
 addopts = [
     "-lv",                              # Show local in trace-backs.
     "--doctest-modules",                # Increased verbosity.
     "--tb=long",                        # Trace-back print mode.
-    "--cov=./src/pybsm",                # Cover our package specifically
+    "--cov=./src/pybsm",                 # Cover our package specifically
     "--cov=./tests",                    # Also cover our tests for dead spots
     "--cov-report=term",                # Coverage report to terminal
     "--cov-report=xml:coverage.xml",    # for external tool reporting
@@ -104,15 +112,31 @@ doctest_optionflags = [
     "NORMALIZE_WHITESPACE",
     "IGNORE_EXCEPTION_DETAIL",
 ]
+# :auto pytest:
 
-###############################################################################
+# :auto flake8:
+[tool.flake8]
+exclude = [
+    "__pycache__",
+    ".eggs",
+    ".venv",
+    "docs",
+    "scripts"
+]
+# While a max length of 79 is encouraged, sometimes going over makes more sense
+# for overall clarity.
+max-line-length = 120
+# :auto flake8:
+
+# :auto black:
 [tool.black]
 # The regular expression pattern must be written as a single line;
 # otherwise pytest-black fails to exclude the folders. For details see
 # https://github.com/shopkeep/pytest-black/issues/36
-exclude = '(/(\.git|.venv|.eggs|docs$)/)'
+exclude = '(/(\.git|.venv|.eggs|docs|scripts$)/)'
+# :auto black:
 
-
+# :auto ruff:
 [tool.ruff]
 select = ["E", "W", "F", "I", "D", "A", "B", "N", "YTT", "C4", "PT"]
 line-length = 120
@@ -122,9 +146,7 @@ ignore = [
     "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
     "C416",  # JATIC guidelines prefer "dict()", rather than "{}", to create an empty dict
     # -- Ignoring these "Missing Docstring" errors for now, we will fix later
-    "D100", "D101", "D102", "D103", "D104", "D105", "D107",
-    # -- Ignore this error, it does not contradict our coding standards
-    "E731"   # The lambda expressions that are used are rudimentary and not worthy of standalone fcn
+    "D100", "D101", "D102", "D103", "D104", "D105", "D107"
 ]
 
 [tool.ruff.pydocstyle]
@@ -135,7 +157,18 @@ max-doc-length = 120
 
 [tool.ruff.isort]
 known-first-party = ["pybsm"]
+# :auto ruff:
 
-[tool.ruff.per-file-ignores]
-# Add any files to be ignored here e.g. 
-# "src/*.py" = ["D100"] # Missing docstring in public module
+# :auto mypy:
+[tool.mypy]
+python_version = "3.8"
+disallow_untyped_defs = true
+ignore_errors = false
+ignore_missing_imports = true
+strict_optional = false
+incremental = false
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+# :auto mypy:
