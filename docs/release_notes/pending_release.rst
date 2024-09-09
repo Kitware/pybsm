@@ -16,5 +16,8 @@ CI/CD
 
 Fixes
 -----
-* Added tests to for geospatial.py to be in line with 
+
+* Added tests to for geospatial.py to be in line with
   coverage requirements
+
+* Added test for noise_gain function

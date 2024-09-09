@@ -1,10 +1,35 @@
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager
+
 import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from pybsm import noise
 
 
 class TestNoise:
+    @pytest.mark.parametrize(
+        ("kernel", "expectation"),
+        [
+            (np.array([[0.25, 0.25], [0.25, 0.25]]),
+             does_not_raise()),
+            (np.array([[0.5], [0.5]]),
+             does_not_raise()),
+            (np.array([[1.25, 0.25], [0.25, 0.25]]),
+             pytest.raises(ValueError, match="Kernel does not sum to 1")),
+            (np.array([[-1.25, 0.25], [0.25, 0.25]]),
+             pytest.raises(ValueError, match="Kernel does not sum to 1")),
+        ],
+    )
+    def test_noise_gain(self,
+                        snapshot: SnapshotAssertion,
+                        kernel: np.ndarray,
+                        expectation: ContextManager) -> None:
+        """Test noise_gain against gold standard results and confirm exceptions are appropriately raised."""
+        with expectation:
+            assert noise.noise_gain(kernel) == snapshot
+
     @pytest.mark.parametrize(
         ("pe_range", "bit_depth"),
         [
