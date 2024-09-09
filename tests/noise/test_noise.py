@@ -22,11 +22,11 @@ class TestNoise:
              pytest.raises(ValueError, match="Kernel does not sum to 1")),
         ],
     )
-    def test_noise_gain_valid(self,
-                              snapshot: SnapshotAssertion,
-                              kernel: np.ndarray,
-                              expectation: ContextManager) -> None:
-        """Test noise_gain under reasonable inputs and expected outputs."""
+    def test_noise_gain(self,
+                        snapshot: SnapshotAssertion,
+                        kernel: np.ndarray,
+                        expectation: ContextManager) -> None:
+        """Test noise_gain against gold standard results and confirm exceptions are appropriately raised."""
         with expectation:
             assert noise.noise_gain(kernel) == snapshot
 
