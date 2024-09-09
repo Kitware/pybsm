@@ -16,3 +16,5 @@ CI/CD
 
 Fixes
 -----
+* Added tests to for geospatial.py to be in line with 
+  coverage requirements

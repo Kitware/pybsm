@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from pybsm import geospatial
 
@@ -63,3 +64,36 @@ class TestGeospatial:
         output = geospatial.altitude_along_slant_path(h_target, h_sensor, slant_range)
         assert np.isclose(output[0], np.linspace(0.0, 1.0, 10000)).all()
         assert np.isclose(output[1], expected).all()
+
+    @pytest.mark.parametrize(
+        ("ifov", "slant_range"),
+        [
+            (1.0, 0.0),
+            (0.0, 1.0),
+            (1.0, 1.0),
+            (2.0, 2.5),
+        ],
+    )
+    def test_ground_sample_distance(self,
+                                    snapshot: SnapshotAssertion,
+                                    ifov: float,
+                                    slant_range: float) -> None:
+        """Test ground_sample_distance with normal inputs and expected outputs."""
+        assert (geospatial.ground_sample_distance(ifov, slant_range) == snapshot)
+
+    @pytest.mark.parametrize(
+        ("h_target", "h_sensor", "ground_range"),
+        [
+            (1.0, 0.0, 1.0),
+            (0.0, 1.0, 1.0),
+            (1.0, 1.0, 1.0),
+        ],
+    )
+    def test_curved_earth_slant_range(self,
+                                      snapshot: SnapshotAssertion,
+                                      h_target: float,
+                                      h_sensor: float,
+                                      ground_range: float) -> None:
+        """Test curved_earth_slant_range with normal inputs and expected outputs."""
+        output = geospatial.curved_earth_slant_range(h_target, h_sensor, ground_range)
+        assert (output == snapshot)
