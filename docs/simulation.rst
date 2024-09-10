@@ -2,27 +2,12 @@
 Simulation
 ##########
 
-.. automodule:: pybsm.simulation.functional
-   :members:
+.. autosummary::
+   :toctree: _implementations/simulation
+   :template: custom-module-template.rst
+   :recursive:
 
-------------------
-Class: RefImage
-------------------
-
-.. automodule:: pybsm.simulation.ref_image
-   :members:
-   :special-members:
-
-------------------
-Class: Scenario
-------------------
-
-.. automodule:: pybsm.simulation.scenario
-   :members:
-
-------------------
-Class: Sensor
-------------------
-
-.. automodule:: pybsm.simulation.sensor
-   :members:
+   pybsm.simulation.functional
+   pybsm.simulation.ref_image
+   pybsm.simulation.scenario
+   pybsm.simulation.sensor
