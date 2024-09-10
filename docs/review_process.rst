@@ -1,5 +1,5 @@
 Steps of the pybsm Release Process
-=================================
+==================================
 Three types of releases are expected to occur:
   - major
   - minor

@@ -1,10 +1,10 @@
 #####
-Noise
+Utils
 #####
 
 .. autosummary::
-   :toctree: _implementations/noise
+   :toctree: _implementations/utils
    :template: custom-module-template.rst
    :recursive:
 
-   pybsm.noise
+   pybsm.utils

@@ -14,6 +14,11 @@ CI/CD
 
 * Updates to dependencies to support the new CI/CD.
 
+Documentation
+
+* Added sphinx's autosummary template for recursively populating
+  docstrings from the module level down to the class method level.
+
 Fixes
 -----
 

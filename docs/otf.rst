@@ -2,13 +2,10 @@
 OTF
 ###
 
-.. automodule:: pybsm.otf.functional
-   :members:
+.. autosummary::
+   :toctree: _implementations/otf
+   :template: custom-module-template.rst
+   :recursive:
 
-------------------
-Class: OTF
-------------------
-
-.. automodule:: pybsm.otf.otf
-   :members:
-   :special-members:
+   pybsm.otf.functional
+   pybsm.otf.otf

@@ -3,13 +3,11 @@ Metrics
 #######
 
 
-.. automodule:: pybsm.metrics.functional
-   :members:
+.. autosummary::
+   :toctree: _implementations/metrics
+   :template: custom-module-template.rst
+   :recursive:
 
-------------------
-Class: Metrics
-------------------
+   pybsm.metrics.functional
+   pybsm.metrics.metrics
 
-.. automodule:: pybsm.metrics.metrics
-   :members:
-   :special-members:
