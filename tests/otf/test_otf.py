@@ -1,13 +1,24 @@
+import unittest.mock as mock
 from typing import Callable, Dict, Tuple
 
-import cv2
 import numpy as np
 import pytest
 
 from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
 
+try:
+    import cv2
 
+    is_usable = True
+except ImportError:
+    is_usable = False
+
+
+@pytest.mark.skipif(
+    not is_usable,
+    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
+)
 class TestOTF:
     @pytest.mark.parametrize(
         ("lambda0", "z_path", "cn2"),
@@ -1680,3 +1691,10 @@ class TestOTF:
         )
         assert np.isclose(output[0], expected[0], atol=5e-20).all()
         assert np.isclose(output[1], expected[1], atol=5e-20).all()
+
+
+@mock.patch("pybsm.otf.functional.is_usable", False)
+def test_missing_deps() -> None:
+    """Test that an exception is raised when required dependencies are not installed."""
+    with pytest.raises(ImportError, match=r"OpenCV not found"):
+        otf.resample_2D(np.ones((5, 5)), 1.0, 1.0)

@@ -14,6 +14,14 @@ CI/CD
 
 * Updates to dependencies to support the new CI/CD.
 
+* Changed `opencv-python` to an optional dependency.
+
+* Added `opencv-python-headless` as an optional dependency.
+
+* Added two extras (graphics and headless) for `opencv-python` and `opencv-python-headless` compatibility.
+
+* Changed CI to use headless extra.
+
 Documentation
 
 * Added sphinx's autosummary template for recursively populating
