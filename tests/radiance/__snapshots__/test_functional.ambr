@@ -1,0 +1,545 @@
+# serializer version: 1
+# name: TestReflectanceToPhotoelectrons.test_check_well_fill[0.0-0.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_check_well_fill[0.0-1.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_check_well_fill[1.0-0.0]
+  0.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_check_well_fill[2.0-1.5]
+  0.75
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L2-1.0-1.0-1.0-lambda02-1.0-1.0-1.0-1.0-expectation2]
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L2-1.0-1.0-1.0-lambda02-1.0-1.0-1.0-1.0-expectation2].1
+  2.199114857512855
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L2-1.0-1.0-1.0-lambda02-1.0-1.0-1.0-1.0-expectation2].2
+  2.5132741228718345
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3]
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].1
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].10
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].11
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].12
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].13
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].14
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].15
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].16
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].17
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].18
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].19
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].2
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].20
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].21
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].22
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].23
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].24
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].25
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].26
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].27
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].28
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].29
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].3
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].30
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].31
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].32
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].33
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].34
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].35
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].36
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].37
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].38
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].39
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].4
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].40
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].41
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].42
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].43
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].44
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].45
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].46
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].47
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].48
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].49
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].5
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].50
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].51
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].52
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].53
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].54
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].55
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].56
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].57
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].58
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].59
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].6
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].60
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].61
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].62
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].63
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].64
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].65
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].66
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].67
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].68
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].69
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].7
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].70
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].71
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].72
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].73
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].74
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].75
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].76
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].77
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].78
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].79
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].8
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].80
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].81
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].82
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].83
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].84
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].85
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].86
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].87
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].88
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].89
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].9
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].90
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].91
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].92
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].93
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].94
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].95
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].96
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].97
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].98
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].99
+  1.2566370614359221
+# ---
+# name: TestReflectanceToPhotoelectrons.test_giqe_radiance[atm1-0-expectation1]
+  tuple(
+    array([3., 3., 3., 3., 3., 3.]),
+    array([2.46666667, 2.46666667, 2.46666667, 2.46666667, 2.46666667,
+         2.46666667]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_giqe_radiance[atm2-1-expectation2]
+  tuple(
+    array([2., 2., 2., 2., 2., 2.]),
+    array([2., 2., 2., 2., 2., 2.]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_giqe_radiance[atm3-1-expectation3]
+  tuple(
+    array([ 459480.        , 1931100.        , 4432700.        , ...,
+         6600919.92056071, 6624654.62130171, 6629847.25993204]),
+    array([ 459480.        , 1931100.        , 4432700.        , ...,
+         6579094.45009266, 6610931.24856827, 6619874.21841677]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor0-radiance_wavelengths0-target_radiance0-background_radiance0]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([], dtype=float64),
+    bkg_n=0.0,
+    bkg_n_rate=0.0,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([], dtype=float64),
+    other_irradiance=array([], dtype=float64),
+    qe=array([], dtype=float64),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.0,
+    signal_noise=0.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([], dtype=float64),
+    tgt_n=0.0,
+    tgt_n_rate=0.0,
+    total_noise=2.2772452799126154e-23,
+    weights=array([], dtype=float64),
+    well_fraction=0.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor1-radiance_wavelengths1-target_radiance1-background_radiance1]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([], dtype=float64),
+    bkg_n=0.0,
+    bkg_n_rate=0.0,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([1.]),
+    other_irradiance=array([1.45622035e-12]),
+    qe=array([1.]),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.0,
+    signal_noise=0.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([], dtype=float64),
+    tgt_n=0.0,
+    tgt_n_rate=0.0,
+    total_noise=2.2772452799126154e-23,
+    weights=array([], dtype=float64),
+    well_fraction=0.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor2-radiance_wavelengths2-target_radiance2-background_radiance2]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([], dtype=float64),
+    bkg_n=0.0,
+    bkg_n_rate=0.0,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([], dtype=float64),
+    other_irradiance=array([], dtype=float64),
+    qe=array([], dtype=float64),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.0,
+    signal_noise=0.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([], dtype=float64),
+    tgt_n=0.0,
+    tgt_n_rate=0.0,
+    total_noise=2.2772452799126154e-23,
+    weights=array([], dtype=float64),
+    well_fraction=0.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor3-radiance_wavelengths3-target_radiance3-background_radiance3]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([], dtype=float64),
+    bkg_n=0.0,
+    bkg_n_rate=0.0,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([], dtype=float64),
+    other_irradiance=array([], dtype=float64),
+    qe=array([], dtype=float64),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.0,
+    signal_noise=0.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([], dtype=float64),
+    tgt_n=0.0,
+    tgt_n_rate=0.0,
+    total_noise=2.2772452799126154e-23,
+    weights=array([], dtype=float64),
+    well_fraction=0.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor4-radiance_wavelengths4-target_radiance4-background_radiance4]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([0.62831853]),
+    bkg_n=0.0,
+    bkg_n_rate=0.0,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([1.]),
+    other_irradiance=array([1.45622035e-12]),
+    qe=array([1.]),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.0,
+    signal_noise=0.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([0.62831853]),
+    tgt_n=0.0,
+    tgt_n_rate=0.0,
+    total_noise=2.2772452799126154e-23,
+    weights=array([3.16302878e+24]),
+    well_fraction=0.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor5-radiance_wavelengths5-target_radiance5-background_radiance5]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([6.28318531e-01, 3.72815399e-14, 1.79792609e-14]),
+    bkg_n=100000000.0,
+    bkg_n_rate=2.372271583273823e+24,
+    contrast_signal=0.0,
+    dark_current_noise=0.0,
+    int_time=4.215368961339421e-17,
+    name='signal-to-noise calculation',
+    opt_trans=array([1., 0., 0.]),
+    other_irradiance=array([1.45622035e-12, 3.72815399e-14, 1.79792609e-14]),
+    qe=array([1., 0., 0.]),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=0.01522381908344492,
+    signal_noise=10000.0,
+    snr=0.0,
+    tgt_FPA_irradiance=array([6.28318531e-01, 3.72815399e-14, 1.79792609e-14]),
+    tgt_n=100000000.0,
+    tgt_n_rate=2.372271583273823e+24,
+    total_noise=10000.0,
+    weights=array([3.16302878e+24, 0.00000000e+00, 0.00000000e+00]),
+    well_fraction=1.0,
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor6-radiance_wavelengths6-target_radiance6-background_radiance6]
+  SNRMetrics(
+    bkg_FPA_irradiance=array([[0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853]]),
+    bkg_n=array([0., 0., 0., 0., 0.]),
+    bkg_n_rate=array([0., 0., 0., 0., 0.]),
+    contrast_signal=array([0., 0., 0., 0., 0.]),
+    dark_current_noise=0.0,
+    int_time=1.0,
+    name='signal-to-noise calculation',
+    opt_trans=array([[1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.]]),
+    other_irradiance=array([[1.45622035e-12, 1.45622035e-12, 1.45622035e-12, 1.45622035e-12,
+          1.45622035e-12],
+         [1.45622035e-12, 1.45622035e-12, 1.45622035e-12, 1.45622035e-12,
+          1.45622035e-12],
+         [1.45622035e-12, 1.45622035e-12, 1.45622035e-12, 1.45622035e-12,
+          1.45622035e-12],
+         [1.45622035e-12, 1.45622035e-12, 1.45622035e-12, 1.45622035e-12,
+          1.45622035e-12],
+         [1.45622035e-12, 1.45622035e-12, 1.45622035e-12, 1.45622035e-12,
+          1.45622035e-12]]),
+    qe=array([[1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1.]]),
+    quantization_noise=2.2772452799126154e-23,
+    self_emission_noise=array([0., 0., 0., 0., 0.]),
+    signal_noise=0.0,
+    snr=array([0., 0., 0., 0., 0.]),
+    tgt_FPA_irradiance=array([[0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853],
+         [0.62831853, 0.62831853, 0.62831853, 0.62831853, 0.62831853]]),
+    tgt_n=array([0., 0., 0., 0., 0.]),
+    tgt_n_rate=array([0., 0., 0., 0., 0.]),
+    total_noise=2.2772452799126154e-23,
+    weights=array([[3.16302878e+24, 3.16302878e+24, 3.16302878e+24, 3.16302878e+24,
+          3.16302878e+24],
+         [3.16302878e+24, 3.16302878e+24, 3.16302878e+24, 3.16302878e+24,
+          3.16302878e+24],
+         [3.16302878e+24, 3.16302878e+24, 3.16302878e+24, 3.16302878e+24,
+          3.16302878e+24],
+         [3.16302878e+24, 3.16302878e+24, 3.16302878e+24, 3.16302878e+24,
+          3.16302878e+24],
+         [3.16302878e+24, 3.16302878e+24, 3.16302878e+24, 3.16302878e+24,
+          3.16302878e+24]]),
+    well_fraction=0.0,
+  )
+# ---
