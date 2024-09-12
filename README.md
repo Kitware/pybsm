@@ -22,6 +22,30 @@ See [here for more installation documentation](
 https://pybsm.readthedocs.io/en/latest/installation.html).
 <!-- :auto installation: -->
 
+Installing using the previous commands will not install OpenCV. While pyBSM will still function, there are a handful of functions that require OpenCV.
+
+There are two options for installing pyBSM with OpenCV: graphics or headless. Graphics will install `opencv-python` as the OpenCV implementation while headless will install `opencv-python-headless` as the OpenCV implementation.
+
+To install pybsm with `opencv-python`
+* using pip:
+```bash
+pip install pybsm[graphics]
+```
+* using Poetry
+```bash
+poetry install --sync --with dev-linting,dev-testing,dev-docs --extras graphics
+```
+
+To install pybsm with `opencv-python-headless`
+* using pip:
+```bash
+pip install pybsm[headless]
+```
+* using Poetry
+```bash
+poetry install --sync --with dev-linting,dev-testing,dev-docs --extras headless
+```
+
 <!-- :auto getting-started: -->
 ## Getting Started
 We provide a number of examples based on Jupyter notebooks in the
