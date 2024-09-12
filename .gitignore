@@ -1,3 +1,4 @@
+# :auto shared:
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -71,6 +72,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/_implementations
 
 # PyBuilder
 .pybuilder/
@@ -140,3 +142,4 @@ cython_debug/
 
 # ruff
 .ruff_cache
+# :auto shared:

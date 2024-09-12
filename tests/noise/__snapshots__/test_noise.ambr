@@ -1,0 +1,7 @@
+# serializer version: 1
+# name: TestNoise.test_noise_gain[kernel0-expectation0]
+  0.5
+# ---
+# name: TestNoise.test_noise_gain[kernel1-expectation1]
+  0.7071067811865476
+# ---

@@ -65,7 +65,12 @@ import os
 import warnings
 from typing import Callable, Tuple
 
-import cv2
+try:
+    import cv2
+
+    is_usable = True
+except ImportError:
+    is_usable = False
 
 # 3rd party imports
 import numpy as np
@@ -671,11 +676,10 @@ def polychromatic_turbulence_OTF(  # noqa: N802
 
     # calculate the coherence diameter over the band
     r0_at_1um = coherence_diameter(1.0e-6, z_path, cn2)
-    r0_function = (
-        lambda wav: r0_at_1um  # noqa: E731
-        * wav ** (6.0 / 5.0)
-        * (1e-6) ** (-6.0 / 5.0)
-    )
+
+    def r0_function(wav: float) -> float:
+        return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)  # noqa: E731
+
     r0_band = weighted_by_wavelength(wavelengths, weights, r0_function)
 
     # calculate the turbulence OTF
@@ -1077,6 +1081,10 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
             if df or dx_out are 0
 
     """
+    if not is_usable:
+        raise ImportError(
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+        )
     # transform the psf
     psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
 
@@ -1419,6 +1427,10 @@ def apply_otf_to_image(
     # this function. Therefore, we can calculate the instantaneous field of view
     # (iFOV) of the assumed real camera, which is
     # 2*arctan(ref_gsd/2/ref_range).
+    if not is_usable:
+        raise ImportError(
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+        )
     psf = otf_to_psf(otf, df, 2 * np.arctan(ref_gsd / 2 / ref_range))
 
     # filter the image
@@ -1581,6 +1593,10 @@ def resample_2D(  # noqa: N802
             if dx_in is 0
 
     """
+    if not is_usable:
+        raise ImportError(
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+        )
     new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
     new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
     img_out = cv2.resize(img_in, (new_x, new_y))

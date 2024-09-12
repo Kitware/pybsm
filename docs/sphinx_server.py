@@ -33,7 +33,7 @@ watch_dirs: List[Path] = [SCRIPT_DIR, SCRIPT_DIR / ".." / "examples"]
 watch_globs = ["*.rst", "*.ipynb"]
 
 # Code source directory. We want to watch all python files under here.
-watch_source_dir = Path("../src/nrtk")
+watch_source_dir = Path("../src/pybsm")
 
 server = Server()
 server.watch("conf.py", rebuild_cmd)

@@ -1,3 +1,0 @@
-# pyBSM LICESNE
-
-TODO

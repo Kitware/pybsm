@@ -12,3 +12,4 @@ The following sections provide documentation of the pyBSM functions:
    otf
    radiance
    simulation
+   utils

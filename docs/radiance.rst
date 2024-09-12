@@ -2,13 +2,10 @@
 Radiance
 ########
 
-.. automodule:: pybsm.radiance.functional
-   :members:
+.. autosummary::
+   :toctree: _implementations/radiance
+   :template: custom-module-template.rst
+   :recursive:
 
-------------------
-Class: SNRMetrics
-------------------
-
-.. automodule:: pybsm.radiance.snr_metrics
-   :members:
-   :special-members:
+   pybsm.radiance.functional
+   pybsm.radiance.snr_metrics
