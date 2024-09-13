@@ -181,7 +181,7 @@ class Sensor:
             # Assume square pixels.
             self.p_y = p_x
         else:
-            p_y = self.p_y
+            self.p_y = p_y
 
         if w_x is None:
             # Assume is 100% fill factor and square detectors.
