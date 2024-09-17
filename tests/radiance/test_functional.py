@@ -1031,6 +1031,18 @@ class TestReflectanceToPhotoelectrons:
                 does_not_raise(),
             ),
             (
+                np.array([1.0, 2.5, 3.0]),
+                0.0001,
+                0.84,
+                0.16,
+                np.array([1.0, 2.5, 3.0]),
+                2.5,
+                70.0,
+                4.0,
+                275e-3,
+                does_not_raise(),
+            ),
+            (
                 np.ones((10, 10)),
                 1.0,
                 1.0,

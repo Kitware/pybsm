@@ -20,304 +20,313 @@
 # name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L2-1.0-1.0-1.0-lambda02-1.0-1.0-1.0-1.0-expectation2].2
   2.5132741228718345
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3]
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-0.0001-0.84-0.16-lambda03-2.5-70.0-4.0-0.275-expectation3]
+  2.590279516178759
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-0.0001-0.84-0.16-lambda03-2.5-70.0-4.0-0.275-expectation3].1
+  6.475236295590437
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-0.0001-0.84-0.16-lambda03-2.5-70.0-4.0-0.275-expectation3].2
+  7.770221888727886
+# ---
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4]
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].1
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].1
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].10
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].10
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].11
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].11
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].12
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].12
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].13
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].13
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].14
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].14
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].15
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].15
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].16
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].16
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].17
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].17
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].18
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].18
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].19
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].19
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].2
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].2
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].20
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].20
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].21
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].21
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].22
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].22
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].23
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].23
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].24
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].24
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].25
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].25
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].26
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].26
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].27
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].27
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].28
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].28
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].29
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].29
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].3
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].3
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].30
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].30
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].31
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].31
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].32
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].32
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].33
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].33
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].34
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].34
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].35
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].35
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].36
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].36
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].37
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].37
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].38
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].38
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].39
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].39
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].4
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].4
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].40
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].40
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].41
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].41
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].42
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].42
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].43
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].43
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].44
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].44
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].45
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].45
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].46
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].46
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].47
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].47
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].48
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].48
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].49
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].49
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].5
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].5
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].50
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].50
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].51
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].51
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].52
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].52
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].53
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].53
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].54
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].54
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].55
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].55
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].56
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].56
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].57
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].57
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].58
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].58
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].59
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].59
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].6
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].6
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].60
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].60
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].61
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].61
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].62
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].62
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].63
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].63
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].64
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].64
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].65
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].65
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].66
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].66
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].67
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].67
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].68
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].68
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].69
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].69
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].7
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].7
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].70
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].70
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].71
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].71
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].72
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].72
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].73
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].73
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].74
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].74
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].75
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].75
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].76
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].76
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].77
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].77
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].78
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].78
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].79
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].79
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].8
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].8
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].80
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].80
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].81
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].81
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].82
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].82
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].83
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].83
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].84
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].84
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].85
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].85
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].86
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].86
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].87
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].87
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].88
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].88
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].89
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].89
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].9
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].9
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].90
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].90
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].91
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].91
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].92
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].92
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].93
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].93
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].94
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].94
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].95
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].95
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].96
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].96
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].97
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].97
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].98
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].98
   1.2566370614359221
 # ---
-# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L3-1.0-1.0-1.0-lambda03-1.0-1.0-1.0-1.0-expectation3].99
+# name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L4-1.0-1.0-1.0-lambda04-1.0-1.0-1.0-1.0-expectation4].99
   1.2566370614359221
 # ---
 # name: TestReflectanceToPhotoelectrons.test_giqe_radiance[atm1-0-expectation1]
