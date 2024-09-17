@@ -1,7 +1,9 @@
-from typing import Tuple
+from contextlib import nullcontext as does_not_raise
+from typing import ContextManager, Tuple
 
 import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from pybsm import radiance, utils
 from pybsm.simulation import Sensor
@@ -977,3 +979,197 @@ class TestReflectanceToPhotoelectrons:
         assert np.isclose(output[0], expected[0]).all()
         assert np.isclose(output[1], expected[1]).all()
         assert np.isclose(output[2], expected[2]).all()
+
+    @pytest.mark.parametrize(
+        (
+            "L",
+            "L_s",
+            "t_opt",
+            "e_opt",
+            "lambda0",
+            "d_lambda",
+            "optics_temperature",
+            "D",
+            "f",
+            "expectation",
+        ),
+        [
+            (
+                np.array([]),
+                0.0,
+                0.0,
+                0.0,
+                np.array([]),
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                pytest.raises(ZeroDivisionError),
+            ),
+            (
+                np.array([]),
+                1.0,
+                1.0,
+                1.0,
+                np.array([]),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                does_not_raise(),
+            ),
+            (
+                np.array([1.0, 2.5, 3.0]),
+                1.0,
+                1.0,
+                1.0,
+                np.array([1.0, 2.5, 3.0]),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                does_not_raise(),
+            ),
+            (
+                np.array([1.0, 2.5, 3.0]),
+                0.0001,
+                0.84,
+                0.16,
+                np.array([1.0, 2.5, 3.0]),
+                2.5,
+                70.0,
+                4.0,
+                275e-3,
+                does_not_raise(),
+            ),
+            (
+                np.ones((10, 10)),
+                1.0,
+                1.0,
+                1.0,
+                np.ones((10, 10)),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                does_not_raise(),
+            ),
+        ],
+    )
+    def test_focal_plane_integrated_irradiance(
+        self,
+        snapshot: SnapshotAssertion,
+        L: np.ndarray,  # noqa: N803
+        L_s: float,  # noqa: N803
+        t_opt: float,
+        e_opt: float,
+        lambda0: np.ndarray,
+        d_lambda: float,
+        optics_temperature: float,
+        D: float,  # noqa: N803
+        f: float,
+        expectation: ContextManager,
+    ) -> None:
+        with expectation:
+            output = radiance.focal_plane_integrated_irradiance(
+                L, L_s, t_opt, e_opt, lambda0, d_lambda, optics_temperature, D, f
+            )
+            assert np.all(output == snapshot)
+
+    @pytest.mark.parametrize(
+        ("total_photoelectrons", "max_fill"),
+        [
+            (0.0, 0.0),
+            (1.0, 0.0),
+            (0.0, 1.0),
+            (2.0, 1.5),
+        ],
+    )
+    def test_check_well_fill(
+        self,
+        snapshot: SnapshotAssertion,
+        total_photoelectrons: float,
+        max_fill: float,
+    ) -> None:
+        output = radiance.check_well_fill(total_photoelectrons, max_fill)
+        assert output == snapshot
+
+    @pytest.mark.parametrize(
+        ("sensor", "radiance_wavelengths", "target_radiance", "background_radiance"),
+        [
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([]),
+                np.array([]),
+                np.array([]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([1.0]),
+                np.array([]),
+                np.array([]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([]),
+                np.array([1.0]),
+                np.array([]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([]),
+                np.array([]),
+                np.array([1.0]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([1.0]),
+                np.array([1.0]),
+                np.array([1.0]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.array([1.0, 2.5, 3.0]),
+                np.array([1.0, 2.5, 3.0]),
+                np.array([1.0, 2.5, 3.0]),
+            ),
+            (
+                Sensor("Test", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
+                np.ones((5, 5)),
+                np.ones((5, 5)),
+                np.ones((5, 5)),
+            ),
+        ],
+    )
+    def test_photon_detector_snr(
+        self,
+        snapshot: SnapshotAssertion,
+        sensor: Sensor,
+        radiance_wavelengths: np.ndarray,
+        target_radiance: np.ndarray,
+        background_radiance: np.ndarray,
+    ) -> None:
+        output = radiance.photon_detector_SNR(
+            sensor, radiance_wavelengths, target_radiance, background_radiance
+        )
+        assert output == snapshot
+
+    @pytest.mark.parametrize(
+        ("atm", "is_emissive", "expectation"),
+        [
+            (np.array([]), 0, pytest.raises(IndexError)),
+            (np.ones((6, 6)), 0, does_not_raise()),
+            (np.ones((6, 6)), 1, does_not_raise()),
+            (utils.load_database_atmosphere(1000.0, 0.0, 1), 1, does_not_raise()),
+        ],
+    )
+    def test_giqe_radiance(
+        self,
+        snapshot: SnapshotAssertion,
+        atm: np.ndarray,
+        is_emissive: int,
+        expectation: ContextManager,
+    ) -> None:
+        with expectation:
+            output = radiance.giqe_radiance(atm, is_emissive)
+            assert output == snapshot
