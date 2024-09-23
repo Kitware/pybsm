@@ -4,11 +4,10 @@ from pybsm.metrics import Metrics
 
 
 class TestMetrics:
+
     @pytest.mark.parametrize(
         ("name"),
-        [
-            ("Test"),
-        ],
+        [("Test")],
     )
     def test_initialization(
         self,

@@ -14,5 +14,7 @@ CI/CD
 
 * Updated config for `black` to set max line length to 120
 
+* Added tests for `metrics.metrics` class
+
 Fixes
 -----
