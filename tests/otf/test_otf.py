@@ -1,8 +1,10 @@
 import unittest.mock as mock
-from typing import Callable, Dict, Tuple
+from contextlib import nullcontext as does_not_raise
+from typing import Callable, ContextManager, Dict, Tuple
 
 import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
@@ -199,139 +201,123 @@ class TestOTFHelper:
         assert np.isclose(output, expected).all()
 
     @pytest.mark.parametrize(
-        ("D", "R", "R0", "expected"),
+        ("D", "R", "R0"),
         [
-            (10.0, 1.0, 1.0, 0.0),
-            (0.0, 2.0, 1.0, 0.0),
+            (10.0, 1.0, 1.0),
+            (0.0, 2.0, 1.0),
             (
                 10.0,
                 1.0,
                 2.0,
-                3.1,
             ),
             (
                 10.0,
                 2.0,
                 1.0,
-                -3.1,
             )
         ],
     )
-    def test_object_domain_radii(  # noqa: N802
+    def test_object_domain_radii(
         self,
         D: float,  # noqa: N803
         R: float,  # noqa: N803
         R0: float,  # noqa: N803
-        expected: float,
+        snapshot: SnapshotAssertion
     ) -> None:
         """Test object_domain_defocus_radii with normal inputs and expected outputs."""
         output = otf.object_domain_defocus_radii(D, R, R0)
-        assert output == expected
+        assert output == snapshot
 
     @pytest.mark.parametrize(
-            ("jd", "w_x", "w_y", "expected"),
+        ("D", "R", "R0", "expected"),
+        [(1.0, 1.0, 0.0, pytest.raises(ZeroDivisionError)),
+         (1.0, 0.0, 1.0, pytest.raises(ZeroDivisionError)),
+         (1.0, 1.0, 1.0, does_not_raise())]
+    )
+    def test_object_domain_radii_zero_division(self,
+                                               D: float,  # noqa: N803
+                                               R: float,  # noqa: N803
+                                               R0: float,  # noqa: N803
+                                               expected: ContextManager):
+        with expected:
+            otf.object_domain_defocus_radii(D, R, R0)
+
+    @pytest.mark.parametrize(
+            ("jd", "w_x", "w_y"),
             [
-                (10.0, 0.0, 1.0, 0.0),
-                (10.0, 2.0, 0.0, 0.0),
-                (0.0, 2.0, 1.0, 0.0),
+                (10.0, 0.0, 1.0),
+                (10.0, 2.0, 0.0),
+                (0.0, 2.0, 1.0),
                 (
                     1.0,
                     1.0,
                     2.0,
-                    1.2483018257999544e+19,
                 ),
                 (
                     1.0,
                     2.0,
                     1.0,
-                    1.2483018257999544e+19,
                 )
             ],
         )
-    def test_dark_current_from_density(  # noqa: N802
+    def test_dark_current_from_density(
         self,
         jd: float,
         w_x: float,
         w_y: float,
-        expected: float
+        snapshot: SnapshotAssertion
     ) -> None:
         """Test dark_current_from_density with normal inputs and expected outputs."""
         output = otf.dark_current_from_density(jd, w_x, w_y)
-        assert output == expected
+        assert output == snapshot
 
     @pytest.mark.parametrize(
-        ("D", "dz", "f", "expected"),
+        ("D", "dz", "f"),
         [
-            (10.0, 0.0, 2.0, 0.0),
-            (0.0, 2.0, 1.0, 0.0),
+            (10.0, 0.0, 1.0),
+            (0.0, 2.0, 1.0),
             (
                 10.0,
                 1.0,
                 2.0,
-                1.55,
             ),
             (
                 10.0,
                 2.0,
                 1.0,
-                12.4,
             )
         ],
     )
-    def test_image_domain_defocus_radii(  # noqa: N802
+    def test_image_domain_defocus_radii(
         self,
         D: float,  # noqa: N803
         dz: float,
         f: float,
-        expected: float,
+        snapshot: SnapshotAssertion,
     ) -> None:
         """Test image_domain_defocus_radii with normal inputs and expected outputs."""
         output = otf.image_domain_defocus_radii(D, dz, f)
-        assert output == expected
+        assert output == snapshot
 
     @pytest.mark.parametrize(
-        ("otf_value", "df", "dx_out"),
-        [
-            (np.array([]), 0.0, 0.0),
-            (np.array([0.0]), 0.0, 0.0),
-        ],
+        ("D", "dz", "f", "expected"),
+        [(1.0, 1.0, 0.0, pytest.raises(ZeroDivisionError)),
+         (1.0, 1.0, 1.0, does_not_raise())]
     )
-    def test_otf_to_psf_index_error(
-        self, otf_value: np.ndarray, df: float, dx_out: float
-    ) -> None:
-        """Cover cases where IndexError occurs."""
-        with pytest.raises(IndexError):
-            otf.otf_to_psf(otf_value, df, dx_out)
+    def test_image_domain_defocus_radii_zero_division(self,
+                                                      D: float,  # noqa: N803
+                                                      dz: float,
+                                                      f: float,
+                                                      expected: ContextManager):
+        with expected:
+            otf.image_domain_defocus_radii(D, dz, f)
 
-    @pytest.mark.parametrize(
-        ("otf_value", "df", "dx_out"),
-        [
-            (np.ones((10, 10)), 0.0, 0.0),
-            (np.ones((10, 10)), 0.0, 1.0),
-            (np.ones((10, 10)), 1.0, 0.0),
-        ],
-    )
-    def test_otf_to_psf_zero_division(
-        self, otf_value: np.ndarray, df: float, dx_out: float
-    ) -> None:
-        """Cover cases where ZeroDivision occurs."""
-        with pytest.raises(ZeroDivisionError):
-            otf.otf_to_psf(otf_value, df, dx_out)
 
-    @pytest.mark.parametrize(
-        ("otf_value", "df", "dx_out", "expected"),
-        [
-            (np.ones((15, 15)), 1.0, 1.0, np.array([1.0])),
-            (np.ones((100, 100)), 1.0, 1.0, np.array([1.0])),
-        ],
-    )
-    def test_otf_to_psf(
-        self, otf_value: np.ndarray, df: float, dx_out: float, expected: np.ndarray
-    ) -> None:
-        """Test otf_to_psf with normal inputs and expected outputs."""
-        output = otf.otf_to_psf(otf_value, df, dx_out)
-        assert np.isclose(output, expected, atol=5e-20).all()
-
+@pytest.mark.skipif(
+                    not is_usable,
+                    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
+                    )
+class TestResample2D:
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
         [
@@ -339,7 +325,7 @@ class TestOTFHelper:
             (np.array([1.0]), 1.0, 1.0),
         ],
     )
-    def test_resample_2D_index_error(  # noqa: N802
+    def test_resample_2d_index_error(
         self, img_in: np.ndarray, dx_in: float, dx_out: float
     ) -> None:
         """Cover cases where IndexError occurs."""
@@ -353,7 +339,7 @@ class TestOTFHelper:
             (np.ones((5, 5)), 1.0, 0.0),
         ],
     )
-    def test_resample_2D_zero_division(  # noqa: N802
+    def test_resample_2d_zero_division(
         self, img_in: np.ndarray, dx_in: float, dx_out: float
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
@@ -366,7 +352,7 @@ class TestOTFHelper:
             (np.ones((5, 5)), 0.0, 1.0),
         ],
     )
-    def test_resample_2D_cv2_error(  # noqa: N802
+    def test_resample_2d_cv2_error(
         self, img_in: np.ndarray, dx_in: float, dx_out: float
     ) -> None:
         """Cover cases where cv2.error occurs."""
@@ -379,13 +365,19 @@ class TestOTFHelper:
             (np.ones((5, 5)), 1.0, 1.0, np.ones((5, 5))),
         ],
     )
-    def test_resample_2D(  # noqa: N802
+    def test_resample_2d(
         self, img_in: np.ndarray, dx_in: float, dx_out: float, expected: np.ndarray
     ) -> None:
         """Test resample_2D with normal inputs and expected outputs."""
         output = otf.resample_2D(img_in, dx_in, dx_out)
         assert np.isclose(output, expected, atol=5e-20).all()
 
+
+@pytest.mark.skipif(
+                    not is_usable,
+                    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
+                    )
+class TestApplyOTFToImage:
     @pytest.mark.parametrize(
         ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
         [
@@ -466,6 +458,55 @@ class TestOTFHelper:
         assert np.isclose(output[1], expected[1], atol=5e-20).all()
 
 
+@pytest.mark.skipif(
+                    not is_usable,
+                    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
+                    )
+class TestOTFToPSF:
+    @pytest.mark.parametrize(
+        ("otf_value", "df", "dx_out"),
+        [
+            (np.array([]), 0.0, 0.0),
+            (np.array([0.0]), 0.0, 0.0),
+        ],
+    )
+    def test_otf_to_psf_index_error(
+        self, otf_value: np.ndarray, df: float, dx_out: float
+    ) -> None:
+        """Cover cases where IndexError occurs."""
+        with pytest.raises(IndexError):
+            otf.otf_to_psf(otf_value, df, dx_out)
+
+    @pytest.mark.parametrize(
+        ("otf_value", "df", "dx_out"),
+        [
+            (np.ones((10, 10)), 0.0, 0.0),
+            (np.ones((10, 10)), 0.0, 1.0),
+            (np.ones((10, 10)), 1.0, 0.0),
+        ],
+    )
+    def test_otf_to_psf_zero_division(
+        self, otf_value: np.ndarray, df: float, dx_out: float
+    ) -> None:
+        """Cover cases where ZeroDivision occurs."""
+        with pytest.raises(ZeroDivisionError):
+            otf.otf_to_psf(otf_value, df, dx_out)
+
+    @pytest.mark.parametrize(
+        ("otf_value", "df", "dx_out", "expected"),
+        [
+            (np.ones((15, 15)), 1.0, 1.0, np.array([1.0])),
+            (np.ones((100, 100)), 1.0, 1.0, np.array([1.0])),
+        ],
+    )
+    def test_otf_to_psf(
+        self, otf_value: np.ndarray, df: float, dx_out: float, expected: np.ndarray
+    ) -> None:
+        """Test otf_to_psf with normal inputs and expected outputs."""
+        output = otf.otf_to_psf(otf_value, df, dx_out)
+        assert np.isclose(output, expected, atol=5e-20).all()
+
+
 class TestCTEOTF:
     @pytest.mark.parametrize(
         ("u", "v", "p_x", "p_y", "cte_n_x", "cte_n_y", "phases_n", "cte_eff", "f"),
@@ -476,7 +517,7 @@ class TestCTEOTF:
             (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, 0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -500,13 +541,77 @@ class TestCTEOTF:
             (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 1.0, 1.0, 1.0, 1.0, 1, 1.0, 0.0),
         ],
     )
-    def test_OTF_nan(  # noqa: N802
+    def test_otf_nan(
         self, u: np.ndarray, v: np.ndarray, p_x: float, p_y: float,
         cte_n_x: float, cte_n_y: float, phases_n: int, cte_eff: float, f: float
     ) -> None:
         """Cover cases where nan output occurs."""
         output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
         assert np.isnan(output).all()
+
+    @pytest.mark.parametrize(
+        ("u", "v", "p_x", "p_y", "cte_n_x", "cte_n_y", "phases_n", "cte_eff", "f", "expected"),
+        [
+            (np.array([1.0]), np.array([1.0]),
+             0.0, 0.0, 1.0, 1.0, 1, 1.0, 1.0, np.array([1.0])),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                1.0,
+                1.0,
+                0.0,
+                0.0,
+                0,
+                1.0,
+                1.0,
+                np.array([1.0]),
+            ),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                0.0,
+                1.0,
+                1.0,
+                2.0,
+                2,
+                2.0,
+                2.0,
+                np.array([2980.95798704]),
+            ),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1,
+                1.0,
+                1.0,
+                np.array([1.0]),
+            ),
+            (
+                np.array([1.0, 1.0]),
+                np.array([1.0, 1.0]),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1,
+                1.0,
+                1.0,
+                np.array([1.0, 1.0]),
+            ),
+        ],
+    )
+    def test_otf(
+        self, u: np.ndarray, v: np.ndarray, p_x: float, p_y: float,
+        cte_n_x: float, cte_n_y: float, phases_n: int, cte_eff: float, f: float,
+        expected: np.ndarray
+    ) -> None:
+        """Test cte_OTF with normal inputs and expected outputs."""
+        output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
+        assert np.isclose(output, expected, atol=5e-34).all()
 
 
 class TestDefocusOTF:
@@ -519,7 +624,7 @@ class TestDefocusOTF:
             (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0),
         ],
     )
-    def test_OTF_empty_array(  # noqa: N802
+    def test_otf_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -569,7 +674,7 @@ class TestDefocusOTF:
             ),
         ],
     )
-    def test_OTF(  # noqa: N802
+    def test_otf(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -593,7 +698,7 @@ class TestDetectorOTFWithAggregation:
             (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0, 1.0, 1),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray, w_x: float, w_y: float,
         p_x: float, p_y: float, f: float, n: int
     ) -> None:
@@ -609,7 +714,7 @@ class TestDetectorOTFWithAggregation:
             (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 1.0, 1.0, 1.0, 0.0, 0.0, 1),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self, u: np.ndarray, v: np.ndarray, w_x: float, w_y: float,
         p_x: float, p_y: float, f: float, n: int
     ) -> None:
@@ -667,7 +772,7 @@ class TestDetectorOTFWithAggregation:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -700,7 +805,7 @@ class TestDiffusionOTF:
             (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 0.0, 1.0, 1.0, 0.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self, u: np.ndarray, v: np.ndarray, alpha: np.ndarray,
         ald: float, al0: float, f: float
     ) -> None:
@@ -717,7 +822,7 @@ class TestDiffusionOTF:
             (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray,
         alpha: np.ndarray, ald: float, al0: float, f: float
     ) -> None:
@@ -757,7 +862,7 @@ class TestDiffusionOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u: np.ndarray, v: np.ndarray, alpha: np.ndarray,
         ald: float, al0: float, f: float, expected: np.ndarray
     ) -> None:
@@ -776,7 +881,7 @@ class TestGaussianOTF:
             (np.array([]), np.array([1.0]), 1.0, 2.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray,
         blur_size_x: float, blur_size_y: float
     ) -> None:
@@ -810,7 +915,7 @@ class TestGaussianOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u: np.ndarray, v: np.ndarray,
         blur_size_x: float, blur_size_y: float, expected: np.ndarray
     ) -> None:
@@ -835,7 +940,7 @@ class TestTdiOTF:
             (np.array([1.0, 2.0]), 1.0, 1.0, 1.0, 1, 0.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self, u_or_v: np.ndarray, w: float, n_tdi: float,
         phases_n: int, beta: float, f: float
     ) -> None:
@@ -849,7 +954,7 @@ class TestTdiOTF:
             (np.array([]), 1.0, 1.0, 1.0, 1, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u_or_v: np.ndarray, w: float, n_tdi: float,
         phases_n: int, beta: float, f: float
     ) -> None:
@@ -889,7 +994,7 @@ class TestTdiOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u_or_v: np.ndarray, w: float, n_tdi: float,
         phases_n: int, beta: float, f: float, expected: np.ndarray
     ) -> None:
@@ -907,7 +1012,7 @@ class TestWavefrontOTF2:
             (np.array([]), np.array([1.0]), 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray, cutoff: float, w_rms: float
 
     ) -> None:
@@ -941,7 +1046,7 @@ class TestWavefrontOTF2:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u: np.ndarray, v: np.ndarray, cutoff: float, w_rms: float, expected: np.ndarray
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
@@ -967,12 +1072,11 @@ class TestSliceOTF:
              np.array([[1.0, 1.0], [1.0, 1.0]]))
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, otf_input: np.ndarray, ang: float, expected: float,
     ) -> None:
         """Test slice_otf with normal inputs and expected outputs."""
         output = otf.slice_otf(otf_input, ang)
-        print("expected", expected, "output", output)
         assert np.isclose(output, expected, atol=5e-34).all()
 
 
@@ -1020,7 +1124,7 @@ class TestPolychromaticTurbulenceOTF:
             ),
         ],
     )
-    def test_zero_division(  # noqa: N802
+    def test_zero_division(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1119,7 +1223,7 @@ class TestPolychromaticTurbulenceOTF:
             ),
         ],
     )
-    def test_index_error(  # noqa: N802
+    def test_index_error(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1237,7 +1341,7 @@ class TestPolychromaticTurbulenceOTF:
             ),
         ],
     )
-    def test_first_array_empty(  # noqa: N802
+    def test_first_array_empty(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1399,7 +1503,7 @@ class TestPolychromaticTurbulenceOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1442,7 +1546,7 @@ class TestDetectorOTF:
             (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray, w_x: float, w_y: float, f: float
     ) -> None:
         """Test detector_OTF with empty input."""
@@ -1457,7 +1561,7 @@ class TestDetectorOTF:
             (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 1.0, 1.0, 0.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self, u: np.ndarray, v: np.ndarray, w_x: float, w_y: float, f: float
     ) -> None:
         """Cover cases where nan output occurs."""
@@ -1502,7 +1606,7 @@ class TestDetectorOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1526,7 +1630,7 @@ class TestDriftOTF:
             (np.array([]), np.array([]), 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray, a_x: float, a_y: float
     ) -> None:
         """Test drift_OTF with empty input."""
@@ -1549,7 +1653,7 @@ class TestDriftOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u: np.ndarray, v: np.ndarray, a_x: float, a_y: float, expected: np.ndarray
     ) -> None:
         """Test drift_OTF with normal inputs and expected outputs."""
@@ -1567,7 +1671,7 @@ class TestJitterOTF:
             (np.array([]), np.array([]), 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self, u: np.ndarray, v: np.ndarray, s_x: float, s_y: float
     ) -> None:
         """Test jitter_OTF with empty input."""
@@ -1605,7 +1709,7 @@ class TestJitterOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self, u: np.ndarray, v: np.ndarray, s_x: float, s_y: float, expected: np.ndarray
     ) -> None:
         """Test jitter_OTF with normal inputs and expected outputs."""
@@ -1614,7 +1718,7 @@ class TestJitterOTF:
 
 
 class TestCommonOTFs:
-    def check_OTF(  # noqa: N802
+    def check_otf(
         self,
         otf: otf.OTF,
         ap_OTF: np.ndarray,  # noqa: N803
@@ -1672,7 +1776,7 @@ class TestCommonOTFs:
             ),
         ],
     )
-    def test_common_OTFs_zero_division(  # noqa: N802
+    def test_common_otfs_zero_division(
         self,
         sensor: Sensor,
         scenario: Scenario,
@@ -1780,7 +1884,7 @@ class TestCommonOTFs:
             ),
         ],
     )
-    def test_common_OTFs_index_error(  # noqa: N802
+    def test_common_otfs_index_error(
         self,
         sensor: Sensor,
         scenario: Scenario,
@@ -1861,7 +1965,7 @@ class TestCommonOTFs:
             ),
         ],
     )
-    def test_common_OTFs(  # noqa: N802
+    def test_common_otfs(
         self,
         sensor: Sensor,
         scenario: Scenario,
@@ -1884,7 +1988,7 @@ class TestCommonOTFs:
             slant_range,
             int_time,
         )
-        self.check_OTF(output, **expected)
+        self.check_otf(output, **expected)
 
 
 class TestTurbulenceOTF:
@@ -1897,7 +2001,7 @@ class TestTurbulenceOTF:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1922,7 +2026,7 @@ class TestTurbulenceOTF:
             (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 1.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1942,7 +2046,7 @@ class TestTurbulenceOTF:
             (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0),
         ],
     )
-    def test_inf(  # noqa: N802
+    def test_inf(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1972,7 +2076,7 @@ class TestTurbulenceOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1997,7 +2101,7 @@ class TestWindSpeedTurbulenceOTF:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2021,7 +2125,7 @@ class TestWindSpeedTurbulenceOTF:
             (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0, 1.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2043,7 +2147,7 @@ class TestWindSpeedTurbulenceOTF:
             (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 1.0, 1.0),
         ],
     )
-    def test_zero_division(  # noqa: N802
+    def test_zero_division(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2092,7 +2196,7 @@ class TestWindSpeedTurbulenceOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2117,7 +2221,7 @@ class TestFilterOTF:
             (np.array([]), np.array([1.0]), np.array([[1.0]]), 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2142,7 +2246,7 @@ class TestFilterOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2152,7 +2256,6 @@ class TestFilterOTF:
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
         output = otf.filter_OTF(u, v, kernel, ifov)
-        print("output", output, "expected", expected)
         assert np.isclose(output, expected, atol=5e-20).all()
 
 
@@ -2166,7 +2269,7 @@ class TestWavefrontOTF:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2187,7 +2290,7 @@ class TestWavefrontOTF:
             (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2246,7 +2349,7 @@ class TestWavefrontOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2271,7 +2374,7 @@ class TestCircularApertureOTF:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2292,7 +2395,7 @@ class TestCircularApertureOTF:
             (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0),
         ],
     )
-    def test_zero_division(  # noqa: N802
+    def test_zero_division(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2311,7 +2414,7 @@ class TestCircularApertureOTF:
             (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0),
         ],
     )
-    def test_nan(  # noqa: N802
+    def test_nan(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2346,7 +2449,7 @@ class TestCircularApertureOTF:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2370,7 +2473,7 @@ class TestCircularApertureOTFWithDefocus:
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 0.0),
         ],
     )
-    def test_empty_array(  # noqa: N802
+    def test_empty_array(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2390,7 +2493,7 @@ class TestCircularApertureOTFWithDefocus:
             (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
         ],
     )
-    def test_zero_division(  # noqa: N802
+    def test_zero_division(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2427,7 +2530,7 @@ class TestCircularApertureOTFWithDefocus:
             ),
         ],
     )
-    def test(  # noqa: N802
+    def test(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2442,6 +2545,10 @@ class TestCircularApertureOTFWithDefocus:
         assert np.isclose(output, expected, atol=5e-20).all()
 
 
+@pytest.mark.skipif(
+                    not is_usable,
+                    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
+                    )
 @mock.patch("pybsm.otf.functional.is_usable", False)
 def test_missing_deps() -> None:
     """Test that an exception is raised when required dependencies are not installed."""

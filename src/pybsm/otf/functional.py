@@ -1104,6 +1104,9 @@ def object_domain_defocus_radii(
         w :
             the 1/e blur spot radii (rad) in one direction
 
+    :raises:
+        ZeroDivisionError:
+            if R or R0 is 0
     """
     w = 0.62 * D * (1.0 / R - 1.0 / R0)
     return w
@@ -1147,6 +1150,9 @@ def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa:
         w :
             the 1/e blur spot radii (rad) in one direction
 
+    :raises:
+        ZeroDivisionError:
+            if slant_range is 0
     """
     w = 0.62 * D * dz / (f**2.0)
     return w
