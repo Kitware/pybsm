@@ -14,7 +14,6 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 # 3rd party imports
-from typing import Optional
 
 import numpy as np
 
@@ -59,6 +58,6 @@ class Metrics:
     rer_90: float
     gsd_w: float
 
-    def __init__(self, name: Optional[str]) -> None:
+    def __init__(self, name: str) -> None:
         """Returns a sensor object whose name is *name*."""
         self.name = name
