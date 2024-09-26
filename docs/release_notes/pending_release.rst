@@ -16,5 +16,11 @@ CI/CD
 
 * Added tests for `metrics.metrics` class
 
+* Added tests for functions in otf/functional.py
+
+* Archived functions in otf/functional.py that inferred otfs
+  based on user data due to lack of testing data. Those functions
+  are preserved in tag v0.7.0.
+
 Fixes
 -----

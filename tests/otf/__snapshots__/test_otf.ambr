@@ -1,0 +1,40 @@
+# serializer version: 1
+# name: TestOTFHelper.test_dark_current_from_density[0.0-2.0-1.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_dark_current_from_density[1.0-1.0-2.0]
+  1.2483018257999544e+19
+# ---
+# name: TestOTFHelper.test_dark_current_from_density[1.0-2.0-1.0]
+  1.2483018257999544e+19
+# ---
+# name: TestOTFHelper.test_dark_current_from_density[10.0-0.0-1.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_dark_current_from_density[10.0-2.0-0.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_image_domain_defocus_radii[0.0-2.0-1.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_image_domain_defocus_radii[10.0-0.0-1.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_image_domain_defocus_radii[10.0-1.0-2.0]
+  1.55
+# ---
+# name: TestOTFHelper.test_image_domain_defocus_radii[10.0-2.0-1.0]
+  12.4
+# ---
+# name: TestOTFHelper.test_object_domain_radii[0.0-2.0-1.0]
+  -0.0
+# ---
+# name: TestOTFHelper.test_object_domain_radii[10.0-1.0-1.0]
+  0.0
+# ---
+# name: TestOTFHelper.test_object_domain_radii[10.0-1.0-2.0]
+  3.1
+# ---
+# name: TestOTFHelper.test_object_domain_radii[10.0-2.0-1.0]
+  -3.1
+# ---
