@@ -22,5 +22,7 @@ CI/CD
   based on user data due to lack of testing data. Those functions
   are preserved in tag v0.7.0.
 
+* Restored and improved review process documentation.
+
 Fixes
 -----
