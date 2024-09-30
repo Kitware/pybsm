@@ -1,5 +1,5 @@
-Steps of the pyBSM Release Process
-==================================
+Steps of the pybsm Release Process
+=================================
 Three types of releases are expected to occur:
   - major
   - minor
@@ -16,7 +16,9 @@ number occurs.
 Create and Merge Version Update Branch
 --------------------------------------
 
-This step of the release process depends on whether the release is considered to be major or minor, or if it is a patch release.
+This step of the release process depends on whether the release is considered to be major or
+minor, or
+if it is a patch release.
 
 Major and Minor Releases
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +56,7 @@ and functionalities.
 5. Merge the pull/merge request into the ``release`` branch.
 
 6. Tag the resulting merge commit.
-   See `Tag New Version`_ below for how to do this.
+   See `Tag new version`_ below for how to do this.
 
 7. As a repository administrator, merge the ``release`` branch into ``main``
    locally and push the updated ``main`` to upstream. (Replace "upstream"
@@ -110,7 +112,7 @@ If a patch release for an older release version is being created, see the
 5. Merge the pull/merge request into the ``release`` branch.
 
 6. Tag the resulting merge commit.
-   See `Tag New Version`_ below for how to do this.
+   See `Tag new version`_ below for how to do this.
 
 7. As a repository administrator, merge the ``release`` branch into ``main``
    locally and push the updated ``main`` to upstream. (Replace "upstream"
@@ -171,22 +173,22 @@ Draft a New Release on GitLab
 After creating and pushing a new version tag, a GitLab "release" should be
 made.
 
-1. Navigate to the GitLab `Releases page`_ for the pybsm repository.
+a. Navigate to the GitLab `Releases page`_ for the pybsm repository.
 
-2. Click the "Create a new release" button (or go `here
+b. Click the "Create a new release" button (or go `here
    <gitlab-new-release-page_>`_).
 
-3. Select from the "Tag name" dropdown the tag version just created and
+c. Select from the "Tag name" dropdown the tag version just created and
    pushed
 
-4. Enter the version number as the title, e.g. "v1.2.3".
+d. Enter the version number as the title, e.g. "v1.2.3".
 
-5. Select the release date.
+e. Select the release date.
 
-6. Copy and paste the release notes for this version into the release notes
+f. Copy and paste the release notes for this version into the release notes
    field.
 
-7. Click the "Create Release" button to create the GitLab release!
+g. Click the "Create Release" button to create the GitLab release!
 
 In the future, this may be automated.
 See the `appropriate GitLab documentation <gitlab-release-using-cicd_>`_ for
