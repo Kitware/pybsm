@@ -33,9 +33,9 @@ CI/CD
 
 Tests
 
-* Documented exceptions for `reflectance2photoelectrons` and its downstream functions.
+* Documented exceptions for ``reflectance2photoelectrons`` and its downstream functions.
 
-* Added tests for `reflectance2photoelectrons` and its downstream functions.
+* Added tests for ``reflectance2photoelectrons`` and its downstream functions.
 
 Release Process
 

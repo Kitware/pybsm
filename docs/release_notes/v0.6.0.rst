@@ -13,15 +13,15 @@ Features
 
 Linting
 
-* Added `py.typed` to `src/pybsm`
+* Added ``py.typed`` to ``src/pybsm``
 
-* Added a few `ignore_missing_imports = True` to `mypy` config.
+* Added a few ``ignore_missing_imports = True`` to ``mypy`` config.
 
 CI/CD
 
-* Optimized to not run anything but `publish` when `tag`.
+* Optimized to not run anything but ``publish`` when ``tag``.
 
-* Created a shared `python-version` job for `python` version matrices.
+* Created a shared ``python-version`` job for ``python`` version matrices.
 
 * Updated scanning to properly report the vulnerabilities.
 
@@ -31,13 +31,13 @@ CI/CD
 
 * Changed check release notes to only fetch last commit from main.
 
-* Added examples to `black` scan.
+* Added examples to ``black`` scan.
 
-* Added `jupyter` notebook extra to `black`.
+* Added ``jupyter`` notebook extra to ``black``.
 
-* Renamed `linting` job to `flake8`.
+* Renamed ``linting`` job to ``flake8``.
 
-* Renamed `typing` job to `mypy`.
+* Renamed ``typing`` job to ``mypy``.
 
 * Swapped out pipeline to use a shared pipeline.
 
@@ -48,8 +48,8 @@ Documentation
 Fixes
 -----
 
-* Updated `poetry.lock` file to remove a development environment vulnerability.
+* Updated ``poetry.lock`` file to remove a development environment vulnerability.
 
 * Modified security scanning to not use latest but instead the stable version.
 
-* Removed `examples` from `mypy` to prevent failure if there are no `.py` files.
+* Removed ``examples`` from ``mypy`` to prevent failure if there are no ``.py`` files.

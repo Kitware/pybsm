@@ -10,11 +10,11 @@ CI/CD
 
 * Added tests for simulation.RefImage class
 
-* Added tests to improve coverage of `radiance/functional.py`
+* Added tests to improve coverage of ``radiance/functional.py``
 
-* Updated config for `black` to set max line length to 120
+* Updated config for ``black`` to set max line length to 120
 
-* Added tests for `metrics.metrics` class
+* Added tests for ``metrics.metrics`` class
 
 * Added tests for functions in otf/functional.py
 
@@ -27,6 +27,8 @@ Documentation
 * Restored and improved review process documentation.
 
 * Added ``sphinx-click`` as a dev docs dependency.
+
+* Fixed sphinx linting errors.
 
 Fixes
 -----
