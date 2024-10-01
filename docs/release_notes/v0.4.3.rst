@@ -11,4 +11,4 @@ Fixes
 
 * Added missing docstring for ``intTime``
 
-* Updated the `numpy` hinge for `Python 3.12`
+* Updated the ``numpy`` hinge for ``Python 3.12``

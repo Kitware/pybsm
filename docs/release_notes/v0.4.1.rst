@@ -9,6 +9,6 @@ Updates / New Features
 Fixes
 -----
 
-* Expands the `scipy` dependency allowed.
+* Expands the ``scipy`` dependency allowed.
 
-* Fixes an incorrect `numpy` dependency hinge.
+* Fixes an incorrect ``numpy`` dependency hinge.
