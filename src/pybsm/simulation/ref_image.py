@@ -71,16 +71,12 @@ class RefImage:
             refl_values = np.array([0.05, 0.95])
         else:
             if refl_values is None:
-                raise ValueError(
-                    "If 'pix_values' is provided, 'refl_values' must be as well."
-                )
+                raise ValueError("If 'pix_values' is provided, 'refl_values' must be as well.")
 
         self.pix_values = pix_values
         self.refl_values = refl_values
 
-    def estimate_capture_parameters(
-        self, altitude: float = 2000000
-    ) -> Tuple[Sensor, Scenario]:
+    def estimate_capture_parameters(self, altitude: float = 2000000) -> Tuple[Sensor, Scenario]:
         """Estimate the scenario and sensor parameters that are consistent with this image.
 
         This provides a no-degradation baseline from which to alter parameters
@@ -124,12 +120,12 @@ class RefImage:
         h, w = self.img.shape[:2]
         plt.imshow(
             self.img,
-            extent=[
+            extent=(
                 -w / 2 * self.gsd,
                 w / 2 * self.gsd,
                 -h / 2 * self.gsd,
                 h / 2 * self.gsd,
-            ],
+            ),
         )
         plt.xlabel("X-Position (m)", fontsize=24)
         plt.ylabel("Y-Position (m)", fontsize=24)
