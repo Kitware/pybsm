@@ -19,7 +19,6 @@ classifiers = [
     'Operating System :: MacOS :: MacOS X',
     'Operating System :: Unix',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -32,21 +31,20 @@ version = "0.7.0"
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+# :auto python-version:
+python = "^3.9"
+# :auto python-version:
+
 # Python capped to <3.13 because of:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
-    {version = ">=1.22,<1.25", python = "~3.8"}, # CVE-2021-34141
-    {version = ">=1.22,^1.25", python = ">=3.9,<3.12" }, # CVE-2021-34141
+    {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
     {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
 matplotlib = ">=3.5.2"
 # simulation.img2reflectance currently uses interpolate.interp1d but will be removed in scipy==1.14.0
 # https://github.com/scipy/scipy/blob/44e4ebaac992fde33f04638b99629d23973cb9b2/scipy/interpolate/_interpolate.py#L118
-scipy = [
-    {version = "<1.11.1", python = "~3.8.1"}, # Can't satisfy CVE-2023-25399 because it is too restrictive
-    {version = ">=1.10.0,<1.14", python = ">=3.9"}, # CVE-2023-25399
-]
+scipy = ">=1.10.0,<1.14"  # CVE-2023-25399
 setuptools = ">=65.6.1"
 opencv-python = {version = ">=4.6", optional = true}
 opencv-python-headless = {version = ">=4.6", optional = true}
@@ -170,7 +168,7 @@ known-first-party = ["pybsm"]
 
 # :auto mypy:
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 disallow_untyped_defs = true
 ignore_errors = false
 ignore_missing_imports = true

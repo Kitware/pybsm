@@ -138,10 +138,10 @@
   )
 # ---
 # name: TestRefImage.test_show_method
-  list([
+  tuple(
     -5.104,
     5.104,
     -5.104,
     5.104,
-  ])
+  )
 # ---

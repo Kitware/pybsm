@@ -75,9 +75,7 @@ def giqe3(rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
     return niirs
 
 
-def giqe4(
-    rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float
-) -> Tuple[float, float]:
+def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float) -> Tuple[float, float]:
     """General Image Quality Equation version 4 from Leachtenauer, et al.
 
     "General Image Quality Equation: GIQE," Applied Optics, Vol 36, No 32,
@@ -118,21 +116,13 @@ def giqe4(
     # fact that only one direction in the gsd is distorted by projection into
     # the ground plane
 
-    niirs = (
-        10.251
-        - c_1 * np.log10(gsd_gp / 0.0254)
-        + c_2 * np.log10(rer)
-        - 0.656 * eho
-        - 0.334 * ng / snr
-    )
+    niirs = 10.251 - c_1 * np.log10(gsd_gp / 0.0254) + c_2 * np.log10(rer) - 0.656 * eho - 0.334 * ng / snr
     # note that, within the GIQE, gsd is defined in inches, hence the
     # conversion
     return niirs, gsd_gp
 
 
-def giqe5(
-    rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float
-) -> Tuple[float, float, float]:
+def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> Tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015.
 
     https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
@@ -172,9 +162,7 @@ def giqe5(
     """
     # note that, within the GIQE, gsd is defined in inches, hence the
     # conversion in the niirs equation below
-    gsd_w = gsd / (
-        np.sin(elev_angle) ** (0.25)
-    )  # geometric mean of the image plane and ground plane gsds
+    gsd_w = gsd / (np.sin(elev_angle) ** (0.25))  # geometric mean of the image plane and ground plane gsds
 
     rer = (np.max([rer_1, rer_2]) * np.min([rer_1, rer_2]) ** 2.0) ** (1.0 / 3.0)
 
@@ -188,9 +176,7 @@ def giqe5(
     return niirs, gsd_w, rer
 
 
-def giqe5_RER(  # noqa: N802
-    mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float
-) -> Tuple[float, float]:
+def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> Tuple[float, float]:  # noqa: N802
     """Calculates the relative edge response from a 2-D MTF.
 
     This function is primarily for use with the GIQE 5. It implements IBSM equations 3-57 and
@@ -221,9 +207,7 @@ def giqe5_RER(  # noqa: N802
     return rer_0, rer_90
 
 
-def giqe_edge_terms(
-    mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float
-) -> Tuple[float, float]:
+def giqe_edge_terms(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> Tuple[float, float]:
     """Calculates the geometric mean relative edge response and edge high overshoot,from a 2-D MTF.
 
     This function is primarily for use with the GIQE. It implements IBSM equations 3-57 and 3-58.
@@ -258,9 +242,7 @@ def giqe_edge_terms(
     return rer, eho
 
 
-def ground_resolved_distance(
-    mtf_slice: np.ndarray, df: float, snr: float, ifov: float, slant_range: float
-) -> float:
+def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov: float, slant_range: float) -> float:
     """IBSM Equation 3-54.
 
     The ground resolved distance is the period of the smallest square wave pattern that can be resolved in an image.
@@ -284,8 +266,7 @@ def ground_resolved_distance(
     """
     w = df * np.arange(1.0 * mtf_slice.size)
     u_r = (
-        np.interp(3.0 / snr, mtf_slice[::-1], w[::-1])
-        + 1e-12  # 1e-12 prevents division by zero in grd_cases
+        np.interp(3.0 / snr, mtf_slice[::-1], w[::-1]) + 1e-12  # 1e-12 prevents division by zero in grd_cases
     )  # arrays were reversed to satisfy the requirements of np.interp
 
     grd_cases = slant_range * np.array([1.0 / u_r, 2.0 * ifov])
@@ -314,20 +295,14 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm = Metrics("niirs " + sensor.name + " " + scenario.name)
     nm.sensor = sensor
     nm.scenario = scenario
-    nm.slant_range = geospatial.curved_earth_slant_range(
-        0.0, scenario.altitude, scenario.ground_range
-    )
+    nm.slant_range = geospatial.curved_earth_slant_range(0.0, scenario.altitude, scenario.ground_range)
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
     if interp:
-        nm.atm = utils.load_database_atmosphere(
-            scenario.altitude, scenario.ground_range, scenario.ihaze
-        )
+        nm.atm = utils.load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
     else:
-        nm.atm = utils.load_database_atmosphere_no_interp(
-            scenario.altitude, scenario.ground_range, scenario.ihaze
-        )
+        nm.atm = utils.load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]
@@ -353,9 +328,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm.radiance_wavelengths = nm.atm[:, 0]
 
     # now calculate now characteristics ****for a single frame******
-    nm.snr = radiance.photon_detector_SNR(
-        sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance
-    )
+    nm.snr = radiance.photon_detector_SNR(sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance)
 
     # break out photon noise sources (not required for NIIRS but useful for
     # analysis) photon noise due to the scene itself (target,background, and
@@ -414,9 +387,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm.cutoff_frequency = sensor.D / np.min(nm.mtf_wavelengths)
     u_rng = np.linspace(-1.0, 1.0, 101) * nm.cutoff_frequency
     v_rng = np.linspace(1.0, -1.0, 101) * nm.cutoff_frequency
-    nm.uu, nm.vv = np.meshgrid(
-        u_rng, v_rng
-    )  # meshgrid of spatial frequencies out to the optics cutoff
+    nm.uu, nm.vv = np.meshgrid(u_rng, v_rng)  # meshgrid of spatial frequencies out to the optics cutoff
     nm.df = u_rng[1] - u_rng[0]  # spatial frequency step size
 
     nm.otf = otf.functional.common_OTFs(
@@ -436,9 +407,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm.gsd_x = nm.ifov_x * nm.slant_range
     nm.gsd_y = nm.ifov_y * nm.slant_range
     nm.gsd_gm = np.sqrt(nm.gsd_x * nm.gsd_y)
-    nm.rer_gm, nm.eho_gm = giqe_edge_terms(
-        np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y
-    )
+    nm.rer_gm, nm.eho_gm = giqe_edge_terms(np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y)
 
     nm.ng = noise.noise_gain(sensor.filter_kernel)
     # note that NIIRS is calculated using the SNR ***after frame stacking****
@@ -452,9 +421,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     )
 
     # NEW FOR VERSION 0.2 - GIQE 4
-    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(
-        0.0, scenario.altitude, nm.slant_range
-    )
+    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(0.0, scenario.altitude, nm.slant_range)
     nm.niirs_4, nm.gsd_gp = giqe4(
         nm.rer_gm,
         nm.gsd_gm,
@@ -489,20 +456,14 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     nm = Metrics("niirs " + sensor.name + " " + scenario.name)
     nm.sensor = sensor
     nm.scenario = scenario
-    nm.slant_range = geospatial.curved_earth_slant_range(
-        0.0, scenario.altitude, scenario.ground_range
-    )
+    nm.slant_range = geospatial.curved_earth_slant_range(0.0, scenario.altitude, scenario.ground_range)
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
     if interp:
-        nm.atm = utils.load_database_atmosphere(
-            scenario.altitude, scenario.ground_range, scenario.ihaze
-        )
+        nm.atm = utils.load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
     else:
-        nm.atm = utils.load_database_atmosphere_no_interp(
-            scenario.altitude, scenario.ground_range, scenario.ihaze
-        )
+        nm.atm = utils.load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]
@@ -528,9 +489,7 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     nm.radiance_wavelengths = nm.atm[:, 0]
 
     # now calculate now characteristics ****for a single frame******
-    nm.snr = radiance.photon_detector_SNR(
-        sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance
-    )
+    nm.snr = radiance.photon_detector_SNR(sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance)
 
     # break out photon noise sources (not required for NIIRS but useful for
     # analysis) photon noise due to the scene itself (target,background, and
@@ -589,14 +548,10 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     nm.cutoff_frequency = sensor.D / np.min(nm.mtf_wavelengths)
     u_rng = np.linspace(-1.0, 1.0, 101) * nm.cutoff_frequency
     v_rng = np.linspace(1.0, -1.0, 101) * nm.cutoff_frequency
-    nm.uu, nm.vv = np.meshgrid(
-        u_rng, v_rng
-    )  # meshgrid of spatial frequencies out to the optics cutoff
+    nm.uu, nm.vv = np.meshgrid(u_rng, v_rng)  # meshgrid of spatial frequencies out to the optics cutoff
     nm.df = u_rng[1] - u_rng[0]  # spatial frequency step size
 
-    sensor.filter_kernel = np.array(
-        [1]
-    )  # ensures that sharpening is turned off.  Not valid for GIQE5
+    sensor.filter_kernel = np.array([1])  # ensures that sharpening is turned off.  Not valid for GIQE5
     nm.otf = otf.functional.common_OTFs(
         sensor,
         scenario,
@@ -612,15 +567,11 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     nm.ifov_x = sensor.p_x / sensor.f
     nm.ifov_y = sensor.p_y / sensor.f
     nm.gsd_x = nm.ifov_x * nm.slant_range  # GIQE5 assumes all square detectors
-    nm.rer_0, nm.rer_90 = giqe5_RER(
-        np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y
-    )
+    nm.rer_0, nm.rer_90 = giqe5_RER(np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y)
 
     # note that NIIRS is calculated using the SNR ***after frame stacking****
     # if any
-    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(
-        0.0, scenario.altitude, nm.slant_range
-    )
+    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(0.0, scenario.altitude, nm.slant_range)
     nm.niirs, nm.gsd_w, nm.rer = giqe5(
         nm.rer_0,
         nm.rer_90,
@@ -650,9 +601,7 @@ def relative_edge_response(mtf_slice: np.ndarray, df: float, ifov: float) -> flo
         rer:
             relative edge response (unitless)
     """
-    rer = edge_response(0.5, mtf_slice, df, ifov) - edge_response(
-        -0.5, mtf_slice, df, ifov
-    )
+    rer = edge_response(0.5, mtf_slice, df, ifov) - edge_response(-0.5, mtf_slice, df, ifov)
     return rer
 
 
@@ -694,9 +643,7 @@ def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> floa
     return eho
 
 
-def edge_response(
-    pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float
-) -> float:
+def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
     """IBSM Equation 3-63.  Imagine a perfectly sharp edge in object space.
 
     After the edge is blurred by the system MTF, the edge response is the normalized
@@ -726,9 +673,7 @@ def edge_response(
     return er
 
 
-def plot_common_MTFs(  # noqa: N802
-    metrics: Metrics, orientation_angle: float = 0.0
-) -> int:
+def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  # noqa: N802
     """Generates a plot of common MTF components.
 
     Generates a plot of common MTF components: aperture, turbulence, detector, jitter, drift, wavefront,
@@ -747,9 +692,7 @@ def plot_common_MTFs(  # noqa: N802
     """
     # spatial frequencies in the image plane in (cycles/mm)
     rad_freq = np.sqrt(metrics.uu**2 + metrics.vv**2)
-    sf = otf.functional.slice_otf(
-        0.001 * (1.0 / metrics.sensor.f) * rad_freq, orientation_angle
-    )
+    sf = otf.functional.slice_otf(0.001 * (1.0 / metrics.sensor.f) * rad_freq, orientation_angle)
 
     # extract MTFs
     ap_mtf = np.abs(otf.functional.slice_otf(metrics.otf.ap_OTF, orientation_angle))
@@ -758,12 +701,8 @@ def plot_common_MTFs(  # noqa: N802
     jit_mtf = np.abs(otf.functional.slice_otf(metrics.otf.jit_OTF, orientation_angle))
     dri_mtf = np.abs(otf.functional.slice_otf(metrics.otf.drft_OTF, orientation_angle))
     wav_mtf = np.abs(otf.functional.slice_otf(metrics.otf.wav_OTF, orientation_angle))
-    sys_mtf = np.abs(
-        otf.functional.slice_otf(metrics.otf.system_OTF, orientation_angle)
-    )
-    fil_mtf = np.abs(
-        otf.functional.slice_otf(metrics.otf.filter_OTF, orientation_angle)
-    )
+    sys_mtf = np.abs(otf.functional.slice_otf(metrics.otf.system_OTF, orientation_angle))
+    fil_mtf = np.abs(otf.functional.slice_otf(metrics.otf.filter_OTF, orientation_angle))
 
     plt.plot(
         sf,
@@ -783,7 +722,7 @@ def plot_common_MTFs(  # noqa: N802
         "gray",
     )
     plt.plot(sf, sys_mtf, "black", linewidth=2)
-    plt.axis([0, sf.max(), 0, fil_mtf.max()])
+    plt.axis((0, sf.max(), 0, fil_mtf.max()))
     plt.xlabel("spatial frequency (cycles/mm)")
     plt.ylabel("MTF")
     plt.legend(

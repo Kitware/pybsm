@@ -4,6 +4,10 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+Build
+
+* New minimum supported python changed to ``python = "^3.9"`` due to 3.8 EOL.
+
 CI/CD
 
 * Added tests for simulation.Sensor class
@@ -21,6 +25,11 @@ CI/CD
 * Archived functions in otf/functional.py that inferred otfs
   based on user data due to lack of testing data. Those functions
   are preserved in tag v0.7.0.
+
+Dependencies
+
+* Updated python minimum requirement to 3.9 (up from 3.8.1) due to 3.8 EOL. This included updates to certain
+  dependencies with bifurcations, an update to pinned versions for development/CI, and removal of 3.8 from CI.
 
 Documentation
 
