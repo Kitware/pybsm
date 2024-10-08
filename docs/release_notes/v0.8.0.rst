@@ -1,0 +1,45 @@
+v0.8.0
+======
+
+Dropped support for Python 3.8, added additional testing, and archived unused functions from original repository.
+
+Updates / New Features
+----------------------
+
+Build
+
+* New minimum supported python changed to ``python = "^3.9"`` due to 3.8 EOL.
+
+CI/CD
+
+* Added tests for simulation.Sensor class
+
+* Added tests for simulation.RefImage class
+
+* Added tests to improve coverage of ``radiance/functional.py``
+
+* Updated config for ``black`` to set max line length to 120
+
+* Added tests for ``metrics.metrics`` class
+
+* Added tests for functions in otf/functional.py
+
+* Archived functions in otf/functional.py that inferred otfs
+  based on user data due to lack of testing data. Those functions
+  are preserved in tag v0.7.0.
+
+Dependencies
+
+* Updated python minimum requirement to 3.9 (up from 3.8.1) due to 3.8 EOL. This included updates to certain
+  dependencies with bifurcations, an update to pinned versions for development/CI, and removal of 3.8 from CI.
+
+Documentation
+
+* Restored and improved review process documentation.
+
+* Added ``sphinx-click`` as a dev docs dependency.
+
+* Fixed sphinx linting errors.
+
+Fixes
+-----
