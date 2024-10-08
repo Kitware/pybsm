@@ -211,6 +211,10 @@ def circular_aperture_OTF_with_defocus(  # noqa: N802
         other words, this is the distance between the geometric focus and the
         actual focus.
 
+    :raises:
+        ZeroDivisionError:
+            if wavelength or D is 0
+
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
@@ -360,7 +364,7 @@ def detector_OTF(  # noqa: N802
 
     :return:
         H:
-            detector OTF. WARNRING: output can be NaN if f is 0
+            detector OTF. WARNING: output can be NaN if f is 0
     """
     H = np.sinc(w_x * u / f) * np.sinc(w_y * v / f)  # noqa: N806
 
@@ -693,40 +697,6 @@ def polychromatic_turbulence_OTF(  # noqa: N802
     return turbulence_OTF, r0_band
 
 
-def radial_user_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, f_name: str
-) -> np.ndarray:
-    """IBSM Section 3.2.6.
-
-    Import a user-defined, 1-dimensional radial OTF and interpolate it onto a 2-dimensional spatial frequency grid.
-    Per ISBM Table.
-
-    3-3a, the OTF data are ASCII text, space delimited data.  Each line of text
-    is formatted as - spatial_frequency OTF_real OTF_imaginary.
-
-    :param u:
-        angular spatial frequency coordinates (rad^-1)
-    :param v:
-        angular spatial frequency coordinates (rad^-1)
-    :param f_name:
-        filename and path to the radial OTF data
-
-    :return:
-        H:
-            OTF at spatial frequency (u,v) (unitless)
-
-    """
-    radial_data = np.genfromtxt(f_name)
-    radial_sf = np.sqrt(u**2.0 + v**2.0)  # calculate radial spatial frequencies
-
-    H = (  # noqa: N806
-        np.interp(radial_sf, radial_data[:, 0], radial_data[:, 1])
-        + np.interp(radial_sf, radial_data[:, 0], radial_data[:, 2]) * 1.0j
-    )
-
-    return H
-
-
 def tdi_OTF(  # noqa: N802
     u_or_v: np.ndarray, w: float, n_tdi: float, phases_n: int, beta: float, f: float
 ) -> np.ndarray:
@@ -801,50 +771,6 @@ def turbulence_OTF(  # noqa: N802
         * (lambda0 * rho / r0) ** (5.0 / 3.0)
         * (1 - alpha * (lambda0 * rho / D) ** (1.0 / 3.0))
     )
-    return H
-
-
-def user_OTF_2D(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, f_name: str, nyquist: float
-) -> np.ndarray:
-    """IBSM Section 3.2.7.  Import an user-defined, 2D OTF and interpolate onto a 2D spatial frequency grid.
-
-    The OTF data is assumed to be stored as a 2D Numpy array (e.g. 'f_name.npy'); this is easier
-    than trying to resurrect the IBSM image file format.  Zero spatial frequency is taken to be at the
-    center of the array.  All OTFs values extrapolate to zero outside of the domain of the imported OTF.
-
-    :param u:
-        angular spatial frequency coordinates (rad^-1)
-    :param v:
-        angular spatial frequency coordinates (rad^-1)
-    :param f_name:
-        filename and path to the OTF data; must include the .npy extension
-    :param nyquist:
-        the Nyquist (i.e. maximum) frequency of the OFT file; support
-        of the OTF is assumed to extend from -nyquist to nyquist (rad^-1)
-
-    :return:
-        H:
-            OTF at spatial frequency (u,v) (unitless)
-
-    """
-    raw_OTF = np.load(f_name)  # noqa: N806
-
-    # find the row and column space of the raw OTF data
-    v_space = np.linspace(1, -1, raw_OTF.shape[0]) * nyquist
-    u_space = np.linspace(-1, 1, raw_OTF.shape[1]) * nyquist
-    u_grid, v_grid = np.meshgrid(u_space, v_space)
-
-    # reshape the data to be acceptable input to scipy's interpolate.griddata
-    # this apparently works but I wonder if there is a better way?
-    raw_OTF = raw_OTF.reshape(-1)  # noqa: N806
-    u_grid = u_grid.reshape(-1)
-    v_grid = v_grid.reshape(-1)
-
-    H = interpolate.griddata(  # noqa: N806
-        (u_grid, v_grid), raw_OTF, (u, v), method="linear", fill_value=0
-    )
-
     return H
 
 
@@ -971,87 +897,6 @@ def wind_speed_turbulence_OTF(  # noqa: N802
     H = weight * turbulence_OTF(u, v, lambda0, D, r0, 0.5) + (  # noqa: N806
         1 - weight
     ) * turbulence_OTF(u, v, lambda0, D, r0, 0.0)
-    return H
-
-
-def x_and_y_user_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, f_name: str
-) -> np.ndarray:
-    """USE x_and_y_user_OTF_2 INSTEAD!  The original pyBSM documentation contains an error.
-
-    IBSM Equation 3-32. Import user-defined, 1-dimensional x-direction and y-direction OTFs and interpolate them onto
-    a 2-dimensional spatial frequency grid.  Per ISBM Table. 3-3c, the OTF data are ASCII text, space delimited data.
-    (Note: There appears to be a typo in the IBSM documentation - Table 3-3c should represent the "x and y" case,
-    not "x or y".)
-
-    :param u:
-        angular spatial frequency coordinates (rad^-1)
-    :param v:
-        angular spatial frequency coordinates (rad^-1)
-    :param f_name:
-        filename and path to the x and y OTF data
-
-    :return:
-        H:
-            OTF at spatial frequency (u,v) (unitless)
-
-    """
-    x_and_y_data = np.genfromtxt(f_name)
-
-    H_x = (  # noqa: N806
-        np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 1])
-        + np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 2]) * 1.0j
-    )
-
-    H_y = (  # noqa: N806
-        np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 4])
-        + np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 5]) * 1.0j
-    )
-
-    H = H_x * H_y  # noqa: N806
-
-    return H
-
-
-def x_and_y_user_OTF_2(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, f_name: str
-) -> np.ndarray:
-    """UPDATE to IBSM Equation 3-32.
-
-    Import user-defined x-direction and y-direction OTFs and interpolate them onto a 2D spatial frequency grid.
-
-    Per ISBM Table 3-3c, the OTF data are ASCII text, space delimited data.
-    (Note: There appears to be a typo in the IBSM documentation - Table 3-3c
-    should represent the "x and y" case, not "x or y".).  In the original
-    version, the 2D OTF is given as H_x*H_y, the result being that the off-axis
-    OTF is lower than either H_x or H_y. The output is now given by the geometric
-    mean.
-
-    :param u:
-        angular spatial frequency coordinates (rad^-1)
-    :param v:
-        angular spatial frequency coordinates (rad^-1)
-    :param f_name:
-        filename and path to the x and y OTF data
-
-    :return:
-        H:
-            OTF at spatial frequency (u,v) (unitless)
-
-    """
-    x_and_y_data = np.genfromtxt(f_name)
-
-    H_x = (  # noqa: N806
-        np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 1])
-        + np.interp(np.abs(u), x_and_y_data[:, 0], x_and_y_data[:, 2]) * 1.0j
-    )
-
-    H_y = (  # noqa: N806
-        np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 4])
-        + np.interp(np.abs(v), x_and_y_data[:, 3], x_and_y_data[:, 5]) * 1.0j
-    )
-
-    H = np.sqrt(H_x * H_y)  # noqa: N806
     return H
 
 
@@ -1259,6 +1104,9 @@ def object_domain_defocus_radii(
         w :
             the 1/e blur spot radii (rad) in one direction
 
+    :raises:
+        ZeroDivisionError:
+            if R or R0 is 0
     """
     w = 0.62 * D * (1.0 / R - 1.0 / R0)
     return w
@@ -1302,6 +1150,9 @@ def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa:
         w :
             the 1/e blur spot radii (rad) in one direction
 
+    :raises:
+        ZeroDivisionError:
+            if slant_range is 0
     """
     w = 0.62 * D * dz / (f**2.0)
     return w
