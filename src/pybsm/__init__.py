@@ -1,3 +1,5 @@
+"""Define the pybsm package"""
+
 import pkg_resources
 
 # It is known that this will fail if package is not "installed" in the

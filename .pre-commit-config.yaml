@@ -12,9 +12,14 @@ repos:
         entry: poetry run black --config pyproject.toml
         types: [file, python]
         language: system
-      - id: ruff
-        name: ruff
-        entry: poetry run ruff --fix
+      - id: ruff-lint
+        name: ruff-lint
+        entry: poetry run ruff check --config pyproject.toml --fix
+        types: [file, python]
+        language: system
+      - id: ruff-format
+        name: ruff-format
+        entry: poetry run ruff format --config pyproject.toml
         types: [file, python]
         language: system
       - id: mypy
