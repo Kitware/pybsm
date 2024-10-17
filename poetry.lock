@@ -4291,4 +4291,4 @@ headless = ["opencv-python-headless"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "474558230112847fe81cda492e0e5d7fac33837587a0752c3e7be4d3aaaad90a"
+content-hash = "8a3d4eeaeb21061c819239ba95a95d84398a1c27aed474461cc60f8a03f65e53"
