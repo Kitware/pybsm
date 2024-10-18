@@ -14,7 +14,7 @@ import pybsm.simulation as simulation
 asset_dir = Path(__file__).parent
 
 img_file_name = str(
-    asset_dir / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+    asset_dir / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff",
 )
 
 

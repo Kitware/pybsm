@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,6 +12,7 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # standard library imports
 import inspect
 import os
@@ -35,7 +35,9 @@ dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def load_database_atmosphere_no_interp(
-    altitude: float, ground_range: float, ihaze: int
+    altitude: float,
+    ground_range: float,
+    ihaze: int,
 ) -> np.ndarray:
     """Loads a precalculated MODTRAN 5.2.1 Tape 7 atmosphere over a wavelength range of 0.3 to 14 micrometers.
 
@@ -84,12 +86,8 @@ def load_database_atmosphere_no_interp(
     decoder = np.genfromtxt(atm_path, delimiter=",", skip_header=1)
 
     decoder = decoder[decoder[:, 3] == ihaze]  # downselects to the right ihaze mode
-    decoder = decoder[
-        decoder[:, 1] == altitude / 1000.0
-    ]  # downselects to the right altitude
-    decoder = decoder[
-        decoder[:, 2] == ground_range / 1000.0
-    ]  # downselects to the right ground range
+    decoder = decoder[decoder[:, 1] == altitude / 1000.0]  # downselects to the right altitude
+    decoder = decoder[decoder[:, 2] == ground_range / 1000.0]  # downselects to the right ground range
 
     if not os.path.isfile(dir_path + "/atms/" + str(int(decoder[0, 0])) + ".bin"):
         raise IndexError("No atm file found for provided condition. Change values or use interpolation as necessary.")
@@ -100,20 +98,57 @@ def load_database_atmosphere_no_interp(
     )
 
     raw_data = raw_data.reshape((1371, 5), order="F")
-    raw_data[:, 1:5] = (
-        raw_data[:, 1:5] / 1e-10
-    )  # convert radiance columns to W/(sr m^2 m)
+    raw_data[:, 1:5] = raw_data[:, 1:5] / 1e-10  # convert radiance columns to W/(sr m^2 m)
 
     # append wavelength as first column
     wavelength = 1e-6 * np.linspace(0.3, 14.0, 1371)
     wavelength = np.expand_dims(wavelength, axis=1)
-    atm = np.hstack((wavelength, raw_data))
 
+    return np.hstack((wavelength, raw_data))
+
+
+def _get_ground_range_array(max_ground_range: float) -> np.ndarray:
+    """Returns an array of ground ranges that are valid in the precalculated MODTRAN database.
+
+    :param max_ground_range:
+        largest ground Range of interest (m)
+
+    :return:
+        g:
+            array of ground ranges less than max_ground_range (m)
+    """
+    g = np.array([0.0, 100.0, 500.0])
+    g = np.append(g, np.arange(1000.0, 20000.01, 1000.0))
+    g = np.append(g, np.arange(22000.0, 80000.01, 2000.0))
+    g = np.append(g, np.arange(85000.0, 300000.01, 5000.0))
+
+    return g[g <= max_ground_range]
+
+
+def _alt_atm_interp(
+    low_alt: float,
+    high_alt: float,
+    altitude: float,
+    ground_range: float,
+    ihaze: int,
+) -> np.ndarray:
+    # this is an internal function for interpolating atmospheres across
+    # altitudes
+    low_atm = load_database_atmosphere_no_interp(low_alt, ground_range, ihaze)
+    if low_alt != high_alt:
+        high_atm = load_database_atmosphere_no_interp(high_alt, ground_range, ihaze)
+        low_weight = 1 - ((altitude - low_alt) / (high_alt - low_alt))
+        high_weight = (altitude - low_alt) / (high_alt - low_alt)
+        atm = low_weight * low_atm + high_weight * high_atm
+    else:
+        atm = low_atm
     return atm
 
 
 def load_database_atmosphere(
-    altitude: float, ground_range: float, ihaze: int
+    altitude: float,
+    ground_range: float,
+    ihaze: int,
 ) -> np.ndarray:
     """Linear interpolation of the pre-calculated MODTRAN atmospheres.
 
@@ -157,42 +192,6 @@ def load_database_atmosphere(
     :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
     """
 
-    def get_ground_range_array(max_ground_range: float) -> np.ndarray:
-        """Returns an array of ground ranges that are valid in the precalculated MODTRAN database.
-
-        :param max_ground_range:
-            largest ground Range of interest (m)
-
-        :return:
-            g:
-                array of ground ranges less than max_ground_range (m)
-        """
-        g = np.array([0.0, 100.0, 500.0])
-        g = np.append(g, np.arange(1000.0, 20000.01, 1000.0))
-        g = np.append(g, np.arange(22000.0, 80000.01, 2000.0))
-        g = np.append(g, np.arange(85000.0, 300000.01, 5000.0))
-        g = g[g <= max_ground_range]
-        return g
-
-    def alt_atm_interp(
-        low_alt: float,
-        high_alt: float,
-        altitude: float,
-        ground_range: float,
-        ihaze: int,
-    ) -> np.ndarray:
-        # this is an internal function for interpolating atmospheres across
-        # altitudes
-        low_atm = load_database_atmosphere_no_interp(low_alt, ground_range, ihaze)
-        if low_alt != high_alt:
-            high_atm = load_database_atmosphere_no_interp(high_alt, ground_range, ihaze)
-            low_weight = 1 - ((altitude - low_alt) / (high_alt - low_alt))
-            high_weight = (altitude - low_alt) / (high_alt - low_alt)
-            atm = low_weight * low_atm + high_weight * high_atm
-        else:
-            atm = low_atm
-        return atm
-
     # define arrays of all possible altitude and ground ranges
     altitude_array = np.array(
         [
@@ -218,9 +217,9 @@ def load_database_atmosphere(
             16000,
             18000,
             20000,
-        ]
+        ],
     )
-    ground_ranges = get_ground_range_array(301e3)
+    ground_ranges = _get_ground_range_array(301e3)
 
     if altitude < min(altitude_array) or altitude > max(altitude_array):
         raise IndexError("Altitude not within range of acceptable values (2,20000)")
@@ -235,9 +234,9 @@ def load_database_atmosphere(
 
     # first interpolate across the low and high altitudes
     # then interpolate across ground range
-    atm_low_range = alt_atm_interp(low_alt, high_alt, altitude, low_range, ihaze)
+    atm_low_range = _alt_atm_interp(low_alt, high_alt, altitude, low_range, ihaze)
     if low_range != high_range:
-        atm_high_range = alt_atm_interp(low_alt, high_alt, altitude, high_range, ihaze)
+        atm_high_range = _alt_atm_interp(low_alt, high_alt, altitude, high_range, ihaze)
         low_weight = 1 - ((ground_range - low_range) / (high_range - low_range))
         high_weight = (ground_range - low_range) / (high_range - low_range)
         atm = low_weight * atm_low_range + high_weight * atm_high_range

@@ -1,5 +1,5 @@
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Tuple
 
 import numpy as np
 import pytest
@@ -74,7 +74,10 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_at_focal_plane_irradiance_zero_division(
-        self, D: float, f: float, L: np.ndarray  # noqa: N803
+        self,
+        D: float,  # noqa: N803
+        f: float,
+        L: np.ndarray,  # noqa: N803
     ) -> None:
         """Cover cases where ZeroDivisionError occurs."""
         with pytest.raises(ZeroDivisionError):
@@ -106,7 +109,11 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_at_focal_plane_irradiance(
-        self, D: float, f: float, L: np.ndarray, expected: np.ndarray  # noqa: N803
+        self,
+        D: float,  # noqa: N803
+        f: float,
+        L: np.ndarray,  # noqa: N803
+        expected: np.ndarray,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.at_focal_plane_irradiance(D, f, L)
@@ -119,7 +126,9 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_blackbody_radiance_empty_array(
-        self, lambda0: np.ndarray, T: float  # noqa: N803
+        self,
+        lambda0: np.ndarray,
+        T: float,  # noqa: N803
     ) -> None:
         """Cover cases where output is an empty array."""
         output = radiance.blackbody_radiance(lambda0, T)
@@ -133,7 +142,10 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_blackbody_radiance(
-        self, lambda0: np.ndarray, T: float, expected: np.ndarray  # noqa: N803
+        self,
+        lambda0: np.ndarray,
+        T: float,  # noqa: N803
+        expected: np.ndarray,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.blackbody_radiance(lambda0, T)
@@ -158,7 +170,10 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_resample_by_wavelength_value_error(
-        self, wavelengths: np.ndarray, values: np.ndarray, new_wavelengths: np.ndarray
+        self,
+        wavelengths: np.ndarray,
+        values: np.ndarray,
+        new_wavelengths: np.ndarray,
     ) -> None:
         """Cover cases where ValueError occurs."""
         with pytest.raises(ValueError):  # noqa: PT011
@@ -171,7 +186,10 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_resample_by_wavelength_empty_array(
-        self, wavelengths: np.ndarray, values: np.ndarray, new_wavelengths: np.ndarray
+        self,
+        wavelengths: np.ndarray,
+        values: np.ndarray,
+        new_wavelengths: np.ndarray,
     ) -> None:
         """Cover cases where output is an empty array."""
         output = radiance.resample_by_wavelength(wavelengths, values, new_wavelengths)
@@ -441,7 +459,7 @@ class TestReflectanceToPhotoelectrons:
         qe: np.ndarray,
         other_irradiance: np.ndarray,
         dark_current: float,
-        expected: Tuple[float, np.ndarray],
+        expected: tuple[float, np.ndarray],
     ) -> None:
         """Cover cases where second output array is empty."""
         output = radiance.signal_rate(
@@ -536,7 +554,7 @@ class TestReflectanceToPhotoelectrons:
         qe: np.ndarray,
         other_irradiance: np.ndarray,
         dark_current: float,
-        expected: Tuple[float, np.ndarray, np.ndarray],
+        expected: tuple[float, np.ndarray, np.ndarray],
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.signal_rate(
@@ -573,7 +591,11 @@ class TestReflectanceToPhotoelectrons:
         """Cover cases where ZeroDivisionError occurs."""
         with pytest.raises(ZeroDivisionError):
             radiance.cold_stop_self_emission(
-                wavelengths, cold_filter_temperature, cold_filter_emissivity, D, f
+                wavelengths,
+                cold_filter_temperature,
+                cold_filter_emissivity,
+                D,
+                f,
             )
 
     @pytest.mark.parametrize(
@@ -593,7 +615,11 @@ class TestReflectanceToPhotoelectrons:
     ) -> None:
         """Cover cases where output is an empty array."""
         output = radiance.cold_stop_self_emission(
-            wavelengths, cold_filter_temperature, cold_filter_emissivity, D, f
+            wavelengths,
+            cold_filter_temperature,
+            cold_filter_emissivity,
+            D,
+            f,
         )
         assert output.size == 0
 
@@ -630,7 +656,11 @@ class TestReflectanceToPhotoelectrons:
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.cold_stop_self_emission(
-            wavelengths, cold_filter_temperature, cold_filter_emissivity, D, f
+            wavelengths,
+            cold_filter_temperature,
+            cold_filter_emissivity,
+            D,
+            f,
         )
         assert np.isclose(output, expected).all()
 
@@ -764,7 +794,10 @@ class TestReflectanceToPhotoelectrons:
         """Cover cases where ZeroDivisionError occurs."""
         with pytest.raises(ZeroDivisionError):
             radiance.cold_shield_self_emission(
-                wavelengths, cold_shield_temperature, D, f
+                wavelengths,
+                cold_shield_temperature,
+                D,
+                f,
             )
 
     @pytest.mark.parametrize(
@@ -783,7 +816,10 @@ class TestReflectanceToPhotoelectrons:
     ) -> None:
         """Cover cases where output is an empty array."""
         output = radiance.cold_shield_self_emission(
-            wavelengths, cold_shield_temperature, D, f
+            wavelengths,
+            cold_shield_temperature,
+            D,
+            f,
         )
         assert output.size == 0
 
@@ -810,7 +846,10 @@ class TestReflectanceToPhotoelectrons:
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.cold_shield_self_emission(
-            wavelengths, cold_shield_temperature, D, f
+            wavelengths,
+            cold_shield_temperature,
+            D,
+            f,
         )
         assert np.isclose(output, expected).all()
 
@@ -823,7 +862,10 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_total_radiance_index_error(
-        self, atm: np.ndarray, reflectance: float, temperature: float
+        self,
+        atm: np.ndarray,
+        reflectance: float,
+        temperature: float,
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
@@ -845,7 +887,7 @@ class TestReflectanceToPhotoelectrons:
                         8.66666667,
                         8.66666667,
                         8.66666667,
-                    ]
+                    ],
                 ),
             ),
         ],
@@ -903,7 +945,11 @@ class TestReflectanceToPhotoelectrons:
         ],
     )
     def test_reflectance_to_photoelectrons_index_error(
-        self, atm: np.ndarray, sensor: Sensor, int_time: float, target_temp: int
+        self,
+        atm: np.ndarray,
+        sensor: Sensor,
+        int_time: float,
+        target_temp: int,
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
@@ -934,11 +980,14 @@ class TestReflectanceToPhotoelectrons:
         sensor: Sensor,
         int_time: float,
         target_temp: int,
-        expected: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        expected: tuple[np.ndarray, np.ndarray, np.ndarray],
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.reflectance_to_photoelectrons(
-            atm, sensor, int_time, target_temp
+            atm,
+            sensor,
+            int_time,
+            target_temp,
         )
         assert np.isclose(output[0], expected[0]).all()
         assert np.isclose(output[1], expected[1]).all()
@@ -955,10 +1004,10 @@ class TestReflectanceToPhotoelectrons:
                 (
                     np.linspace(0.0, 1.0, 100),
                     np.load(
-                        "./tests/radiance/data/reflectance_to_photoelectrons_pe.npy"
+                        "./tests/radiance/data/reflectance_to_photoelectrons_pe.npy",
                     ),
                     np.load(
-                        "./tests/radiance/data/reflectance_to_photoelectrons_spectral_weights.npy"
+                        "./tests/radiance/data/reflectance_to_photoelectrons_spectral_weights.npy",
                     ),
                 ),
             ),
@@ -970,11 +1019,14 @@ class TestReflectanceToPhotoelectrons:
         sensor: Sensor,
         int_time: float,
         target_temp: int,
-        expected: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        expected: tuple[np.ndarray, np.ndarray, np.ndarray],
     ) -> None:
         """Cover cases with normal inputs, atm input, and expected outputs."""
         output = radiance.reflectance_to_photoelectrons(
-            atm, sensor, int_time, target_temp
+            atm,
+            sensor,
+            int_time,
+            target_temp,
         )
         assert np.isclose(output[0], expected[0]).all()
         assert np.isclose(output[1], expected[1]).all()
@@ -1068,11 +1120,19 @@ class TestReflectanceToPhotoelectrons:
         optics_temperature: float,
         D: float,  # noqa: N803
         f: float,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         with expectation:
             output = radiance.focal_plane_integrated_irradiance(
-                L, L_s, t_opt, e_opt, lambda0, d_lambda, optics_temperature, D, f
+                L,
+                L_s,
+                t_opt,
+                e_opt,
+                lambda0,
+                d_lambda,
+                optics_temperature,
+                D,
+                f,
             )
             assert np.all(output == snapshot)
 
@@ -1150,7 +1210,10 @@ class TestReflectanceToPhotoelectrons:
         background_radiance: np.ndarray,
     ) -> None:
         output = radiance.photon_detector_SNR(
-            sensor, radiance_wavelengths, target_radiance, background_radiance
+            sensor,
+            radiance_wavelengths,
+            target_radiance,
+            background_radiance,
         )
         assert output == snapshot
 
@@ -1168,7 +1231,7 @@ class TestReflectanceToPhotoelectrons:
         snapshot: SnapshotAssertion,
         atm: np.ndarray,
         is_emissive: int,
-        expectation: ContextManager,
+        expectation: AbstractContextManager,
     ) -> None:
         with expectation:
             output = radiance.giqe_radiance(atm, is_emissive)

@@ -15,7 +15,10 @@ class TestSimulation:
         ],
     )
     def test_img_to_reflectance_value_error(
-        self, img: np.ndarray, pix_values: np.ndarray, refl_values: np.ndarray
+        self,
+        img: np.ndarray,
+        pix_values: np.ndarray,
+        refl_values: np.ndarray,
     ) -> None:
         """Cover cases where ValueError occurs."""
         with pytest.raises(ValueError):  # noqa: PT011
@@ -29,7 +32,10 @@ class TestSimulation:
         ],
     )
     def test_img_to_reflectance_nan(
-        self, img: np.ndarray, pix_values: np.ndarray, refl_values: np.ndarray
+        self,
+        img: np.ndarray,
+        pix_values: np.ndarray,
+        refl_values: np.ndarray,
     ) -> None:
         """Cover cases where nan occurs."""
         output = simulation.img_to_reflectance(img, pix_values, refl_values)

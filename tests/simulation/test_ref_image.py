@@ -1,7 +1,7 @@
 import unittest.mock as mock
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import ContextManager
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +28,12 @@ class TestRefImage:
             (np.array([0.05, 0.95]), np.array([0.1, 0.9]), does_not_raise()),
         ],
     )
-    def test_ref_image_init(self, pix_values: np.ndarray, refl_values: np.ndarray, expectation: ContextManager) -> None:
+    def test_ref_image_init(
+        self,
+        pix_values: np.ndarray,
+        refl_values: np.ndarray,
+        expectation: AbstractContextManager,
+    ) -> None:
         img = plt.imread(IMAGE_PATH)
         gsd = 3.19 / 160.0
         with expectation:

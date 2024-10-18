@@ -178,6 +178,7 @@ ignore = [
   "ANN102",
   # -- Ignore these rules, since they contradict our coding standards
   "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
+
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -190,6 +191,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = [
   "S101",  # Allow asserts in tests
+  "SLF001",  # Allow private member access in tests
   "D100", "D101", "D102", "D103", "D104", "D105", "D107"  # Allow missing docstring in test dir
 ]
 

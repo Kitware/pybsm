@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,6 +12,7 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # 3rd party imports
 from typing import Optional
 
@@ -29,41 +29,39 @@ class Scenario:
     is called, values for target/background temperature, reflectance, etc. are
     overridden with the NIIRS model defaults.
 
-    :parameter ihaze:
-        MODTRAN code for visibility, valid options are ihaze = 1 (Rural
-        extinction with 23 km visibility) or ihaze = 2 (Rural extinction
-        with 5 km visibility)
-    :parameter altitude:
-        sensor height above ground level in meters; the database includes the
-        following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
-        12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
-        24500
-    :parameter ground_range:
-        projection of line of sight between the camera and target along on the
-        ground in meters; the distance between the target and the camera is
-        given by sqrt(altitude^2 + ground_range^2).
-        The following ground ranges are included in the database at each
-        altitude until the ground range exceeds the distance to the spherical
-        earth horizon: 0 100 500 1000 to 20000 in 1000 meter steps, 22000 to
-        80000 in 2000 m steps, and  85000 to 300000 in 5000 meter steps.
-    :parameter aircraft_speed:
-        ground speed of the aircraft (m/s)
-    :parameter target_reflectance:
-        object reflectance (unitless); the default 0.15 is the giqe standard
-    :parameter target_temperature:
-        object temperature (Kelvin); 282 K is used for GIQE calculation
-    :parameter background_reflectance:
-        background reflectance (unitless)
-    :parameter background_temperature:
-        background temperature (Kelvin); 280 K used for GIQE calculation
-    :parameter ha_wind_speed:
-        the high altitude wind speed (m/s) used to calculate the turbulence
-        profile; the default, 21.0, is the HV 5/7 profile value
-    :parameter cn2_at_1m:
-        the refractive index structure parameter "near the ground"
-        (e.g. at h = 1 m) used to calculate the turbulence profile; the
-        default, 1.7e-14, is the HV 5/7 profile value
+    Attributes:
+    name (str):
+        The name of the scenario.
 
+    ihaze (int):
+        The haze index for the scenario.
+
+    altitude (float):
+        The altitude of the aircraft in meters.
+
+    ground_range (float):
+        The ground range of the scenario in meters.
+
+    aircraft_speed (float):
+        The speed of the aircraft in meters per second.
+
+    target_reflectance (float):
+        The reflectance of the target.
+
+    target_temperature (float):
+        The temperature of the target in Kelvin.
+
+    background_reflectance (float):
+        The reflectance of the background.
+
+    background_temperature (float):
+        The temperature of the background in Kelvin.
+
+    ha_wind_speed (float):
+        The horizontal atmospheric wind speed in meters per second.
+
+    cn2_at_1m (float):
+        The structure parameter of the refractive index at 1 meter above ground level.
     """
 
     def __init__(
@@ -79,8 +77,51 @@ class Scenario:
         background_temperature: float = 293,
         ha_wind_speed: float = 21,
         cn2_at_1m: float = 1.7e-14,
-        interp: Optional[bool] = False
+        interp: Optional[bool] = False,
     ) -> None:
+        """
+        Initializes a scenario object.
+
+        :parameter name:
+            The name of the scenario object
+        :parameter ihaze:
+            MODTRAN code for visibility, valid options are ihaze = 1 (Rural
+            extinction with 23 km visibility) or ihaze = 2 (Rural extinction
+            with 5 km visibility)
+        :parameter altitude:
+            sensor height above ground level in meters; the database includes the
+            following altitude options: 2 32.55 75 150 225 500 meters, 1000 to
+            12000 in 1000 meter steps, and 14000 to 20000 in 2000 meter steps,
+            24500
+        :parameter ground_range:
+            projection of line of sight between the camera and target along on the
+            ground in meters; the distance between the target and the camera is
+            given by sqrt(altitude^2 + ground_range^2).
+            The following ground ranges are included in the database at each
+            altitude until the ground range exceeds the distance to the spherical
+            earth horizon: 0 100 500 1000 to 20000 in 1000 meter steps, 22000 to
+            80000 in 2000 m steps, and  85000 to 300000 in 5000 meter steps.
+        :parameter aircraft_speed:
+            ground speed of the aircraft (m/s)
+        :parameter target_reflectance:
+            object reflectance (unitless); the default 0.15 is the giqe standard
+        :parameter target_temperature:
+            object temperature (Kelvin); 282 K is used for GIQE calculation
+        :parameter background_reflectance:
+            background reflectance (unitless)
+        :parameter background_temperature:
+            background temperature (Kelvin); 280 K used for GIQE calculation
+        :parameter ha_wind_speed:
+            the high altitude wind speed (m/s) used to calculate the turbulence
+            profile; the default, 21.0, is the HV 5/7 profile value
+        :parameter cn2_at_1m:
+            the refractive index structure parameter "near the ground"
+            (e.g. at h = 1 m) used to calculate the turbulence profile; the
+            default, 1.7e-14, is the HV 5/7 profile value
+        :parameter interp:
+            A flag to indicate whether atmospheric interpolation should be used.
+            Defaults to False.
+        """
         self.name = name
         self._ihaze = ihaze
         self._altitude = altitude
@@ -99,6 +140,10 @@ class Scenario:
 
     @property
     def ihaze(self) -> int:
+        """
+        Get or set ihaze, MODTRAN code for visibility. Valid options are ihaze = 1 (Rural
+        extinction with 23 km visibility) or ihaze = 2 (Rural extinction with 5 km visibility)
+        """
         return self._ihaze
 
     @ihaze.setter
@@ -108,6 +153,7 @@ class Scenario:
 
     @property
     def altitude(self) -> float:
+        """Get or set altitude, in meters."""
         return self._altitude
 
     @altitude.setter
@@ -117,6 +163,7 @@ class Scenario:
 
     @property
     def ground_range(self) -> float:
+        """Get or set ground range, in meters."""
         return self._ground_range
 
     @ground_range.setter
@@ -155,11 +202,15 @@ class Scenario:
             # Read in and cache results.
             if self._interp:
                 self._atm = utils.load_database_atmosphere(
-                    self.altitude, self.ground_range, self.ihaze
+                    self.altitude,
+                    self.ground_range,
+                    self.ihaze,
                 )
             else:
                 self._atm = utils.load_database_atmosphere_no_interp(
-                    self.altitude, self.ground_range, self.ihaze
+                    self.altitude,
+                    self.ground_range,
+                    self.ihaze,
                 )
 
         return self._atm

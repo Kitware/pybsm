@@ -12,3 +12,5 @@ Documentation
 
 Fixes
 -----
+
+* Updated and applied ruff configuration.
