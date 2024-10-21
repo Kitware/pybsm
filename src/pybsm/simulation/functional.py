@@ -59,6 +59,11 @@ def instantaneous_FOV(w: int, f: int) -> float:  # noqa: N802
     :return:
         ifov:
             detector instantaneous field-of-view (radians)
+
+    :raises:
+        ZeroDivisionError:
+            error raised when f is 0
+
     """
     return w / f
 
