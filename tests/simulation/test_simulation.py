@@ -1,6 +1,6 @@
+from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import ContextManager, List
 
 import numpy as np
 import pytest
@@ -9,8 +9,8 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm import simulation
 
-BASE_PATH = Path(__file__).parent.parent.parent
-IMAGE_PATH = BASE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+BASE_FILE_PATH = Path(__file__).parent.parent.parent
+IMAGE_FILE_PATH = BASE_FILE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class TestSimulation:
@@ -87,10 +87,13 @@ class TestSimulation:
         ],
     )
     def test_instantaneous_FOV_ZeroDivision_error(  # noqa: N802
-        self, w: int, f: int, expectation: ContextManager
+        self,
+        w: int,
+        f: int,
+        expectation: AbstractContextManager,
     ) -> None:
         """Cover cases where ValueError occurs."""
-        with expectation:  # noqa: PT011
+        with expectation:
             simulation.instantaneous_FOV(w, f)
 
     @pytest.mark.parametrize(("w", "f"), [(1, 1), (2, 1), (1, 2)])
@@ -126,35 +129,60 @@ class TestSimulation:
         assert np.isnan(output).any()
 
     @pytest.mark.parametrize(
-        ("img_path", "perc"),
+        ("img_file_path", "perc"),
         [
             (
-                IMAGE_PATH,
+                IMAGE_FILE_PATH,
                 None,
             ),
             (
-                IMAGE_PATH,
+                IMAGE_FILE_PATH,
                 [10.0, 90.0],
             ),
         ],
     )
-    def test_stretch_contrast_convert_8bit(self, img_path: str, perc: List[float], snapshot: SnapshotAssertion) -> None:
-        img = np.array(Image.open(img_path))
+    def test_stretch_contrast_convert_8bit(
+        self,
+        img_file_path: str,
+        perc: list[float],
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        img = np.array(Image.open(img_file_path))
         output = [simulation.stretch_contrast_convert_8bit(img, perc)]
         assert output == snapshot
 
     @pytest.mark.parametrize(
-        ("img_path", "gsd", "altitude"), [(IMAGE_PATH, 3.19 / 160.0, 1000), (IMAGE_PATH, 3.19 / 160.0, 10000)]
+        ("img_file_path", "gsd", "altitude", "true_img_file_path", "blur_img_file_path", "noisy_img_file_path"),
+        [
+            (
+                IMAGE_FILE_PATH,
+                3.19 / 160.0,
+                1000,
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_true_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_blur_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_noisy_img.png",
+            ),
+        ],
     )
     def test_simulate_image(
         self,
-        img_path: str,
+        img_file_path: str,
         gsd: float,
         altitude: int,
-        snapshot: SnapshotAssertion,
+        true_img_file_path: Path,
+        blur_img_file_path: Path,
+        noisy_img_file_path: Path,
     ) -> None:
-        img = np.array(Image.open(img_path))
+        img = np.array(Image.open(img_file_path))
+        expected_true_img = np.array(Image.open(true_img_file_path))
+        expected_blur_img = np.array(Image.open(blur_img_file_path))
+        expected_noisy_img = np.array(Image.open(noisy_img_file_path))
         ref_img = simulation.RefImage(img, gsd)
         sensor, scenario = ref_img.estimate_capture_parameters(altitude=altitude)
-        output = simulation.simulate_image(ref_img, sensor, scenario)
-        assert output == snapshot
+        true_img, blur_img, noisy_img = simulation.simulate_image(ref_img, sensor, scenario)
+        true_img = simulation.stretch_contrast_convert_8bit(true_img)
+        blur_img = simulation.stretch_contrast_convert_8bit(blur_img)
+        noisy_img = simulation.stretch_contrast_convert_8bit(noisy_img)
+        assert np.isclose(true_img.all(), expected_true_img.all())
+        assert np.isclose(blur_img.all(), expected_blur_img.all())
+        assert np.isclose(noisy_img.all(), expected_noisy_img.all())

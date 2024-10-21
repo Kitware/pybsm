@@ -10,6 +10,10 @@ Documentation
 
 * Updated Design Principles link to new URL.
 
+CI/CD
+
+* Added test coverage for simulation/functional.py
+
 Fixes
 -----
 
