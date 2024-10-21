@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -18,12 +17,13 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 import inspect
 import os
 import warnings
-from typing import Any, Optional, Tuple
+from typing import Optional
 
 import matplotlib.pyplot as plt
 
 # 3rd party imports
 import numpy as np
+from scipy import integrate
 
 # local imports
 import pybsm.otf as otf
@@ -69,13 +69,12 @@ def giqe3(rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
         niirs :
             a National Image Interpretability Rating Scale value (unitless)
     """
-    niirs = 11.81 + 3.32 * np.log10(rer / (gsd / 0.0254)) - 1.48 * eho - ng / snr
     # note that, within the GIQE, gsd is defined in inches, hence the
     # conversion
-    return niirs
+    return 11.81 + 3.32 * np.log10(rer / (gsd / 0.0254)) - 1.48 * eho - ng / snr
 
 
-def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float) -> Tuple[float, float]:
+def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float) -> tuple[float, float]:
     """General Image Quality Equation version 4 from Leachtenauer, et al.
 
     "General Image Quality Equation: GIQE," Applied Optics, Vol 36, No 32,
@@ -122,7 +121,7 @@ def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle:
     return niirs, gsd_gp
 
 
-def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> Tuple[float, float, float]:
+def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015.
 
     https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
@@ -176,7 +175,7 @@ def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float)
     return niirs, gsd_w, rer
 
 
-def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> Tuple[float, float]:  # noqa: N802
+def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:  # noqa: N802
     """Calculates the relative edge response from a 2-D MTF.
 
     This function is primarily for use with the GIQE 5. It implements IBSM equations 3-57 and
@@ -207,7 +206,7 @@ def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> Tuple
     return rer_0, rer_90
 
 
-def giqe_edge_terms(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> Tuple[float, float]:
+def giqe_edge_terms(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:
     """Calculates the geometric mean relative edge response and edge high overshoot,from a 2-D MTF.
 
     This function is primarily for use with the GIQE. It implements IBSM equations 3-57 and 3-58.
@@ -270,9 +269,8 @@ def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov:
     )  # arrays were reversed to satisfy the requirements of np.interp
 
     grd_cases = slant_range * np.array([1.0 / u_r, 2.0 * ifov])
-    grd = np.max(grd_cases)
 
-    return grd
+    return np.max(grd_cases)
 
 
 def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
@@ -334,7 +332,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     # analysis) photon noise due to the scene itself (target,background, and
     # path emissions/scattering)
     tgt_noise = np.sqrt(
-        np.trapz(
+        integrate.trapezoid(
             radiance.photon_detection_rate(
                 nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
                 nm.sensor.w_x,
@@ -345,10 +343,10 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
             nm.radiance_wavelengths,
         )
         * nm.snr.int_time
-        * sensor.n_tdi
+        * sensor.n_tdi,
     )
     bkg_noise = np.sqrt(
-        np.trapz(
+        integrate.trapezoid(
             radiance.photon_detection_rate(
                 nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
                 nm.sensor.w_x,
@@ -359,7 +357,7 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
             nm.radiance_wavelengths,
         )
         * nm.snr.int_time
-        * sensor.n_tdi
+        * sensor.n_tdi,
     )  # assign the scene Noise to the larger of the target or background noise
     scene_and_path_noise = np.max([tgt_noise, bkg_noise])
     # calculate noise due to just the path scattered or emitted radiation
@@ -495,7 +493,7 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     # analysis) photon noise due to the scene itself (target,background, and
     # path emissions/scattering)
     tgt_noise = np.sqrt(
-        np.trapz(
+        integrate.trapezoid(
             radiance.photon_detection_rate(
                 nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
                 nm.sensor.w_x,
@@ -506,10 +504,10 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
             nm.radiance_wavelengths,
         )
         * nm.snr.int_time
-        * sensor.n_tdi
+        * sensor.n_tdi,
     )
     bkg_noise = np.sqrt(
-        np.trapz(
+        integrate.trapezoid(
             radiance.photon_detection_rate(
                 nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
                 nm.sensor.w_x,
@@ -520,7 +518,7 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
             nm.radiance_wavelengths,
         )
         * nm.snr.int_time
-        * sensor.n_tdi
+        * sensor.n_tdi,
     )  # assign the scene Noise to the larger of the target or background noise
     scene_and_path_noise = np.max([tgt_noise, bkg_noise])
     # calculate noise due to just the path scattered or emitted radiation
@@ -601,8 +599,7 @@ def relative_edge_response(mtf_slice: np.ndarray, df: float, ifov: float) -> flo
         rer:
             relative edge response (unitless)
     """
-    rer = edge_response(0.5, mtf_slice, df, ifov) - edge_response(-0.5, mtf_slice, df, ifov)
-    return rer
+    return edge_response(0.5, mtf_slice, df, ifov) - edge_response(-0.5, mtf_slice, df, ifov)
 
 
 def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> float:
@@ -635,12 +632,8 @@ def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> floa
         er[index] = edge_response(dist, mtf_slice, df, ifov)
         index = index + 1
 
-    if np.all(np.diff(er) > 0):  # when true, er is monotonically increasing
-        eho = er[1]  # the edge response at 1.25 pixels from the edge
-    else:
-        eho = np.max(er)
-
-    return eho
+    # if er is monotonically increasing, use the edge response at 1.25 pixels from the edge
+    return er[1] if np.all(np.diff(er) > 0) else np.max(er)
 
 
 def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
@@ -669,8 +662,7 @@ def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: floa
     w = df * np.arange(1.0 * mtf_slice.size) + 1e-6  # note tiny offset to avoid infs
     y = (mtf_slice / w) * np.sin(2 * np.pi * w * ifov * pixel_pos)
 
-    er = 0.5 + (1.0 / np.pi) * np.trapz(y, w)
-    return er
+    return 0.5 + (1.0 / np.pi) * integrate.trapezoid(y, w)
 
 
 def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  # noqa: N802
@@ -735,7 +727,7 @@ def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  
             "wavefront",
             "image processing",
             "system",
-        ]
+        ],
     )
 
     # add nyquist frequency to plot
@@ -749,7 +741,7 @@ def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  
     return 0
 
 
-def plot_noise_terms(metrics: Any, max_val: int = 0) -> int:
+def plot_noise_terms(metrics: Metrics, max_val: int = 0) -> int:
     """Generates a plot of common noise components in units of equivalent photoelectrons.
 
     Generates a plot of common noise components in units of equivalent photoelectrons: components total,
@@ -765,7 +757,7 @@ def plot_noise_terms(metrics: Any, max_val: int = 0) -> int:
     :return:
         a plot
     """
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     ms = metrics.snr
     noise_terms = np.array(
         [
@@ -776,7 +768,7 @@ def plot_noise_terms(metrics: Any, max_val: int = 0) -> int:
             ms.dark_current_noise,
             ms.quantization_noise,
             metrics.sensor.read_noise,
-        ]
+        ],
     )
     ind = np.arange(noise_terms.shape[0])
     ax.bar(ind, noise_terms, color="b")
@@ -803,7 +795,7 @@ def plot_noise_terms(metrics: Any, max_val: int = 0) -> int:
         + str(int(metrics.snr.tgt_n - metrics.snr.bkg_n))
         + "\n well fill: "
         + str(int(metrics.snr.well_fraction * 100.0))
-        + "%"
+        + "%",
     )
     if max_val > 0:
         plt.ylim([0, max_val])

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,6 +12,7 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # 3rd party imports
 import numpy as np
 

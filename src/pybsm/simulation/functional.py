@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,12 +12,13 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # standard library imports
 import inspect
 import logging
 import os
 import warnings
-from typing import List, Optional, Tuple
+from typing import Optional
 
 # 3rd party imports
 import numpy as np
@@ -60,13 +60,13 @@ def instantaneous_FOV(w: int, f: int) -> float:  # noqa: N802
         ifov:
             detector instantaneous field-of-view (radians)
     """
-    ifov = w / f
-    return ifov
+    return w / f
 
 
 def wiener_filter(
-    otf: np.ndarray, noise_to_signal_power_spectrum: float
-) -> np.ndarray:  # noqa: N803
+    otf: np.ndarray,
+    noise_to_signal_power_spectrum: float,
+) -> np.ndarray:
     """An image restoration transfer function based on the Wiener Filter.
 
     See from Gonzalex and Woods, "Digital Image Processing," 3 ed.  Note that the
@@ -91,15 +91,13 @@ def wiener_filter(
         WF:
             frequency space representation of the wiener_filter
     """
-    WF = np.conj(otf) / (  # noqa: N806
-        np.abs(otf) ** 2 + noise_to_signal_power_spectrum
-    )
-
-    return WF
+    return np.conj(otf) / (np.abs(otf) ** 2 + noise_to_signal_power_spectrum)
 
 
 def img_to_reflectance(
-    img: np.ndarray, pix_values: np.ndarray, refl_values: np.ndarray
+    img: np.ndarray,
+    pix_values: np.ndarray,
+    refl_values: np.ndarray,
 ) -> np.ndarray:
     """Maps pixel values to reflectance values with linear interpolation between points.
 
@@ -141,8 +139,10 @@ def img_to_reflectance(
 
 
 def simulate_image(
-    ref_img: RefImage, sensor: Sensor, scenario: Scenario
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ref_img: RefImage,
+    sensor: Sensor,
+    scenario: Scenario,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates radiometrically accurate imagery collected through a sensor.
 
     We start with a notionally ideal reference image 'img', which captures a
@@ -224,7 +224,7 @@ def simulate_image(
         int_time,
     ).system_OTF
 
-    df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
+    df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2  # noqa: PD901
 
     if df <= 0:
         raise ValueError("Cutoff frequency values must be increasing.")
@@ -239,7 +239,9 @@ def simulate_image(
 
     # Convert to reference image into a floating point reflectance image.
     reflectance_img = img_to_reflectance(
-        ref_img.img, ref_img.pix_values, ref_img.refl_values
+        ref_img.img,
+        ref_img.pix_values,
+        ref_img.refl_values,
     )
 
     # Convert the reflectance image to photoelectrons.
@@ -248,27 +250,55 @@ def simulate_image(
 
     # blur and resample the image
     blur_img, _ = otf.apply_otf_to_image(
-        true_img, ref_img.gsd, slant_range, system_otf, df, ifov
+        true_img,
+        ref_img.gsd,
+        slant_range,
+        system_otf,
+        df,
+        ifov,
     )
 
+    rng = np.random.default_rng()
     # add photon noise (all sources) and dark current noise
-    poisson_noisy_img = np.random.poisson(lam=blur_img)
+    poisson_noisy_img = rng.poisson(lam=blur_img)
     # add any noise from Gaussian sources, e.g. read_noise, quantizaiton
-    noisy_img = np.random.normal(poisson_noisy_img, g_noise)
+    noisy_img = rng.normal(poisson_noisy_img, g_noise)
 
     if noisy_img.shape[0] > ref_img.img.shape[0]:
         logging.warn(
-            "The simulated image has oversampled the"
-            " reference image!  This result should not be"
-            " trusted!!"
+            "The simulated image has oversampled the reference image!  This result should not be trusted!!",
         )
 
     return true_img, blur_img, noisy_img
 
 
 def stretch_contrast_convert_8bit(
-    img: np.ndarray, perc: Optional[List[float]] = None
+    img: np.ndarray,
+    perc: Optional[list[float]] = None,
 ) -> np.ndarray:
+    """
+    Adjusts the contrast of an image and converts it to an 8-bit format.
+
+    This function stretches the contrast of the input image based on specified
+    percentile values. The pixel values are normalized to the 8-bit range (0-255)
+    and any values outside this range are clipped.
+
+    :param img:
+        The original image.
+    :param perc:
+        A list of two percentile values (0-100) to determine the contrast stretch.
+        The first value corresponds to the lower percentile and the second to the
+        upper percentile. If not provided, defaults to [0.1, 99.9].
+
+    :return:
+        A numpy array of the same shape as `img`, with pixel values converted
+        to 8-bit unsigned integers (0-255) after contrast stretching.
+
+    Example:
+        >>> import numpy as np
+        >>> img = np.random.rand(100, 100) * 65535  # Example 16-bit image
+        >>> stretched_img = stretch_contrast_convert_8bit(img)
+    """
     if perc is None:
         perc = [0.1, 99.9]
     img = img.astype(float)

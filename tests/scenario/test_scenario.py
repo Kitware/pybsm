@@ -1,5 +1,3 @@
-from typing import Dict
-
 import numpy as np
 import pytest
 
@@ -66,7 +64,7 @@ class TestScenario:
         altitude: float,
         ground_range: float,
         interp: bool,
-        other_args: Dict[str, float],
+        other_args: dict[str, float],
     ) -> None:
         """Test initialization with and without default parameters."""
         scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp, **other_args)
@@ -152,7 +150,12 @@ class TestScenario:
         ],
     )
     def test_atm_index_error(
-        self, name: str, ihaze: int, altitude: float, ground_range: float, interp: bool
+        self,
+        name: str,
+        ihaze: int,
+        altitude: float,
+        ground_range: float,
+        interp: bool,
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):

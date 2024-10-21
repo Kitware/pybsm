@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,6 +12,7 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # 3rd party imports
 from typing import Optional
 
@@ -204,11 +204,11 @@ class Sensor:
         self.bit_depth = bit_depth
         self.n_tdi = n_tdi
 
-        # TODO this should be exposed so a custom one can be provided.
-        self.qe_wavelengths = opt_trans_wavelengths  # tplaceholder
+        # TODO this should be exposed so a custom one can be provided.  # noqa: FIX002
+        self.qe_wavelengths = opt_trans_wavelengths  # placeholder
         self.qe = np.ones(opt_trans_wavelengths.shape[0])  # placeholder
 
-        # TODO I don't think these automatically get used everywhere they
+        # TODO I don't think these automatically get used everywhere they   # noqa: FIX002
         # should, some functions override by assuming different temperatures.
         self.cold_shield_temperature = cold_shield_temperature
         self.optics_temperature = optics_temperature
@@ -226,7 +226,7 @@ class Sensor:
         self.L_y = D
         self.other_noise = np.array([0])
 
-        # TODO, before we expose these, we should track down whether they are
+        # TODO, before we expose these, we should track down whether they are  # noqa: FIX002
         # actually used anywhere downstream.
         self.filter_kernel = np.array([1])
         self.frame_stacks = 1
