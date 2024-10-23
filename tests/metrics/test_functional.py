@@ -203,6 +203,26 @@ class TestFunctional:
         assert output == snapshot
 
     @pytest.mark.parametrize(
+        ("mtf", "df", "ifov_x", "ifov_y"),
+        [
+            (np.array([[1.0, 2.0], [1.0, 2.0]]), 5.0, np.pi / 2, np.pi / 2),
+            (np.array([[1.0, 0.0], [1.0, 0.0]]), 10.0, 0, 0),
+            (np.array([[0.0, 1.0], [0.0, 1.0]]), 1.0, 0, np.pi / 4),
+            (np.array([[0.0, 0.0], [0.0, 0.0]]), 0.0, np.pi / 4, 0),
+        ],
+    )
+    def test_giqe_edge_terms(
+        self,
+        mtf: np.ndarray,
+        df: float,
+        ifov_x: float,
+        ifov_y: float,
+        snapshot: SnapshotAssertion,
+    ) -> None:
+        output = functional.giqe_edge_terms(mtf, df, ifov_x, ifov_y)
+        assert output == snapshot
+
+    @pytest.mark.parametrize(
         ("mtf_slice", "df", "snr", "ifov", "slant_range", "expectation"),
         [
             (np.array([1.0, 2.0]), 1.0, 0.0, np.pi / 2, 10.0, pytest.raises(ZeroDivisionError)),
@@ -245,7 +265,7 @@ class TestFunctional:
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
+                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([3.0, 3.58 + 0.08]) * 1.0e-6),
                 Scenario("test_scenario", 1, 9000, 0.0),
                 True,
             ),
@@ -275,7 +295,7 @@ class TestFunctional:
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
+                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([3.0, 3.58 + 0.08]) * 1.0e-6),
                 Scenario("test_scenario", 1, 9000, 0.0),
                 True,
             ),
