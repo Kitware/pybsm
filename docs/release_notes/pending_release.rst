@@ -14,7 +14,7 @@ CI/CD
 
 * Added test coverage for simulation/functional.py
 
-* Added test coverage for metrcs/functional.py
+* Added test coverage for metrics/functional.py
 
 Fixes
 -----

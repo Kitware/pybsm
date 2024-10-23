@@ -265,7 +265,7 @@ class TestFunctional:
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([3.0, 3.58 + 0.08]) * 1.0e-6),
+                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([2.91, 3.58 + 0.08]) * 1.0e-6),
                 Scenario("test_scenario", 1, 9000, 0.0),
                 True,
             ),
@@ -295,7 +295,7 @@ class TestFunctional:
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([3.0, 3.58 + 0.08]) * 1.0e-6),
+                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([2.91, 3.58 + 0.08]) * 1.0e-6),
                 Scenario("test_scenario", 1, 9000, 0.0),
                 True,
             ),
