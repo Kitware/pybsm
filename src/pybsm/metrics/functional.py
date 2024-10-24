@@ -68,6 +68,10 @@ def giqe3(rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
     :return:
         niirs :
             a National Image Interpretability Rating Scale value (unitless)
+
+    :raises:
+        ZeroDivisionError:
+            error raised when gsd or snr is 0
     """
     # note that, within the GIQE, gsd is defined in inches, hence the
     # conversion
@@ -103,6 +107,10 @@ def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle:
     :return:
         niirs :
             a National Image Interpretability Rating Scale value (unitless)
+
+    :raises:
+        ZeroDivisionError:
+            error raised when snr is 0
     """
     if rer >= 0.9:
         c_1 = 3.32
@@ -154,6 +162,11 @@ def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float)
             elevation angle weighted GSD (m)
         rer :
             weighted relative edge response (rer)
+
+    :raises:
+        ZeroDivisionError:
+            error raised when snr is 0
+
     :NOTE:
         NIIRS 5 test case: rer_1=rer_2=0.35, gsd = 0.52832 (20.8 inches),
         snr = 50, elev_angle = np.pi/2. From Figure 1 in the NGA GIQE5 paper.
@@ -259,9 +272,14 @@ def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov:
         instantaneous field-of-view of a detector (radians)
     :param slant_range:
         distance between the target and sensor (m)
+
     :return:
         grd:
             ground resolved distance (m)
+
+    :raises:
+        ZeroDivisionError:
+            error raised when gsd or snr is 0
     """
     w = df * np.arange(1.0 * mtf_slice.size)
     u_r = (
@@ -654,7 +672,6 @@ def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: floa
     :param ifov:
         instantaneous field-of-view of a detector (radians)
 
-
     :return:
         er:
             normalized edge response (unitless)
@@ -735,8 +752,8 @@ def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  
     plt.annotate(
         "",
         xy=(nyquist, 0),
-        xy_text=(nyquist, 0.1),
-        arrow_props=dict(face_color="black", shrink=0.05),
+        xytext=(nyquist, 0.1),
+        arrowprops=dict(facecolor="black", shrink=0.05),
     )
     return 0
 
