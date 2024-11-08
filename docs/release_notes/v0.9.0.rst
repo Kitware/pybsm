@@ -1,6 +1,11 @@
 v0.9.0
 ======
 
+Updated a large amount of linting and type hinting to support
+a new ruff configuration, brought the test coverage up to near
+100%, and finally exposed the random seed for randomness to
+ensure reproducibility.
+
 Updates / New Features
 ----------------------
 
