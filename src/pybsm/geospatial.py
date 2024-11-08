@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,11 +12,11 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # standard library imports
 import inspect
 import os
 import warnings
-from typing import Tuple
 
 # 3rd party imports
 import numpy as np
@@ -39,8 +38,10 @@ r_earth = 6378.164e3  # radius of the earth (m)
 
 
 def altitude_along_slant_path(
-    h_target: float, h_sensor: float, slant_range: float
-) -> Tuple[np.ndarray, np.ndarray]:
+    h_target: float,
+    h_sensor: float,
+    slant_range: float,
+) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the height above the curved earth at points along a path from the target to the sensor.
 
     Calculate the height above the curved earth at points along a path from the
@@ -97,8 +98,7 @@ def ground_sample_distance(ifov: float, slant_range: float) -> float:
         gsd:
             ground sample distance (m)
     """
-    gsd = slant_range * ifov
-    return gsd
+    return slant_range * ifov
 
 
 def nadir_angle(h_target: float, h_sensor: float, slant_range: float) -> float:
@@ -126,13 +126,14 @@ def nadir_angle(h_target: float, h_sensor: float, slant_range: float) -> float:
     a = r_earth + h_sensor
     b = slant_range
     c = r_earth + h_target
-    nadir = np.arccos(-1.0 * (c**2.0 - a**2.0 - b**2.0) / (2.0 * a * b))
 
-    return nadir
+    return np.arccos(-1.0 * (c**2.0 - a**2.0 - b**2.0) / (2.0 * a * b))
 
 
 def curved_earth_slant_range(
-    h_target: float, h_sensor: float, ground_range: float
+    h_target: float,
+    h_sensor: float,
+    ground_range: float,
 ) -> float:
     """Returns the slant range from target to sensor above a curved (circular) Earth.
 
@@ -150,6 +151,5 @@ def curved_earth_slant_range(
     a = r_earth + h_sensor
     c = r_earth + h_target
     theta = ground_range / r_earth  # exact arc length angle (easy to derive)
-    slant_range = np.sqrt(c**2.0 + a**2.0 - 2.0 * a * c * np.cos(theta))
 
-    return slant_range
+    return np.sqrt(c**2.0 + a**2.0 - 2.0 * a * c * np.cos(theta))

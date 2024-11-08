@@ -1,0 +1,32 @@
+# serializer version: 1
+# name: TestSimulation.test_instantaneous_FOV[1-1]
+  1.0
+# ---
+# name: TestSimulation.test_instantaneous_FOV[1-2]
+  0.5
+# ---
+# name: TestSimulation.test_instantaneous_FOV[2-1]
+  2.0
+# ---
+# name: TestSimulation.test_stretch_contrast_convert_8bit[img_file_path0-None]
+  list([
+    array([[184, 190, 187, ..., 171, 177, 177],
+         [135, 143, 156, ..., 166, 154, 154],
+         [154, 159, 166, ..., 201, 201, 193],
+         ...,
+         [174, 201, 187, ..., 221, 205, 201],
+         [198, 208, 201, ..., 213, 216, 208],
+         [208, 213, 201, ..., 213, 205, 205]], dtype=uint8),
+  ])
+# ---
+# name: TestSimulation.test_stretch_contrast_convert_8bit[img_file_path1-perc1]
+  list([
+    array([[186, 197, 192, ..., 165, 175, 175],
+         [104, 118, 140, ..., 156, 137, 137],
+         [137, 145, 156, ..., 217, 217, 203],
+         ...,
+         [170, 217, 192, ..., 250, 222, 217],
+         [211, 228, 217, ..., 236, 241, 228],
+         [228, 236, 217, ..., 236, 222, 222]], dtype=uint8),
+  ])
+# ---

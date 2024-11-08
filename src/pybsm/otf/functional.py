@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -59,11 +58,12 @@ coordinates (rad^-1) and 'extra_parameters' captures all of relevant parameters
 of the imaging system dictating the particular mode of OTF. The return, H, is
 the OTF response (unitless) for that those spatial frequencies.
 """
+
 # standard library imports
 import inspect
 import os
 import warnings
-from typing import Callable, Tuple
+from typing import Callable
 
 try:
     import cv2
@@ -74,7 +74,7 @@ except ImportError:
 
 # 3rd party imports
 import numpy as np
-from scipy import interpolate
+from scipy import integrate, interpolate
 from scipy.special import jn
 
 # local imports
@@ -108,7 +108,11 @@ r_earth = 6378.164e3  # radius of the earth (m)
 
 
 def circular_aperture_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, lambda0: float, D: float, eta: float  # noqa: N803
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,  # noqa: N803
+    eta: float,
 ) -> np.ndarray:
     """IBSM Equation 3-20.  Obscured circular aperture diffraction OTF.
 
@@ -145,41 +149,29 @@ def circular_aperture_OTF(  # noqa: N802
     r0 = D / lambda0  # diffraction limited cutoff spatial frequency (cy/rad)
 
     # this A term by itself is the unobscured circular aperture OTF
-    a = (2.0 / np.pi) * (  # noqa: N806
-        np.arccos(rho / r0) - (rho / r0) * np.sqrt(1.0 - (rho / r0) ** 2.0)
-    )
-    a = np.nan_to_num(a)  # noqa: N806
+    a = (2.0 / np.pi) * (np.arccos(rho / r0) - (rho / r0) * np.sqrt(1.0 - (rho / r0) ** 2.0))
+    a = np.nan_to_num(a)
 
     # region where (rho < (eta*r0)):
-    b = (2.0 * eta**2.0 / np.pi) * (  # noqa: N806
-        np.arccos(rho / eta / r0)
-        - (rho / eta / r0) * np.sqrt(1.0 - (rho / eta / r0) ** 2.0)
+    b = (2.0 * eta**2.0 / np.pi) * (
+        np.arccos(rho / eta / r0) - (rho / eta / r0) * np.sqrt(1.0 - (rho / eta / r0) ** 2.0)
     )
-    b = np.nan_to_num(b)  # noqa: N806
+    b = np.nan_to_num(b)
 
     # region where (rho < ((1.0-eta)*r0/2.0)):
-    c_1 = -2.0 * eta**2.0 * (rho < (1.0 - eta) * r0 / 2.0)  # noqa: N806
+    c_1 = -2.0 * eta**2.0 * (rho < (1.0 - eta) * r0 / 2.0)
 
     # region where (rho <= ((1.0+eta)*r0/2.0)):
     phi = np.arccos((1.0 + eta**2.0 - (2.0 * rho / r0) ** 2) / 2.0 / eta)
-    c_2 = (  # noqa: N806
-        2.0 * eta * np.sin(phi) / np.pi
-        + (1.0 + eta**2.0) * phi / np.pi
-        - 2.0 * eta**2.0
+    c_2 = 2.0 * eta * np.sin(phi) / np.pi + (1.0 + eta**2.0) * phi / np.pi - 2.0 * eta**2.0
+    c_2 = c_2 - (2.0 * (1.0 - eta**2.0) / np.pi) * np.arctan(
+        (1.0 + eta) * np.tan(phi / 2.0) / (1.0 - eta),
     )
-    c_2 = c_2 - (2.0 * (1.0 - eta**2.0) / np.pi) * np.arctan(  # noqa: N806
-        (1.0 + eta) * np.tan(phi / 2.0) / (1.0 - eta)
-    )
-    c_2 = np.nan_to_num(c_2)  # noqa: N806
-    c_2 = c_2 * (rho <= ((1.0 + eta) * r0 / 2.0))  # noqa: N806
+    c_2 = np.nan_to_num(c_2)
+    c_2 = c_2 * (rho <= ((1.0 + eta) * r0 / 2.0))
 
     # note that c_1+c_2 = C from the IBSM documentation
-
-    if eta > 0.0:
-        H = (a + b + c_1 + c_2) / (1.0 - eta**2.0)  # noqa: N806
-    else:
-        H = a  # noqa: N806
-    return H
+    return (a + b + c_1 + c_2) / (1.0 - eta**2.0) if eta > 0.0 else a
 
 
 def circular_aperture_OTF_with_defocus(  # noqa: N802
@@ -225,9 +217,7 @@ def circular_aperture_OTF_with_defocus(  # noqa: N802
     r0 = D / wavelength  # diffraction limited cutoff spatial frequency (cy/rad)
 
     s = 2.0 * rho / r0
-    w20 = (
-        0.5 / (1.0 + 4.0 * (f / D) ** 2.0) * defocus
-    )  # note that this is the OPD error at
+    w20 = 0.5 / (1.0 + 4.0 * (f / D) ** 2.0) * defocus  # note that this is the OPD error at
     # the edge of the pupil.  w20/wavelength is a commonly used specification
     # (e.g. waves of defocus)
     alpha = 4 * np.pi / wavelength * w20 * s
@@ -250,9 +240,7 @@ def circular_aperture_OTF_with_defocus(  # noqa: N802
     else:
         defocus_otf = 1 / np.pi * (2 * beta - np.sin(2 * beta))
 
-    H = np.nan_to_num(defocus_otf)  # noqa: N806
-
-    return H
+    return np.nan_to_num(defocus_otf)
 
 
 def cte_OTF(  # noqa: N802
@@ -299,21 +287,24 @@ def cte_OTF(  # noqa: N802
     # or cte_n_y and pu is the product of pitch and spatial frequency - either
     # v*p_y or u*p_x
     def cte_OTF_xy(  # noqa: N802
-        n: float, pu: np.ndarray, phases_n: int, cte_eff: float, f: float
+        n: float,
+        pu: np.ndarray,
+        phases_n: int,
+        cte_eff: float,
+        f: float,
     ) -> np.ndarray:
         return np.exp(
-            -1.0 * phases_n * n * (1.0 - cte_eff) * (1.0 - np.cos(2.0 * np.pi * pu / f))
+            -1.0 * phases_n * n * (1.0 - cte_eff) * (1.0 - np.cos(2.0 * np.pi * pu / f)),
         )
 
-    H = cte_OTF_xy(cte_n_x, p_x * u, phases_n, cte_eff, f) * cte_OTF_xy(  # noqa: N806
-        cte_n_y, p_y * v, phases_n, cte_eff, f
-    )
-
-    return H
+    return cte_OTF_xy(cte_n_x, p_x * u, phases_n, cte_eff, f) * cte_OTF_xy(cte_n_y, p_y * v, phases_n, cte_eff, f)
 
 
 def defocus_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, D: float, w_x: float, w_y: float  # noqa: N803
+    u: np.ndarray,
+    v: np.ndarray,
+    w_x: float,
+    w_y: float,
 ) -> np.ndarray:
     """IBSM Equation 3-25.  Gaussian approximation for defocus on the optical axis.
 
@@ -323,8 +314,6 @@ def defocus_OTF(  # noqa: N802
         spatial frequency coordinates (rad^-1)
     :param v:
         spatial frequency coordinates (rad^-1)
-    :param D:
-        effective aperture diameter (m)
     :param w_x:
         the 1/e blur spot radii in the x direction
     :param w_y:
@@ -335,15 +324,15 @@ def defocus_OTF(  # noqa: N802
             OTF at spatial frequency (u,v) (unitless)
 
     """
-    H = np.exp(  # noqa: N806
-        (-np.pi**2.0 / 4.0) * (w_x**2.0 * u**2.0 + w_y**2.0 * v**2.0)
-    )
-
-    return H
+    return np.exp((-(np.pi**2.0) / 4.0) * (w_x**2.0 * u**2.0 + w_y**2.0 * v**2.0))
 
 
 def detector_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, w_x: float, w_y: float, f: float
+    u: np.ndarray,
+    v: np.ndarray,
+    w_x: float,
+    w_y: float,
+    f: float,
 ) -> np.ndarray:
     """A simplified version of IBSM Equation 3-36.
 
@@ -366,9 +355,7 @@ def detector_OTF(  # noqa: N802
         H:
             detector OTF. WARNING: output can be NaN if f is 0
     """
-    H = np.sinc(w_x * u / f) * np.sinc(w_y * v / f)  # noqa: N806
-
-    return H
+    return np.sinc(w_x * u / f) * np.sinc(w_y * v / f)
 
 
 def detector_OTF_with_aggregation(  # noqa: N802
@@ -418,15 +405,16 @@ def detector_OTF_with_aggregation(  # noqa: N802
         phi_v = 2.0 * np.pi * ((i * p_y * v / f) - ((n - 1.0) * p_y * v / 2.0 / f))
         agg_v = agg_v + np.cos(phi_v)
 
-    H = (  # noqa: N806
-        (agg_u * agg_v / n**2) * np.sinc(w_x * u / f) * np.sinc(w_y * v / f)
-    )
-
-    return H
+    return (agg_u * agg_v / n**2) * np.sinc(w_x * u / f) * np.sinc(w_y * v / f)
 
 
 def diffusion_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, alpha: np.ndarray, ald: float, al0: float, f: float
+    u: np.ndarray,
+    v: np.ndarray,
+    alpha: np.ndarray,
+    ald: float,
+    al0: float,
+    f: float,
 ) -> float:
     """IBSM Equation 3-40.  Blur due to the effects of minority carrier diffusion in a CCD sensor.
 
@@ -452,7 +440,9 @@ def diffusion_OTF(  # noqa: N802
     """
 
     def diffusion_OTF_params(  # noqa: N802
-        al: float, alpha: np.ndarray, ald: float
+        al: float,
+        alpha: np.ndarray,
+        ald: float,
     ) -> float:
         return 1.0 - np.exp(-alpha * ald) / (1.0 + alpha * al)
 
@@ -460,15 +450,14 @@ def diffusion_OTF(  # noqa: N802
 
     al_rho = np.sqrt((1.0 / al0**2 + (2.0 * np.pi * rho / f) ** 2) ** (-1))
 
-    H = diffusion_OTF_params(al_rho, alpha, ald) / diffusion_OTF_params(  # noqa: N806
-        al0, alpha, ald
-    )
-
-    return H
+    return diffusion_OTF_params(al_rho, alpha, ald) / diffusion_OTF_params(al0, alpha, ald)
 
 
 def drift_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, a_x: float, a_y: float
+    u: np.ndarray,
+    v: np.ndarray,
+    a_x: float,
+    a_y: float,
 ) -> np.ndarray:
     """IBSM Equation 3-29.  Blur due to constant angular line-of-sight motion during the integration time.
 
@@ -488,13 +477,14 @@ def drift_OTF(  # noqa: N802
             OTF at spatial frequency (u,v) (unitless)
 
     """
-    H = np.sinc(a_x * u) * np.sinc(a_y * v)  # noqa: N806
-
-    return H
+    return np.sinc(a_x * u) * np.sinc(a_y * v)
 
 
 def filter_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, kernel: np.ndarray, ifov: float
+    u: np.ndarray,
+    v: np.ndarray,
+    kernel: np.ndarray,
+    ifov: float,
 ) -> np.ndarray:
     """Returns the OTF of any filter applied to the image (e.g. a sharpening filter).
 
@@ -538,7 +528,7 @@ def filter_OTF(  # noqa: N802
         return (value + nyquist) % (2 * nyquist) - nyquist
 
     # and interpolate up to the desired range
-    H = interpolate.griddata(  # noqa: N806
+    return interpolate.griddata(
         (n_u, n_v),
         xfer_fcn,
         (wrap_val(u, nyquist), wrap_val(v, nyquist)),
@@ -546,11 +536,12 @@ def filter_OTF(  # noqa: N802
         fill_value=0,
     )
 
-    return H
-
 
 def gaussian_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, blur_size_x: float, blur_size_y: float
+    u: np.ndarray,
+    v: np.ndarray,
+    blur_size_x: float,
+    blur_size_y: float,
 ) -> np.ndarray:
     """A real-valued Gaussian OTF.
 
@@ -580,13 +571,14 @@ def gaussian_OTF(  # noqa: N802
     fcX = 1 / blur_size_x  # x-direction cutoff frequency    # noqa: N806
     fcY = 1 / blur_size_y  # y-direction cutoff frequency    # noqa: N806
 
-    H = np.exp(-np.pi * ((u / fcX) ** 2 + (v / fcY) ** 2))  # noqa: N806
-
-    return H
+    return np.exp(-np.pi * ((u / fcX) ** 2 + (v / fcY) ** 2))
 
 
 def jitter_OTF(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, s_x: float, s_y: float
+    u: np.ndarray,
+    v: np.ndarray,
+    s_x: float,
+    s_y: float,
 ) -> np.ndarray:
     """IBSM Equation 3-28.  Blur due to random line-of-sight motion that occurs at high.
 
@@ -609,11 +601,7 @@ def jitter_OTF(  # noqa: N802
             OTF at spatial frequency (u,v) (unitless)
 
     """
-    H = np.exp(  # noqa: N806
-        (-2.0 * np.pi**2.0) * (s_x**2.0 * u**2.0 + s_y**2.0 * v**2.0)
-    )
-
-    return H
+    return np.exp((-2.0 * np.pi**2.0) * (s_x**2.0 * u**2.0 + s_y**2.0 * v**2.0))
 
 
 def polychromatic_turbulence_OTF(  # noqa: N802
@@ -628,7 +616,7 @@ def polychromatic_turbulence_OTF(  # noqa: N802
     cn2_at_1m: float,
     int_time: float,
     aircraft_speed: float,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """IBSM Eqn 3.9. Returns a polychromatic turbulence MTF.
 
     Returns a polychromatic turbulence MTF based on the Hufnagel-Valley turbulence profile
@@ -682,23 +670,36 @@ def polychromatic_turbulence_OTF(  # noqa: N802
     r0_at_1um = coherence_diameter(1.0e-6, z_path, cn2)
 
     def r0_function(wav: float) -> float:
-        return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)  # noqa: E731
+        return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)
 
     r0_band = weighted_by_wavelength(wavelengths, weights, r0_function)
 
     # calculate the turbulence OTF
     turb_function = lambda wavelengths: wind_speed_turbulence_OTF(  # noqa: E731
-        u, v, wavelengths, D, r0_function(wavelengths), int_time, aircraft_speed
+        u,
+        v,
+        wavelengths,
+        D,
+        r0_function(wavelengths),
+        int_time,
+        aircraft_speed,
     )
     turbulence_OTF = weighted_by_wavelength(  # noqa: N806
-        wavelengths, weights, turb_function
+        wavelengths,
+        weights,
+        turb_function,
     )
 
     return turbulence_OTF, r0_band
 
 
 def tdi_OTF(  # noqa: N802
-    u_or_v: np.ndarray, w: float, n_tdi: float, phases_n: int, beta: float, f: float
+    u_or_v: np.ndarray,
+    w: float,
+    n_tdi: float,
+    phases_n: int,
+    beta: float,
+    f: float,
 ) -> np.ndarray:
     """IBSM Equation 3-38.  Blur due to a mismatch between the time-delay-integration clocking rate and image motion.
 
@@ -721,17 +722,14 @@ def tdi_OTF(  # noqa: N802
         H:
             tdi OTF
     """
-    xx = (
-        w * u_or_v / (f * beta)
-    )  # this occurs twice, so we'll pull it out to simplify the
+    xx = w * u_or_v / (f * beta)  # this occurs twice, so we'll pull it out to simplify the
     # the code
 
     exp_sum = 0.0
     iind = np.arange(0, n_tdi * phases_n)  # goes from 0 to tdiN*phases_n-1
     for ii in iind:
         exp_sum = exp_sum + np.exp(-2.0j * np.pi * xx * (beta - 1.0) * ii)
-    H = np.sinc(xx) * exp_sum / (n_tdi * phases_n)  # noqa: N806
-    return H
+    return np.sinc(xx) * exp_sum / (n_tdi * phases_n)
 
 
 def turbulence_OTF(  # noqa: N802
@@ -766,12 +764,9 @@ def turbulence_OTF(  # noqa: N802
             Output can be nan if lambda0 and alpha are 0.
     """
     rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
-    H = np.exp(  # noqa: N806
-        -3.44
-        * (lambda0 * rho / r0) ** (5.0 / 3.0)
-        * (1 - alpha * (lambda0 * rho / D) ** (1.0 / 3.0))
+    return np.exp(
+        -3.44 * (lambda0 * rho / r0) ** (5.0 / 3.0) * (1 - alpha * (lambda0 * rho / D) ** (1.0 / 3.0)),
     )
-    return H
 
 
 def wavefront_OTF(  # noqa: N802
@@ -816,13 +811,15 @@ def wavefront_OTF(  # noqa: N802
 
     """
     auto_c = np.exp(-(lambda0**2) * ((u / L_x) ** 2 + (v / L_y) ** 2))
-    H = np.exp(-pv * (1 - auto_c))  # noqa: N806
 
-    return H
+    return np.exp(-pv * (1 - auto_c))
 
 
 def wavefront_OTF_2(  # noqa: N802
-    u: np.ndarray, v: np.ndarray, cutoff: float, w_rms: float
+    u: np.ndarray,
+    v: np.ndarray,
+    cutoff: float,
+    w_rms: float,
 ) -> np.ndarray:
     """This function is an alternative to wavefront_OTF. MTF due to wavefront errors.
 
@@ -851,9 +848,7 @@ def wavefront_OTF_2(  # noqa: N802
     """
     v = np.sqrt(u**2.0 + v**2.0) / cutoff
 
-    H = 1.0 - ((w_rms / 0.18) ** 2.0) * (1.0 - 4.0 * (v - 0.5) ** 2.0)  # noqa: N806
-
-    return H
+    return 1.0 - ((w_rms / 0.18) ** 2.0) * (1.0 - 4.0 * (v - 0.5) ** 2.0)
 
 
 def wind_speed_turbulence_OTF(  # noqa: N802
@@ -894,10 +889,7 @@ def wind_speed_turbulence_OTF(  # noqa: N802
         Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * t_d / r0)
-    H = weight * turbulence_OTF(u, v, lambda0, D, r0, 0.5) + (  # noqa: N806
-        1 - weight
-    ) * turbulence_OTF(u, v, lambda0, D, r0, 0.0)
-    return H
+    return weight * turbulence_OTF(u, v, lambda0, D, r0, 0.5) + (1 - weight) * turbulence_OTF(u, v, lambda0, D, r0, 0.0)
 
 
 # ----------------------------- END OTF Models -------------------------------
@@ -928,7 +920,7 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     """
     if not is_usable:
         raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
         )
     # transform the psf
     psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
@@ -947,13 +939,11 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     # crop function for the desired kernel size
     get_middle = lambda x, k_size: x[  # noqa: E731
         tuple(
-            [
-                slice(
-                    int(np.floor(d / 2 - k_size / 2)),
-                    int(np.ceil(d / 2 + k_size / 2)),
-                )
-                for d in x.shape
-            ]
+            slice(
+                int(np.floor(d / 2 - k_size / 2)),
+                int(np.ceil(d / 2 + k_size / 2)),
+            )
+            for d in x.shape
         )
     ]
 
@@ -964,13 +954,13 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
             break
 
     # make up for cropped out portions of the psf
-    psf_out = psf_out / psf_out.sum()  # bug fix 3 April 2020
-
-    return psf_out
+    return psf_out / psf_out.sum()  # bug fix 3 April 2020
 
 
 def weighted_by_wavelength(
-    wavelengths: np.ndarray, weights: np.ndarray, my_function: Callable
+    wavelengths: np.ndarray,
+    weights: np.ndarray,
+    my_function: Callable,
 ) -> np.ndarray:
     """Returns a wavelength weighted composite array based on my_function.
 
@@ -1043,15 +1033,15 @@ def coherence_diameter(lambda0: float, z_path: np.ndarray, cn2: np.ndarray) -> f
         r0 can be infinite if z_path is one element or if cn2 is one element and 0.
     """
     # the path integral of the structure parameter term
-    sp_integral = np.trapz(cn2 * (z_path / z_path.max()) ** (5.0 / 3.0), z_path)
+    sp_integral = integrate.trapezoid(cn2 * (z_path / z_path.max()) ** (5.0 / 3.0), z_path)
 
-    r0 = (sp_integral * 0.423 * (2 * np.pi / lambda0) ** 2) ** (-3.0 / 5.0)
-
-    return r0
+    return (sp_integral * 0.423 * (2 * np.pi / lambda0) ** 2) ** (-3.0 / 5.0)
 
 
 def hufnagel_valley_turbulence_profile(
-    h: np.ndarray, v: float, cn2_at_1m: float
+    h: np.ndarray,
+    v: float,
+    cn2_at_1m: float,
 ) -> np.ndarray:
     """Replaces IBSM Equations 3-6 through 3-8.  The Hufnagel-Valley Turbulence profile.
 
@@ -1077,13 +1067,11 @@ def hufnagel_valley_turbulence_profile(
             refractive index structure parameter as a function of height
             (m^(-2/3))
     """
-    cn2 = (
+    return (
         5.94e-53 * (v / 27.0) ** 2.0 * h**10.0 * np.exp(-h / 1000.0)
         + 2.7e-16 * np.exp(-h / 1500.0)
         + cn2_at_1m * np.exp(-h / 100.0)
     )
-
-    return cn2
 
 
 def object_domain_defocus_radii(
@@ -1108,8 +1096,7 @@ def object_domain_defocus_radii(
         ZeroDivisionError:
             if R or R0 is 0
     """
-    w = 0.62 * D * (1.0 / R - 1.0 / R0)
-    return w
+    return 0.62 * D * (1.0 / R - 1.0 / R0)
 
 
 def dark_current_from_density(jd: float, w_x: float, w_y: float) -> float:
@@ -1132,8 +1119,7 @@ def dark_current_from_density(jd: float, w_x: float, w_y: float) -> float:
             dark current electron rate (e-/s); for TDI systems, just multiply
             the result by the number of TDI stages
     """
-    jde = jd * w_x * w_y / qc  # recall that qc is defined as charge of an electron
-    return jde
+    return jd * w_x * w_y / qc  # recall that qc is defined as charge of an electron
 
 
 def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa: N803
@@ -1154,8 +1140,7 @@ def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa:
         ZeroDivisionError:
             if slant_range is 0
     """
-    w = 0.62 * D * dz / (f**2.0)
-    return w
+    return 0.62 * D * dz / (f**2.0)
 
 
 def slice_otf(otf: np.ndarray, ang: float) -> np.ndarray:
@@ -1176,12 +1161,12 @@ def slice_otf(otf: np.ndarray, ang: float) -> np.ndarray:
     r = np.arange(0.0, 1.0, u[1] - u[0])
 
     f = interpolate.interp2d(u, v, otf)
-    o_slice = np.diag(f(r * np.cos(ang), r * np.sin(ang)))
+
     # the interpolator, f, calculates a bunch of points that we don't really
     # need since everything but the diagonal is thrown away.  It works but
     # it's inefficient.
 
-    return o_slice
+    return np.diag(f(r * np.cos(ang), r * np.sin(ang)))
 
 
 def apply_otf_to_image(
@@ -1191,7 +1176,7 @@ def apply_otf_to_image(
     otf: np.ndarray,
     df: float,
     ifov: float,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Applies OTF to ideal reference image to simulate real imaging.
 
     We assume that 'ref_img' is an ideal, high-resolution view of the world
@@ -1280,7 +1265,7 @@ def apply_otf_to_image(
     # 2*arctan(ref_gsd/2/ref_range).
     if not is_usable:
         raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
         )
     psf = otf_to_psf(otf, df, 2 * np.arctan(ref_gsd / 2 / ref_range))
 
@@ -1347,14 +1332,16 @@ def common_OTFs(  # noqa: N802
 
     # aperture OTF
     ap_function = lambda wavelengths: circular_aperture_OTF(  # noqa: E731
-        uu, vv, wavelengths, sensor.D, sensor.eta
+        uu,
+        vv,
+        wavelengths,
+        sensor.D,
+        sensor.eta,
     )
     otf.ap_OTF = weighted_by_wavelength(mtf_wavelengths, mtf_weights, ap_function)
 
     # turbulence OTF
-    if (
-        scenario.cn2_at_1m > 0.0
-    ):  # this option allows you to turn off turbulence completely
+    if scenario.cn2_at_1m > 0.0:  # this option allows you to turn off turbulence completely
         # by setting cn2 at the ground level to 0
         otf.turb_OTF, otf.r0_band = polychromatic_turbulence_OTF(
             uu,
@@ -1406,21 +1393,15 @@ def common_OTFs(  # noqa: N802
         otf.filter_OTF = np.ones(uu.shape)
 
     # system OTF
-    otf.system_OTF = (
-        otf.ap_OTF
-        * otf.turb_OTF
-        * otf.det_OTF
-        * otf.jit_OTF
-        * otf.drft_OTF
-        * otf.wav_OTF
-        * otf.filter_OTF
-    )
+    otf.system_OTF = otf.ap_OTF * otf.turb_OTF * otf.det_OTF * otf.jit_OTF * otf.drft_OTF * otf.wav_OTF * otf.filter_OTF
 
     return otf
 
 
 def resample_2D(  # noqa: N802
-    img_in: np.ndarray, dx_in: float, dx_out: float
+    img_in: np.ndarray,
+    dx_in: float,
+    dx_out: float,
 ) -> np.ndarray:
     """Resample an image.
 
@@ -1446,10 +1427,9 @@ def resample_2D(  # noqa: N802
     """
     if not is_usable:
         raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'."
+            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
         )
     new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
     new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
-    img_out = cv2.resize(img_in, (new_x, new_y))
 
-    return img_out
+    return cv2.resize(img_in, (new_x, new_y))

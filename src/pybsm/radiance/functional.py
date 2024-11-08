@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -19,15 +18,16 @@ of radiance to photons. Anything material with a non-zero temperature emits
 electromagnetic radiation according to Planck's law and its temperature,
 spectral emissivity.
 """
+
 # standard library imports
 import inspect
 import logging
 import os
 import warnings
-from typing import Tuple
 
 # 3rd party imports
 import numpy as np
+from scipy import integrate
 
 # local imports
 from pybsm import noise
@@ -55,7 +55,9 @@ qc = 1.60217662e-19  # charge of an electron (coulombs)
 
 
 def at_focal_plane_irradiance(
-    D: float, f: float, L: np.ndarray  # noqa: N803
+    D: float,  # noqa: N803
+    f: float,
+    L: np.ndarray,  # noqa: N803
 ) -> np.ndarray:
     """Converts pupil plane radiance to focal plane irradiance for an extended source.
 
@@ -87,12 +89,11 @@ def at_focal_plane_irradiance(
     """
     if L.size == 0:
         warnings.warn(
-            UserWarning("Input array is empty. Expect output to be empty"), stacklevel=2
+            UserWarning("Input array is empty. Expect output to be empty"),
+            stacklevel=2,
         )
 
-    E = L * np.pi / (1.0 + 4.0 * (f / D) ** 2.0)  # noqa: N806
-
-    return E
+    return L * np.pi / (1.0 + 4.0 * (f / D) ** 2.0)
 
 
 def blackbody_radiance(lambda0: np.ndarray, T: float) -> np.ndarray:  # noqa: N803
@@ -112,14 +113,11 @@ def blackbody_radiance(lambda0: np.ndarray, T: float) -> np.ndarray:  # noqa: N8
     # lambda0 = lambda0+1e-20
     if lambda0.size == 0:
         warnings.warn(
-            UserWarning("Input array is empty. Expect output to be empty"), stacklevel=2
+            UserWarning("Input array is empty. Expect output to be empty"),
+            stacklevel=2,
         )
 
-    Lbb = (2.0 * hc * cc**2.0 / lambda0**5.0) * (  # noqa: N806
-        np.exp(hc * cc / (lambda0 * kc * T)) - 1.0
-    ) ** (-1.0)
-
-    return Lbb
+    return (2.0 * hc * cc**2.0 / lambda0**5.0) * (np.exp(hc * cc / (lambda0 * kc * T)) - 1.0) ** (-1.0)
 
 
 def check_well_fill(total_photoelectrons: float, max_fill: float) -> float:
@@ -176,14 +174,11 @@ def cold_shield_self_emission(
     """
     if wavelengths.size == 0:
         warnings.warn(
-            UserWarning("Input array is empty. Expect output to be empty"), stacklevel=2
+            UserWarning("Input array is empty. Expect output to be empty"),
+            stacklevel=2,
         )
     # coldshield solid angle x blackbody emitted radiance
-    cold_shield_E = (  # noqa: N806
-        np.pi - np.pi / (4.0 * (f / D) ** 2.0 + 1.0)
-    ) * blackbody_radiance(wavelengths, cold_shield_temperature)
-
-    return cold_shield_E  # noqa: N806
+    return (np.pi - np.pi / (4.0 * (f / D) ** 2.0 + 1.0)) * blackbody_radiance(wavelengths, cold_shield_temperature)
 
 
 def cold_stop_self_emission(
@@ -218,14 +213,16 @@ def cold_stop_self_emission(
     """
     if wavelengths.size == 0:
         warnings.warn(
-            UserWarning("Input array is empty. Expect output to be empty"), stacklevel=2
+            UserWarning("Input array is empty. Expect output to be empty"),
+            stacklevel=2,
         )
 
     cold_stop_L = cold_filter_emissivity * blackbody_radiance(  # noqa: N806
-        wavelengths, cold_filter_temperature
+        wavelengths,
+        cold_filter_temperature,
     )
-    cold_stop_E = at_focal_plane_irradiance(D, f, cold_stop_L)  # noqa: N806
-    return cold_stop_E
+
+    return at_focal_plane_irradiance(D, f, cold_stop_L)
 
 
 def focal_plane_integrated_irradiance(
@@ -272,14 +269,9 @@ def focal_plane_integrated_irradiance(
         E:
             integrated irradiance (W/m^2) at the focal plane
     """
-    L = (  # noqa: N806
-        t_opt * L
-        + e_opt * blackbody_radiance(lambda0, optics_temperature) * d_lambda
-        + L_s
-    )  # noqa: N806
-    E = at_focal_plane_irradiance(D, f, L)  # noqa: N806
+    L = t_opt * L + e_opt * blackbody_radiance(lambda0, optics_temperature) * d_lambda + L_s  # noqa: N806
 
-    return E
+    return at_focal_plane_irradiance(D, f, L)
 
 
 def optics_self_emission(
@@ -319,16 +311,15 @@ def optics_self_emission(
     """
     if wavelengths.size == 0:
         warnings.warn(
-            UserWarning("Input array is empty. Expect output to be empty"), stacklevel=2
+            UserWarning("Input array is empty. Expect output to be empty"),
+            stacklevel=2,
         )
 
     optics_L = (  # noqa: N806
-        cold_filter_transmission
-        * optics_emissivity
-        * blackbody_radiance(wavelengths, optics_temperature)
+        cold_filter_transmission * optics_emissivity * blackbody_radiance(wavelengths, optics_temperature)
     )
-    optics_E = at_focal_plane_irradiance(D, f, optics_L)  # noqa: N806
-    return optics_E
+
+    return at_focal_plane_irradiance(D, f, optics_L)
 
 
 def photon_detection_rate(
@@ -336,7 +327,7 @@ def photon_detection_rate(
     w_x: float,
     w_y: float,
     wavelengths: np.ndarray,
-    qe: np.ndarray,  # noqa: N806
+    qe: np.ndarray,
 ) -> np.ndarray:
     """IBSM Equation 3-42 with dark current, integration time, and tdi separated out.
 
@@ -359,9 +350,8 @@ def photon_detection_rate(
         dN:
             array of photoelectrons/wavelength/second (e-/m)
     :NOTE:
-        To calculate total integrated photoelectrons, N = td*n_tdi*np.trapz(dN,
-        wavelens) where td is integration time (s) and n_tdi is the number of
-        tdi stages (optional).
+        To calculate total integrated photoelectrons, N = td*n_tdi*integrate.trapezoid(dN, wavelens) where td is
+        integration time (s) and n_tdi is the number of tdi stages (optional).
     """
     if E.size == 0 or wavelengths.size == 0 or qe.size == 0:
         warnings.warn(
@@ -369,8 +359,7 @@ def photon_detection_rate(
             stacklevel=2,
         )
 
-    dN = (wavelengths / (hc * cc)) * qe * w_x * w_y * E  # noqa: N806
-    return dN
+    return (wavelengths / (hc * cc)) * qe * w_x * w_y * E
 
 
 def photon_detector_SNR(  # noqa: N802
@@ -417,7 +406,9 @@ def photon_detector_SNR(  # noqa: N802
         )
     )
     snr.qe = resample_by_wavelength(
-        sensor.qe_wavelengths, sensor.qe, radiance_wavelengths
+        sensor.qe_wavelengths,
+        sensor.qe,
+        radiance_wavelengths,
     )
 
     # for infrared systems, calculate FPA irradiance contributions from within
@@ -480,7 +471,8 @@ def photon_detector_SNR(  # noqa: N802
     # check to see that well fill is within a desirable range and, if not,
     # scale back the integration time and recalculate the total photon counts
     scale_factor = check_well_fill(
-        np.max([snr.tgt_n, snr.bkg_n]), sensor.max_well_fill * sensor.max_n
+        np.max([snr.tgt_n, snr.bkg_n]),
+        sensor.max_well_fill * sensor.max_n,
     )
     snr.tgt_n = scale_factor * snr.tgt_n
     snr.bkg_n = scale_factor * snr.bkg_n
@@ -503,7 +495,7 @@ def photon_detector_SNR(  # noqa: N802
     snr.quantization_noise = noise.quantization_noise(sensor.max_n, sensor.bit_depth)
     # photon noise due to self emission in the optical system
     snr.self_emission_noise = np.sqrt(
-        np.trapz(
+        integrate.trapezoid(
             photon_detection_rate(
                 snr.other_irradiance,
                 sensor.w_x,
@@ -514,16 +506,13 @@ def photon_detector_SNR(  # noqa: N802
             radiance_wavelengths,
         )
         * snr.int_time
-        * sensor.n_tdi
+        * sensor.n_tdi,
     )
 
     # note that signal_noise includes sceneNoise, dark current noise, and self
     # emission noise
     snr.total_noise = np.sqrt(
-        snr.signal_noise**2
-        + snr.quantization_noise**2
-        + sensor.read_noise**2
-        + np.sum(sensor.other_noise**2)
+        snr.signal_noise**2 + snr.quantization_noise**2 + sensor.read_noise**2 + np.sum(sensor.other_noise**2),
     )
 
     # calculate signal-to-noise ratio
@@ -533,8 +522,11 @@ def photon_detector_SNR(  # noqa: N802
 
 
 def reflectance_to_photoelectrons(
-    atm: np.ndarray, sensor: Sensor, int_time: float, target_temp: int = 300
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    atm: np.ndarray,
+    sensor: Sensor,
+    int_time: float,
+    target_temp: int = 300,  # noqa: ARG001
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Provides a mapping between reflectance on the ground and photoelectrons collected in the sensor well.
 
     Provides a mapping between reflectance (0 to 1 in 100 steps) on the
@@ -604,7 +596,10 @@ def reflectance_to_photoelectrons(
         # itself generates radiative emissions. So, we account for these
         # emissions here. This is only relevant in the thermal infrared bands.
         other_irradiance = cold_shield_self_emission(
-            wavelengths, sensor.cold_shield_temperature, sensor.D, sensor.f
+            wavelengths,
+            sensor.cold_shield_temperature,
+            sensor.D,
+            sensor.f,
         )
         other_irradiance = other_irradiance + optics_self_emission(
             wavelengths,
@@ -622,7 +617,7 @@ def reflectance_to_photoelectrons(
             sensor.f,
         )
 
-        tgt_n_rate, tgt_FPA_irradiance, weights = signal_rate(  # noqa: N806
+        tgt_n_rate, _, weights = signal_rate(
             wavelengths,
             target_radiance,
             opt_trans,
@@ -640,8 +635,7 @@ def reflectance_to_photoelectrons(
     sat = pe.max() / sensor.max_n
     if sat > 1:
         logging.info(
-            f"Reducing integration time from {int_time} to {int_time/sat}"
-            " to avoid overexposure"
+            f"Reducing integration time from {int_time} to {int_time/sat} to avoid overexposure",
         )
         pe = pe / sat
 
@@ -664,7 +658,7 @@ def signal_rate(
     qe: np.ndarray,
     other_irradiance: np.ndarray,
     dark_current: float,
-) -> Tuple[float, np.ndarray, np.ndarray]:
+) -> tuple[float, np.ndarray, np.ndarray]:
     """For semiconductor-based detectors, returns the signal rate generated at the output as well as other quantities.
 
     For semiconductor-based detectors, returns the signal rate (total
@@ -725,23 +719,28 @@ def signal_rate(
 
     # get at FPA spectral irradiance
     tgt_FPA_irradiance = (  # noqa: N806
-        optical_transmission * at_focal_plane_irradiance(D, f, target_radiance)
-        + other_irradiance
+        optical_transmission * at_focal_plane_irradiance(D, f, target_radiance) + other_irradiance
     )
 
     # convert spectral irradiance to spectral photoelectron rate
     tgt_dN = photon_detection_rate(  # noqa: N806
-        tgt_FPA_irradiance, w_x, w_y, wavelengths, qe
+        tgt_FPA_irradiance,
+        w_x,
+        w_y,
+        wavelengths,
+        qe,
     )
 
     # calculate total detected target and background photoelectron rate
-    tgt_rate = np.trapz(tgt_dN, wavelengths) + dark_current
+    tgt_rate = integrate.trapezoid(tgt_dN, wavelengths) + dark_current
 
     return tgt_rate, tgt_FPA_irradiance, tgt_dN
 
 
 def total_radiance(
-    atm: np.ndarray, reflectance: float, temperature: float
+    atm: np.ndarray,
+    reflectance: float,
+    temperature: float,
 ) -> np.ndarray:
     """Calculates total spectral radiance at the aperture for a object of interest.
 
@@ -767,17 +766,16 @@ def total_radiance(
         total spectral radiance.
     """
     db_reflectance = 0.15  # object reflectance used in the database
-    radiance = (
+
+    return (
         atm[:, 2]
         + (1.0 - reflectance) * blackbody_radiance(atm[:, 0], temperature) * atm[:, 1]
         + atm[:, 4]
         + atm[:, 5] * (reflectance / db_reflectance)
     )
 
-    return radiance
 
-
-def giqe_radiance(atm: np.ndarray, is_emissive: int) -> Tuple[np.ndarray, np.ndarray]:
+def giqe_radiance(atm: np.ndarray, is_emissive: int) -> tuple[np.ndarray, np.ndarray]:
     """This function provides target and background spectral radiance as defined by the GIQE.
 
     :param atm:
@@ -834,7 +832,9 @@ def giqe_radiance(atm: np.ndarray, is_emissive: int) -> Tuple[np.ndarray, np.nda
 
 
 def resample_by_wavelength(
-    wavelengths: np.ndarray, values: np.ndarray, new_wavelengths: np.ndarray
+    wavelengths: np.ndarray,
+    values: np.ndarray,
+    new_wavelengths: np.ndarray,
 ) -> np.ndarray:
     """Resamples arrays that are input as a function of wavelength.
 
@@ -855,5 +855,4 @@ def resample_by_wavelength(
             if the length of wavelengths array and values array are
             not equal
     """
-    new_values = np.interp(new_wavelengths, wavelengths, values, 0.0, 0.0)
-    return new_values
+    return np.interp(new_wavelengths, wavelengths, values, 0.0, 0.0)

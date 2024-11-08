@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The Python Based Sensor Model (pyBSM) is a collection of electro-optical camera modeling functions.
 
 Developed by the Air Force Research Laboratory, Sensors Directorate.
@@ -13,6 +12,7 @@ Public release approval for version 0.1: 88ABW-2018-5226
 
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
+
 # standard library imports
 import inspect
 import os
@@ -56,8 +56,7 @@ def noise_gain(kernel: np.ndarray) -> float:
     if np.sum(kernel) != 1.0:
         raise ValueError("Kernel does not sum to 1")
 
-    ng = np.sqrt(np.sum(np.sum(kernel**2)))
-    return ng
+    return np.sqrt(np.sum(np.sum(kernel**2)))
 
 
 def quantization_noise(pe_range: float, bit_depth: float) -> float:
@@ -80,5 +79,4 @@ def quantization_noise(pe_range: float, bit_depth: float) -> float:
         output can be nan if pe_range is 0
         output can be inf if bit_depth is 0
     """
-    sigma_q = pe_range / (np.sqrt(12) * (2.0**bit_depth - 1.0))
-    return sigma_q
+    return pe_range / (np.sqrt(12) * (2.0**bit_depth - 1.0))
