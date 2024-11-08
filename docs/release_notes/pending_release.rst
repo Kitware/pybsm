@@ -4,6 +4,9 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+* Exposed parameter allowing for random seed to be set
+  ensuring reproducibility
+
 Documentation
 
 * Updated a few links from ``GitLab`` to ``GitHub``.

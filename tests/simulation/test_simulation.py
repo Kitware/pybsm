@@ -1,6 +1,7 @@
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 import pytest
@@ -152,15 +153,25 @@ class TestSimulation:
         assert output == snapshot
 
     @pytest.mark.parametrize(
-        ("img_file_path", "gsd", "altitude", "true_img_file_path", "blur_img_file_path", "noisy_img_file_path"),
+        ("img_file_path", "gsd", "altitude", "rng", "true_img_file_path", "blur_img_file_path", "noisy_img_file_path"),
         [
             (
                 IMAGE_FILE_PATH,
                 3.19 / 160.0,
                 1000,
-                BASE_FILE_PATH / "tests" / "data" / "test_simulate_true_img.png",
-                BASE_FILE_PATH / "tests" / "data" / "test_simulate_blur_img.png",
-                BASE_FILE_PATH / "tests" / "data" / "test_simulate_noisy_img.png",
+                2,
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_true_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_blur_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_noisy_img.png",
+            ),
+            (
+                IMAGE_FILE_PATH,
+                3.19 / 160.0,
+                1000,
+                np.random.default_rng(2),
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_true_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_blur_img.png",
+                BASE_FILE_PATH / "tests" / "data" / "test_simulate_provided_noisy_img.png",
             ),
         ],
     )
@@ -169,6 +180,7 @@ class TestSimulation:
         img_file_path: str,
         gsd: float,
         altitude: int,
+        rng: Union[np.random.Generator, int],
         true_img_file_path: Path,
         blur_img_file_path: Path,
         noisy_img_file_path: Path,
@@ -179,10 +191,40 @@ class TestSimulation:
         expected_noisy_img = np.array(Image.open(noisy_img_file_path))
         ref_img = simulation.RefImage(img, gsd)
         sensor, scenario = ref_img.estimate_capture_parameters(altitude=altitude)
-        true_img, blur_img, noisy_img = simulation.simulate_image(ref_img, sensor, scenario)
+        true_img, blur_img, noisy_img = simulation.simulate_image(ref_img, sensor, scenario, rng)
         true_img = simulation.stretch_contrast_convert_8bit(true_img)
         blur_img = simulation.stretch_contrast_convert_8bit(blur_img)
         noisy_img = simulation.stretch_contrast_convert_8bit(noisy_img)
-        assert np.isclose(true_img.all(), expected_true_img.all())
-        assert np.isclose(blur_img.all(), expected_blur_img.all())
-        assert np.isclose(noisy_img.all(), expected_noisy_img.all())
+        assert np.array_equal(true_img, expected_true_img)
+        assert np.array_equal(blur_img, expected_blur_img)
+        assert np.array_equal(noisy_img, expected_noisy_img)
+
+    @pytest.mark.parametrize(
+        (
+            "img_file_path",
+            "gsd",
+            "altitude",
+        ),
+        [
+            (
+                IMAGE_FILE_PATH,
+                3.19 / 160.0,
+                1000,
+            ),
+        ],
+    )
+    def test_simulate_image_random_seeds(
+        self,
+        img_file_path: str,
+        gsd: float,
+        altitude: int,
+    ) -> None:
+        img = np.array(Image.open(img_file_path))
+        ref_img = simulation.RefImage(img, gsd)
+        sensor, scenario = ref_img.estimate_capture_parameters(altitude=altitude)
+        _, _, noisy_img_1 = simulation.simulate_image(ref_img, sensor, scenario, rng=None)
+        _, _, noisy_img_2 = simulation.simulate_image(ref_img, sensor, scenario, rng=None)
+        noisy_img_1 = simulation.stretch_contrast_convert_8bit(noisy_img_1)
+        noisy_img_2 = simulation.stretch_contrast_convert_8bit(noisy_img_2)
+        assert not np.array_equal(noisy_img_1, noisy_img_2)
+        assert np.isclose(noisy_img_1.all(), noisy_img_2.all())
