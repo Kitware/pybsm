@@ -18,7 +18,7 @@ import inspect
 import logging
 import os
 import warnings
-from typing import Optional
+from typing import Optional, Union
 
 # 3rd party imports
 import numpy as np
@@ -147,6 +147,7 @@ def simulate_image(
     ref_img: RefImage,
     sensor: Sensor,
     scenario: Scenario,
+    rng: Optional[Union[np.random.Generator, int]] = 1,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates radiometrically accurate imagery collected through a sensor.
 
@@ -169,6 +170,9 @@ def simulate_image(
     :param scenario:
         Specification of the deployment of the virtual sensor within the world
         relative to the target.
+    :type rng: np.random.Generator or int
+    :param rng:
+
 
     :return:
         true_img:
@@ -190,6 +194,8 @@ def simulate_image(
     :raises: ValueError if cutoff Frequency matrix u_rng is not monotonically
              increasing
     """
+    pybsm_rng = np.random.default_rng(rng)
+
     # integration time (s)
     int_time = sensor.int_time
 
@@ -263,11 +269,10 @@ def simulate_image(
         ifov,
     )
 
-    rng = np.random.default_rng()
     # add photon noise (all sources) and dark current noise
-    poisson_noisy_img = rng.poisson(lam=blur_img)
+    poisson_noisy_img = pybsm_rng.poisson(lam=blur_img)
     # add any noise from Gaussian sources, e.g. read_noise, quantizaiton
-    noisy_img = rng.normal(poisson_noisy_img, g_noise)
+    noisy_img = pybsm_rng.normal(poisson_noisy_img, g_noise)
 
     if noisy_img.shape[0] > ref_img.img.shape[0]:
         logging.warn(
