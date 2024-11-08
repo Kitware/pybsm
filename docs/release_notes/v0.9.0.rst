@@ -1,0 +1,30 @@
+v0.9.0
+======
+
+Updated a large amount of linting and type hinting to support
+a new ruff configuration, brought the test coverage up to near
+100%, and finally exposed the random seed for randomness to
+ensure reproducibility.
+
+Updates / New Features
+----------------------
+
+* Exposed parameter allowing for random seed to be set
+  ensuring reproducibility
+
+Documentation
+
+* Updated a few links from ``GitLab`` to ``GitHub``.
+
+* Updated Design Principles link to new URL.
+
+CI/CD
+
+* Added test coverage for simulation/functional.py
+
+* Added test coverage for metrics/functional.py
+
+Fixes
+-----
+
+* Updated and applied ruff configuration.
