@@ -24,11 +24,11 @@ class TestGeospatial:
             geospatial.nadir_angle(h_target, h_sensor, slant_range)
 
     @pytest.mark.parametrize(
-        ("h_target", "h_sensor", "slant_range", "expected"),
+        ("h_target", "h_sensor", "slant_range"),
         [
-            (1.0, 0.0, 1.0, 3.141592653589793),
-            (0.0, 1.0, 1.0, 0.0),
-            (1.0, 1.0, 1.0, 1.5707962484024436),
+            (1.0, 0.0, 1.0),
+            (0.0, 1.0, 1.0),
+            (1.0, 1.0, 1.0),
         ],
     )
     def test_nadir_angle(
@@ -36,11 +36,11 @@ class TestGeospatial:
         h_target: float,
         h_sensor: float,
         slant_range: float,
-        expected: float,
+        snapshot: SnapshotAssertion,
     ) -> None:
         """Test nadir_angle with normal inputs and expected outputs."""
         output = geospatial.nadir_angle(h_target, h_sensor, slant_range)
-        assert np.isclose(output, expected)
+        assert snapshot == output
 
     @pytest.mark.parametrize(
         ("h_target", "h_sensor", "slant_range"),

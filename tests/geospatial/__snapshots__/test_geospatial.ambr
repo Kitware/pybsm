@@ -20,3 +20,12 @@
 # name: TestGeospatial.test_ground_sample_distance[2.0-2.5]
   5.0
 # ---
+# name: TestGeospatial.test_nadir_angle[0.0-1.0-1.0]
+  0.0
+# ---
+# name: TestGeospatial.test_nadir_angle[1.0-0.0-1.0]
+  3.141592653589793
+# ---
+# name: TestGeospatial.test_nadir_angle[1.0-1.0-1.0]
+  1.5707962484024436
+# ---
