@@ -51,18 +51,13 @@ class TestNoise:
         assert np.isinf(output)
 
     @pytest.mark.parametrize(
-        ("pe_range", "bit_depth", "expected"),
+        ("pe_range", "bit_depth"),
         [
-            (0.0, 1.0, 0.0),
-            (1.0, 1.0, 0.2886751345948129),
+            (0.0, 1.0),
+            (1.0, 1.0),
         ],
     )
-    def test_quantization_noise(
-        self,
-        pe_range: float,
-        bit_depth: float,
-        expected: float,
-    ) -> None:
+    def test_quantization_noise(self, pe_range: float, bit_depth: float, snapshot: SnapshotAssertion) -> None:
         """Test quantization_noise with normal inputs and expected outputs."""
         output = noise.quantization_noise(pe_range, bit_depth)
-        assert np.isclose(output, expected)
+        assert output == snapshot
