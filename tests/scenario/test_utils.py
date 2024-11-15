@@ -1,7 +1,13 @@
-import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from pybsm import utils
+from tests import CustomFloatSnapshotExtension
+
+
+@pytest.fixture
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
 
 class TestUtils:
@@ -26,10 +32,10 @@ class TestUtils:
             utils.load_database_atmosphere_no_interp(altitude, ground_range, ihaze)
 
     @pytest.mark.parametrize(
-        ("ihaze", "altitude", "ground_range", "expected"),
+        ("ihaze", "altitude", "ground_range"),
         [
-            (1, 1000.0, 0.0, np.load("./tests/scenario/data/1_1000_0_atm.npy")),
-            (1, 1000.0, 500.0, np.load("./tests/scenario/data/1_1000_500_atm.npy")),
+            (1, 1000.0, 0.0),
+            (1, 1000.0, 500.0),
         ],
     )
     def test_load_database_atmosphere_no_interp(
@@ -37,11 +43,11 @@ class TestUtils:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere_no_interp with normal inputs and expected outputs."""
         output = utils.load_database_atmosphere_no_interp(altitude, ground_range, ihaze)
-        assert np.isclose(output, expected).all()
+        snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range"),
@@ -62,12 +68,16 @@ class TestUtils:
             utils.load_database_atmosphere(altitude, ground_range, ihaze)
 
     @pytest.mark.parametrize(
-        ("ihaze", "altitude", "ground_range", "expected"),
+        ("ihaze", "altitude", "ground_range"),
         [
-            (1, 1000.0, 0.0, np.load("./tests/scenario/data/1_1000_0_atm.npy")),
-            (1, 300.0, 0.0, np.load("./tests/scenario/data/1_300_0_atm.npy")),
-            (1, 1000.0, 500.0, np.load("./tests/scenario/data/1_1000_500_atm.npy")),
-            (1, 1000.0, 300.0, np.load("./tests/scenario/data/1_1000_300_atm.npy")),
+            (1, 1000.0, 0.0),
+            (
+                1,
+                300.0,
+                0.0,
+            ),
+            (1, 1000.0, 500.0),
+            (1, 1000.0, 300.0),
         ],
     )
     def test_load_database_atmosphere(
@@ -75,8 +85,8 @@ class TestUtils:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere with normal inputs and expected outputs."""
         output = utils.load_database_atmosphere(altitude, ground_range, ihaze)
-        assert np.isclose(output, expected).all()
+        snapshot_custom.assert_match(output)

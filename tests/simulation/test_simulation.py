@@ -9,6 +9,13 @@ from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import simulation
+from tests import CustomFloatSnapshotExtension
+
+
+@pytest.fixture
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+
 
 BASE_FILE_PATH = Path(__file__).parent.parent.parent
 IMAGE_FILE_PATH = BASE_FILE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
@@ -52,10 +59,9 @@ class TestSimulation:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("img", "pix_values", "refl_values", "expected"),
+        ("img", "pix_values", "refl_values"),
         [
             (
-                np.array([0.0, 1.0]),
                 np.array([0.0, 1.0]),
                 np.array([0.0, 1.0]),
                 np.array([0.0, 1.0]),
@@ -64,7 +70,6 @@ class TestSimulation:
                 np.ones((10, 10)),
                 np.array([0.0, 1.0]),
                 np.array([0.0, 2.0]),
-                np.ones((10, 10)),
             ),
         ],
     )
@@ -73,11 +78,11 @@ class TestSimulation:
         img: np.ndarray,
         pix_values: np.ndarray,
         refl_values: np.ndarray,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test img_to_reflectance with normal inputs and expected outputs."""
         output = simulation.img_to_reflectance(img, pix_values, refl_values)
-        assert np.isclose(output, expected).all()
+        snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("w", "f", "expectation"),
