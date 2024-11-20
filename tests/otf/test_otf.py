@@ -9,7 +9,7 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
-from tests import CustomFloatSnapshotExtension
+from tests.test_utils import CustomFloatSnapshotExtension
 
 try:
     import cv2
@@ -19,7 +19,7 @@ except ImportError:
     is_usable = False
 
 
-@pytest.fixture
+@pytest.fixture()
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 

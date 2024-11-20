@@ -6,10 +6,10 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import noise
-from tests import CustomFloatSnapshotExtension
+from tests.test_utils import CustomFloatSnapshotExtension
 
 
-@pytest.fixture
+@pytest.fixture()
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
