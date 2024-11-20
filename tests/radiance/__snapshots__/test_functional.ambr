@@ -1,4 +1,22 @@
 # serializer version: 1
+# name: TestReflectanceToPhotoelectrons.test_at_focal_plane_irradiance[1.0-0.0-L0]
+  array([3.14159265])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_at_focal_plane_irradiance[1.0-1.0-L1]
+  array([0.62831853])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_at_focal_plane_irradiance[1.0-1.0-L2]
+  array([0.62831853, 0.62831853])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_at_focal_plane_irradiance[1.0-1.0-L3]
+  array([0.62831853, 1.25663706])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_blackbody_radiance[lambda00-1.0]
+  array([8.21875092e-15])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_blackbody_radiance[lambda01-1.0]
+  array([8.21875092e-15, 8.21875092e-15])
+# ---
 # name: TestReflectanceToPhotoelectrons.test_check_well_fill[0.0-0.0]
   1.0
 # ---
@@ -10,6 +28,21 @@
 # ---
 # name: TestReflectanceToPhotoelectrons.test_check_well_fill[2.0-1.5]
   0.75
+# ---
+# name: TestReflectanceToPhotoelectrons.test_cold_shield_self_emission[wavelengths0-1.0-1.0-1.0]
+  array([2.0655974e-14])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_cold_shield_self_emission[wavelengths1-1.0-1.0-1.0]
+  array([2.0655974e-14, 2.0655974e-14])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_cold_stop_self_emission[wavelengths0-0.0-0.0-1.0-0.0]
+  array([0.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_cold_stop_self_emission[wavelengths1-1.0-1.0-1.0-1.0]
+  array([5.16399351e-15])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_cold_stop_self_emission[wavelengths2-1.0-1.0-1.0-1.0]
+  array([5.16399351e-15, 5.16399351e-15])
 # ---
 # name: TestReflectanceToPhotoelectrons.test_focal_plane_integrated_irradiance[L2-1.0-1.0-1.0-lambda02-1.0-1.0-1.0-1.0-expectation2]
   1.2566370614359221
@@ -350,6 +383,21 @@
          6579094.45009266, 6610931.24856827, 6619874.21841677]),
   )
 # ---
+# name: TestReflectanceToPhotoelectrons.test_optics_self_emission[wavelengths0-0.0-0.0-0.0-1.0-0.0]
+  array([0.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_optics_self_emission[wavelengths1-1.0-1.0-1.0-1.0-1.0]
+  array([5.16399351e-15])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_optics_self_emission[wavelengths2-1.0-1.0-1.0-1.0-1.0]
+  array([5.16399351e-15, 5.16399351e-15])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detection_rate[E0-1.0-1.0-wavelengths0-qe0]
+  array([5.03411665e+24])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_photon_detection_rate[E1-1.0-1.0-wavelengths1-qe1]
+  array([5.03411665e+24, 5.03411665e+24])
+# ---
 # name: TestReflectanceToPhotoelectrons.test_photon_detector_snr[sensor0-radiance_wavelengths0-target_radiance0-background_radiance0]
   SNRMetrics(
     bkg_FPA_irradiance=array([], dtype=float64),
@@ -551,4 +599,205 @@
           3.16302878e+24]]),
     well_fraction=0.0,
   )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_reflectance_to_photoelectrons[atm0-sensor0-0.0-0]
+  tuple(
+    array([0.        , 0.01010101, 0.02020202, 0.03030303, 0.04040404,
+         0.05050505, 0.06060606, 0.07070707, 0.08080808, 0.09090909,
+         0.1010101 , 0.11111111, 0.12121212, 0.13131313, 0.14141414,
+         0.15151515, 0.16161616, 0.17171717, 0.18181818, 0.19191919,
+         0.2020202 , 0.21212121, 0.22222222, 0.23232323, 0.24242424,
+         0.25252525, 0.26262626, 0.27272727, 0.28282828, 0.29292929,
+         0.3030303 , 0.31313131, 0.32323232, 0.33333333, 0.34343434,
+         0.35353535, 0.36363636, 0.37373737, 0.38383838, 0.39393939,
+         0.4040404 , 0.41414141, 0.42424242, 0.43434343, 0.44444444,
+         0.45454545, 0.46464646, 0.47474747, 0.48484848, 0.49494949,
+         0.50505051, 0.51515152, 0.52525253, 0.53535354, 0.54545455,
+         0.55555556, 0.56565657, 0.57575758, 0.58585859, 0.5959596 ,
+         0.60606061, 0.61616162, 0.62626263, 0.63636364, 0.64646465,
+         0.65656566, 0.66666667, 0.67676768, 0.68686869, 0.6969697 ,
+         0.70707071, 0.71717172, 0.72727273, 0.73737374, 0.74747475,
+         0.75757576, 0.76767677, 0.77777778, 0.78787879, 0.7979798 ,
+         0.80808081, 0.81818182, 0.82828283, 0.83838384, 0.84848485,
+         0.85858586, 0.86868687, 0.87878788, 0.88888889, 0.8989899 ,
+         0.90909091, 0.91919192, 0.92929293, 0.93939394, 0.94949495,
+         0.95959596, 0.96969697, 0.97979798, 0.98989899, 1.        ]),
+    array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]),
+    array([[1., 1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1., 1.]]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_reflectance_to_photoelectrons[atm1-sensor1-1.0-300]
+  tuple(
+    array([0.        , 0.01010101, 0.02020202, 0.03030303, 0.04040404,
+         0.05050505, 0.06060606, 0.07070707, 0.08080808, 0.09090909,
+         0.1010101 , 0.11111111, 0.12121212, 0.13131313, 0.14141414,
+         0.15151515, 0.16161616, 0.17171717, 0.18181818, 0.19191919,
+         0.2020202 , 0.21212121, 0.22222222, 0.23232323, 0.24242424,
+         0.25252525, 0.26262626, 0.27272727, 0.28282828, 0.29292929,
+         0.3030303 , 0.31313131, 0.32323232, 0.33333333, 0.34343434,
+         0.35353535, 0.36363636, 0.37373737, 0.38383838, 0.39393939,
+         0.4040404 , 0.41414141, 0.42424242, 0.43434343, 0.44444444,
+         0.45454545, 0.46464646, 0.47474747, 0.48484848, 0.49494949,
+         0.50505051, 0.51515152, 0.52525253, 0.53535354, 0.54545455,
+         0.55555556, 0.56565657, 0.57575758, 0.58585859, 0.5959596 ,
+         0.60606061, 0.61616162, 0.62626263, 0.63636364, 0.64646465,
+         0.65656566, 0.66666667, 0.67676768, 0.68686869, 0.6969697 ,
+         0.70707071, 0.71717172, 0.72727273, 0.73737374, 0.74747475,
+         0.75757576, 0.76767677, 0.77777778, 0.78787879, 0.7979798 ,
+         0.80808081, 0.81818182, 0.82828283, 0.83838384, 0.84848485,
+         0.85858586, 0.86868687, 0.87878788, 0.88888889, 0.8989899 ,
+         0.90909091, 0.91919192, 0.92929293, 0.93939394, 0.94949495,
+         0.95959596, 0.96969697, 0.97979798, 0.98989899, 1.        ]),
+    array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]),
+    array([[1., 1., 1., 1., 1., 1.],
+         [1., 1., 1., 1., 1., 1.]]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_reflectance_to_photoelectrons_atm[atm0-sensor0-1.0-300]
+  tuple(
+    array([0.        , 0.01010101, 0.02020202, 0.03030303, 0.04040404,
+         0.05050505, 0.06060606, 0.07070707, 0.08080808, 0.09090909,
+         0.1010101 , 0.11111111, 0.12121212, 0.13131313, 0.14141414,
+         0.15151515, 0.16161616, 0.17171717, 0.18181818, 0.19191919,
+         0.2020202 , 0.21212121, 0.22222222, 0.23232323, 0.24242424,
+         0.25252525, 0.26262626, 0.27272727, 0.28282828, 0.29292929,
+         0.3030303 , 0.31313131, 0.32323232, 0.33333333, 0.34343434,
+         0.35353535, 0.36363636, 0.37373737, 0.38383838, 0.39393939,
+         0.4040404 , 0.41414141, 0.42424242, 0.43434343, 0.44444444,
+         0.45454545, 0.46464646, 0.47474747, 0.48484848, 0.49494949,
+         0.50505051, 0.51515152, 0.52525253, 0.53535354, 0.54545455,
+         0.55555556, 0.56565657, 0.57575758, 0.58585859, 0.5959596 ,
+         0.60606061, 0.61616162, 0.62626263, 0.63636364, 0.64646465,
+         0.65656566, 0.66666667, 0.67676768, 0.68686869, 0.6969697 ,
+         0.70707071, 0.71717172, 0.72727273, 0.73737374, 0.74747475,
+         0.75757576, 0.76767677, 0.77777778, 0.78787879, 0.7979798 ,
+         0.80808081, 0.81818182, 0.82828283, 0.83838384, 0.84848485,
+         0.85858586, 0.86868687, 0.87878788, 0.88888889, 0.8989899 ,
+         0.90909091, 0.91919192, 0.92929293, 0.93939394, 0.94949495,
+         0.95959596, 0.96969697, 0.97979798, 0.98989899, 1.        ]),
+    array([99999999.99999999, 99884314.12327585, 99768628.24655169,
+         99652942.36982754, 99537256.49310338, 99421570.61637923,
+         99305884.73965509, 99190198.86293092, 99074512.98620677,
+         98958827.10948262, 98843141.23275846, 98727455.35603432,
+         98611769.47931017, 98496083.60258602, 98380397.72586185,
+         98264711.84913771, 98149025.97241355, 98033340.0956894 ,
+         97917654.21896523, 97801968.3422411 , 97686282.46551694,
+         97570596.58879279, 97454910.71206863, 97339224.8353445 ,
+         97223538.95862032, 97107853.08189617, 96992167.20517202,
+         96876481.32844788, 96760795.45172372, 96645109.57499957,
+         96529423.69827542, 96413737.82155126, 96298051.94482711,
+         96182366.06810296, 96066680.19137882, 95950994.31465465,
+         95835308.4379305 , 95719622.56120634, 95603936.6844822 ,
+         95488250.80775803, 95372564.9310339 , 95256879.05430974,
+         95141193.17758557, 95025507.30086142, 94909821.42413728,
+         94794135.54741311, 94678449.67068897, 94562763.79396482,
+         94447077.91724066, 94331392.04051651, 94215706.16379236,
+         94100020.2870682 , 93984334.41034406, 93868648.5336199 ,
+         93752962.65689574, 93637276.78017159, 93521590.90344743,
+         93405905.0267233 , 93290219.14999914, 93174533.27327499,
+         93058847.39655083, 92943161.51982668, 92827475.64310253,
+         92711789.76637837, 92596103.88965422, 92480418.01293007,
+         92364732.13620591, 92249046.25948177, 92133360.3827576 ,
+         92017674.50603347, 91901988.62930931, 91786302.75258514,
+         91670616.87586099, 91554930.99913685, 91439245.1224127 ,
+         91323559.24568854, 91207873.36896439, 91092187.49224024,
+         90976501.61551608, 90860815.73879193, 90745129.86206779,
+         90629443.98534362, 90513758.10861947, 90398072.23189533,
+         90282386.35517116, 90166700.47844703, 90051014.60172287,
+         89935328.72499873, 89819642.84827456, 89703956.97155039,
+         89588271.09482625, 89472585.2181021 , 89356899.34137794,
+         89241213.46465379, 89125527.58792965, 89009841.7112055 ,
+         88894155.83448134, 88778469.95775717, 88662784.081033  ,
+         88547098.20430888]),
+    array([[3.00000000e-07, 3.10000000e-07, 3.20000000e-07, ...,
+          1.39800000e-05, 1.39900000e-05, 1.40000000e-05],
+         [7.75884229e-03, 3.57893422e-02, 9.09201825e-02, ...,
+          5.80539306e-01, 5.79977882e-01, 5.79218157e-01]]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_resample_by_wavelength[wavelengths0-values0-new_wavelengths0]
+  array([1.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_resample_by_wavelength[wavelengths1-values1-new_wavelengths1]
+  array([1., 2., 3.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_resample_by_wavelength[wavelengths2-values2-new_wavelengths2]
+  array([1., 2., 0.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_resample_by_wavelength[wavelengths3-values3-new_wavelengths3]
+  array([0., 1., 2.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_resample_by_wavelength[wavelengths4-values4-new_wavelengths4]
+  array([0., 1., 0.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate[wavelengths0-target_radiance0-optical_transmission0-1.0-1.0-1.0-1.0-qe0-other_irradiance0-1.0]
+  tuple(
+    1.0,
+    array([1.62831853]),
+    array([8.19714543e+24]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate[wavelengths1-target_radiance1-optical_transmission1-1.0-1.0-1.0-1.0-qe1-other_irradiance1-1.0]
+  tuple(
+    1.0,
+    array([1.62831853, 1.62831853]),
+    array([8.19714543e+24, 8.19714543e+24]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate[wavelengths2-target_radiance2-optical_transmission2-1.0-1.0-1.0-1.0-qe2-other_irradiance2-2.0]
+  tuple(
+    2.0,
+    array([1.62831853, 1.62831853]),
+    array([8.19714543e+24, 8.19714543e+24]),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_both_arrays_empty[wavelengths0-target_radiance0-optical_transmission0-1.0-1.0-1.0-1.0-qe0-other_irradiance0-1.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_both_arrays_empty[wavelengths1-target_radiance1-optical_transmission1-1.0-1.0-1.0-1.0-qe1-other_irradiance1-1.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_both_arrays_empty[wavelengths2-target_radiance2-optical_transmission2-1.0-1.0-1.0-1.0-qe2-other_irradiance2-1.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_both_arrays_empty[wavelengths3-target_radiance3-optical_transmission3-1.0-1.0-1.0-1.0-qe3-other_irradiance3-1.0]
+  1.0
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_second_array_empty[wavelengths0-target_radiance0-optical_transmission0-1.0-1.0-1.0-1.0-qe0-other_irradiance0-1.0]
+  tuple(
+    array([1.62831853]),
+    array([], dtype=float64),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_signal_rate_second_array_empty[wavelengths1-target_radiance1-optical_transmission1-1.0-1.0-1.0-1.0-qe1-other_irradiance1-1.0]
+  tuple(
+    array([1.62831853]),
+    array([], dtype=float64),
+  )
+# ---
+# name: TestReflectanceToPhotoelectrons.test_total_radiance[atm0-0.0-0.0]
+  array([2., 2., 2., 2., 2., 2.])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_total_radiance[atm1-1.0-1.0]
+  array([8.66666667, 8.66666667, 8.66666667, 8.66666667, 8.66666667,
+         8.66666667])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_total_radiance_atm[atm0-0.0-0.0]
+  array([ 459480.       , 1931100.       , 4432700.       , ...,
+         5774200.013586 , 6104500.0056898, 6251600.003347 ])
+# ---
+# name: TestReflectanceToPhotoelectrons.test_total_radiance_atm[atm1-1.0-1.0]
+  array([ 4180280.        , 18660433.33333334, 45924033.33333334, ...,
+          6711666.68025267,  6700380.0056898 ,  6686820.003347  ])
 # ---

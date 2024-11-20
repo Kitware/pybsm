@@ -5,3 +5,9 @@
 # name: TestNoise.test_noise_gain[kernel1-expectation1]
   0.7071067811865476
 # ---
+# name: TestNoise.test_quantization_noise[0.0-1.0]
+  0.0
+# ---
+# name: TestNoise.test_quantization_noise[1.0-1.0]
+  0.2886751345948129
+# ---
