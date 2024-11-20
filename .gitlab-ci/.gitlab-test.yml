@@ -13,7 +13,7 @@
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,dev-testing --extras headless
+    - poetry install --sync --only main,tests --extras headless
 
 notebooks:
   parallel:
