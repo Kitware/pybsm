@@ -1,4 +1,3 @@
-import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Callable
@@ -11,23 +10,12 @@ from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
 from tests.test_utils import CustomFloatSnapshotExtension
 
-try:
-    import cv2
 
-    is_usable = True
-except ImportError:
-    is_usable = False
-
-
-@pytest.fixture()
+@pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestOTFHelper:
     @pytest.mark.parametrize(
         ("lambda0", "z_path", "cn2"),
@@ -44,7 +32,10 @@ class TestOTFHelper:
         cn2: np.ndarray,
     ) -> None:
         """Cover cases where ValueError occurs."""
-        with pytest.raises(ValueError):  # noqa: PT011 - This just raises a ValueError
+        with pytest.raises(
+            ValueError,
+            match=r"zero-size array to reduction operation maximum which has no identity",
+        ):
             otf.coherence_diameter(lambda0, z_path, cn2)
 
     @pytest.mark.parametrize(
@@ -343,10 +334,6 @@ class TestOTFHelper:
             otf.image_domain_defocus_radii(D, dz, f)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestResample2D:
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
@@ -388,14 +375,14 @@ class TestResample2D:
             (np.ones((5, 5)), 0.0, 1.0),
         ],
     )
-    def test_resample_2d_cv2_error(
+    def test_resample_2d_PIL_error(  # noqa: N802
         self,
         img_in: np.ndarray,
         dx_in: float,
         dx_out: float,
     ) -> None:
-        """Cover cases where cv2.error occurs."""
-        with pytest.raises(cv2.error):
+        """Cover cases where ValueError occurs."""
+        with pytest.raises(ValueError, match=r"height and width must be > 0"):
             otf.resample_2D(img_in, dx_in, dx_out)
 
     @pytest.mark.parametrize(
@@ -416,10 +403,6 @@ class TestResample2D:
         snapshot_custom.assert_match(output)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestApplyOTFToImage:
     @pytest.mark.parametrize(
         ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
@@ -504,10 +487,6 @@ class TestApplyOTFToImage:
         snapshot_custom.assert_match(output)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestOTFToPSF:
     @pytest.mark.parametrize(
         ("otf_value", "df", "dx_out"),
@@ -2637,14 +2616,3 @@ class TestCircularApertureOTFWithDefocus:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
         output = otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
         snapshot_custom.assert_match(output)
-
-
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
-@mock.patch("pybsm.otf.functional.is_usable", False)
-def test_missing_deps() -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
-        otf.resample_2D(np.ones((5, 5)), 1.0, 1.0)

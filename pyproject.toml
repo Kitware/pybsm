@@ -45,12 +45,10 @@ matplotlib = ">=3.5.2"
 # https://github.com/scipy/scipy/blob/44e4ebaac992fde33f04638b99629d23973cb9b2/scipy/interpolate/_interpolate.py#L118
 scipy = ">=1.10.0,<1.14"  # CVE-2023-25399
 setuptools = ">=65.6.1"
-opencv-python = {version = ">=4.6", optional = true}
-opencv-python-headless = {version = ">=4.6", optional = true}
+Pillow = {version=">=10.3.0", optional=true} # CVE-2024-28219
 
 [tool.poetry.extras]
-graphics = ["opencv-python"]
-headless = ["opencv-python-headless"]
+pillow = ["Pillow"]
 
 # :auto linting:
 # Linting
@@ -203,4 +201,3 @@ incremental = false
 module = "tests.*"
 ignore_errors = true
 # :auto mypy:
-

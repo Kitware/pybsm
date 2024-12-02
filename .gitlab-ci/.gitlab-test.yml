@@ -1,9 +1,9 @@
 ###############################################################################
 # Stage -- Unit Testing
 ###############################################################################
-# 
+#
 # Overrides:
-# 
+#
 # 1) pybsm specific notebooks.
 # 2) Added the original example as a job
 # 3) Poetry install for opencv-python-headless
@@ -13,7 +13,7 @@
 .test-setup:
   before_script:
     - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests --extras headless
+    - poetry install --sync --only main,tests --extras pillow
 
 notebooks:
   parallel:
@@ -35,6 +35,5 @@ original-example:
   image: python:${PYTHON_VERSION}
   before_script:
     - !reference [.test-setup, before_script]
-    - !reference [.needs-headless-opencv, before_script]
   script:
     - poetry run python examples/pybsm_example.py

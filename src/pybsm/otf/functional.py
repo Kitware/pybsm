@@ -65,16 +65,11 @@ import os
 import warnings
 from typing import Callable
 
-try:
-    import cv2
-
-    is_usable = True
-except ImportError:
-    is_usable = False
-
 # 3rd party imports
 import numpy as np
+from PIL import Image
 from scipy import integrate, interpolate
+from scipy.ndimage import convolve
 from scipy.special import jn
 
 # local imports
@@ -918,10 +913,6 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
             if df or dx_out are 0
 
     """
-    if not is_usable:
-        raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
-        )
     # transform the psf
     psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
 
@@ -931,7 +922,9 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     # resample to the desired sample size
     new_x = max([1, int(psf.shape[1] * dx_in / dx_out)])
     new_y = max([1, int(psf.shape[0] * dx_in / dx_out)])
-    psf = cv2.resize(psf, (new_x, new_y)).astype(np.float64)
+    psf = np.asarray(
+        Image.fromarray(psf).resize(size=(new_x, new_y), resample=Image.Resampling.BILINEAR),
+    ).astype(np.float64)
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
@@ -1263,17 +1256,26 @@ def apply_otf_to_image(
     # this function. Therefore, we can calculate the instantaneous field of view
     # (iFOV) of the assumed real camera, which is
     # 2*arctan(ref_gsd/2/ref_range).
-    if not is_usable:
-        raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
-        )
     psf = otf_to_psf(otf, df, 2 * np.arctan(ref_gsd / 2 / ref_range))
 
-    # filter the image
-    blur_img = cv2.filter2D(ref_img, -1, psf)
+    if ref_img.ndim == 3:
+        # Initialize arrays
+        blur_img = np.empty(ref_img.shape)
+        new_x, new_y = resampled_dimensions(blur_img[:, :, 0], ref_gsd / ref_range, ifov)
+        sim_img = np.empty((new_x, new_y, 3))
 
-    # resample the image to the camera's ifov
-    sim_img = resample_2D(blur_img, ref_gsd / ref_range, ifov)
+        for channel in range(0, 3):
+            # filter the image
+            blur_img[:, :, channel] = convolve(ref_img[:, :, channel], np.flipud(np.fliplr(psf)), mode="mirror")
+
+            # resample the image to the camera's ifov
+            sim_img[:, :, channel] = resample_2D(blur_img[:, :, channel], ref_gsd / ref_range, ifov)
+    else:
+        # filter the image
+        blur_img = convolve(ref_img, np.flipud(np.fliplr(psf)), mode="mirror")
+
+        # resample the image to the camera's ifov
+        sim_img = resample_2D(blur_img, ref_gsd / ref_range, ifov)
 
     # resample psf (good for health checks on the simulation)
     sim_psf = resample_2D(psf, ref_gsd / ref_range, ifov)
@@ -1421,15 +1423,47 @@ def resample_2D(  # noqa: N802
             if imigin is not a 2D array
         ZeroDivisionError:
             if dx_out is 0
-        cv2.error:
+        PIL.error:
             if dx_in is 0
 
     """
-    if not is_usable:
-        raise ImportError(
-            "OpenCV not found. Please install 'pybsm[graphics]' or 'pybsm[headless]'.",
-        )
+    new_x, new_y = resampled_dimensions(img_in, dx_in, dx_out)
+
+    return np.asarray(
+        Image.fromarray(img_in).resize(size=(new_x, new_y), resample=Image.Resampling.BILINEAR),
+    ).astype(np.float64)
+
+
+def resampled_dimensions(
+    img_in: np.ndarray,
+    dx_in: float,
+    dx_out: float,
+) -> tuple[int, int]:
+    """Get the resampled dimension.
+
+    :param img:
+        the input image
+    :param dx_in:
+        sample spacing of the input image (radians)
+    :param dx_out:
+        sample spacing of the output image (radians)
+
+    :return:
+        new_x:
+            Resampled width
+        new_y:
+            Resampled height
+
+    :raises:
+        IndexError:
+            if imigin is not a 2D array
+        ZeroDivisionError:
+            if dx_out is 0
+        PIL.error:
+            if dx_in is 0
+
+    """
     new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
     new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
 
-    return cv2.resize(img_in, (new_x, new_y))
+    return new_x, new_y
