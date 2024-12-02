@@ -375,14 +375,14 @@ class TestResample2D:
             (np.ones((5, 5)), 0.0, 1.0),
         ],
     )
-    def test_resample_2d_PIL_error(  # noqa: N802
+    def test_resample_2d_scale_factor_error(
         self,
         img_in: np.ndarray,
         dx_in: float,
         dx_out: float,
     ) -> None:
         """Cover cases where ValueError occurs."""
-        with pytest.raises(ValueError, match=r"height and width must be > 0"):
+        with pytest.raises(ValueError, match=r"Invalid sample spacing for input image"):
             otf.resample_2D(img_in, dx_in, dx_out)
 
     @pytest.mark.parametrize(

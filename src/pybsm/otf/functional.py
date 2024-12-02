@@ -67,9 +67,8 @@ from typing import Callable
 
 # 3rd party imports
 import numpy as np
-from PIL import Image
 from scipy import integrate, interpolate
-from scipy.ndimage import convolve
+from scipy.ndimage import convolve, zoom
 from scipy.special import jn
 
 # local imports
@@ -922,9 +921,9 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     # resample to the desired sample size
     new_x = max([1, int(psf.shape[1] * dx_in / dx_out)])
     new_y = max([1, int(psf.shape[0] * dx_in / dx_out)])
-    psf = np.asarray(
-        Image.fromarray(psf).resize(size=(new_x, new_y), resample=Image.Resampling.BILINEAR),
-    ).astype(np.float64)
+    x_zoom_factor = new_x / psf.shape[1]
+    y_zoom_factor = new_y / psf.shape[0]
+    psf = zoom(psf, (x_zoom_factor, y_zoom_factor), order=1).astype(np.float64)
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
@@ -1263,7 +1262,6 @@ def apply_otf_to_image(
         blur_img = np.empty(ref_img.shape)
         new_x, new_y = resampled_dimensions(blur_img[:, :, 0], ref_gsd / ref_range, ifov)
         sim_img = np.empty((new_x, new_y, 3))
-
         for channel in range(0, 3):
             # filter the image
             blur_img[:, :, channel] = convolve(ref_img[:, :, channel], np.flipud(np.fliplr(psf)), mode="mirror")
@@ -1428,10 +1426,10 @@ def resample_2D(  # noqa: N802
 
     """
     new_x, new_y = resampled_dimensions(img_in, dx_in, dx_out)
+    x_zoom_factor = new_x / img_in.shape[1]
+    y_zoom_factor = new_y / img_in.shape[0]
 
-    return np.asarray(
-        Image.fromarray(img_in).resize(size=(new_x, new_y), resample=Image.Resampling.BILINEAR),
-    ).astype(np.float64)
+    return zoom(img_in, (x_zoom_factor, y_zoom_factor), order=1).astype(np.float64)
 
 
 def resampled_dimensions(
@@ -1463,6 +1461,10 @@ def resampled_dimensions(
             if dx_in is 0
 
     """
+    if dx_out == 0:
+        raise ZeroDivisionError
+    if dx_in == 0:
+        raise ValueError("Invalid sample spacing for input image")
     new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
     new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
 

@@ -11,8 +11,8 @@ Tests
 
 Code Refactor
 
-* Refactored codebase to replace ``cv2`` based functions with ``Pillow``
-  and ``scipy`` alternatives.
+* Refactored codebase to replace ``cv2`` based functions with ``scipy``
+  and ``matplotlib`` alternatives.
 
 Fixes
 -----
