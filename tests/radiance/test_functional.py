@@ -10,7 +10,7 @@ from pybsm.simulation import Sensor
 from tests.test_utils import CustomFloatSnapshotExtension
 
 
-@pytest.fixture()
+@pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
