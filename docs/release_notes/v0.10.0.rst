@@ -1,6 +1,11 @@
 v0.10.0
 =======
 
+Swapped out ``opencv`` function calls with equivalent calls already supported by
+other dependencies. This allowed the removal of the ``opencv-python`` and
+``opencv-python-headless`` dependency bifurcation. Allso added a custom ``syrupy``
+comparator to better handle "close-enough" known-state regression.
+
 Updates / New Features
 ----------------------
 
