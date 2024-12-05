@@ -1,14 +1,14 @@
 # serializer version: 1
 # name: TestApplyOTFToImage.test_apply_otf_to_image[ref_img0-1.0-1.0-otf_value0-1.0-1.0]
   tuple(
-    array([[0., 0., 0., ..., 0., 0., 0.],
-         [0., 0., 0., ..., 0., 0., 0.],
-         [0., 0., 0., ..., 0., 0., 0.],
+    array([[1., 1., 1., ..., 1., 1., 1.],
+         [1., 1., 1., ..., 1., 1., 1.],
+         [1., 1., 1., ..., 1., 1., 1.],
          ...,
-         [0., 0., 0., ..., 0., 0., 0.],
-         [0., 0., 0., ..., 0., 0., 0.],
-         [0., 0., 0., ..., 0., 0., 0.]]),
-    array([[nan]]),
+         [1., 1., 1., ..., 1., 1., 1.],
+         [1., 1., 1., ..., 1., 1., 1.],
+         [1., 1., 1., ..., 1., 1., 1.]]),
+    array([[1.]]),
   )
 # ---
 # name: TestCTEOTF.test_otf[u0-v0-0.0-0.0-1.0-1.0-1-1.0-1.0]
@@ -231,10 +231,10 @@
   array([3.33333333])
 # ---
 # name: TestOTFToPSF.test_otf_to_psf[otf_value0-1.0-1.0]
-  array([[nan]])
+  array([[1.]])
 # ---
 # name: TestOTFToPSF.test_otf_to_psf[otf_value1-1.0-1.0]
-  array([[nan]])
+  array([[1.]])
 # ---
 # name: TestPolychromaticTurbulenceOTF.test[u0-v0-wavelengths0-weights0-1.0-1.0-1.0-1.0-1.0-1.0-1.0]
   tuple(
