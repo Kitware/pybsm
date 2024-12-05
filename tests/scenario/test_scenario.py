@@ -1,8 +1,14 @@
 import numpy as np
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
-from pybsm import utils
 from pybsm.simulation import Scenario
+from tests.test_utils import CustomFloatSnapshotExtension
+
+
+@pytest.fixture
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
 
 class TestScenario:
@@ -162,15 +168,15 @@ class TestScenario:
             Scenario(name, ihaze, altitude, ground_range, interp).atm  # noqa: B018
 
     @pytest.mark.parametrize(
-        ("name", "ihaze", "altitude", "ground_range", "interp", "expected"),
+        ("name", "ihaze", "altitude", "ground_range", "interp"),
         [
-            ("test", 2, 1000.0, 0.0, True, utils.load_database_atmosphere(1000.0, 0.0, 2)),
-            ("test", 1, 1000.0, 0.0, True, utils.load_database_atmosphere(1000.0, 0.0, 1)),
-            ("test", 1, 1000.0, 5.0, True, utils.load_database_atmosphere(1000.0, 5.0, 1)),
-            ("test", 1, 2000.0, 0.0, True, utils.load_database_atmosphere(2000.0, 0.0, 1)),
-            ("test", 2, 1000.0, 0.0, False, utils.load_database_atmosphere_no_interp(1000.0, 0.0, 2)),
-            ("test", 1, 1000.0, 0.0, False, utils.load_database_atmosphere_no_interp(1000.0, 0.0, 1)),
-            ("test", 1, 2000.0, 0.0, False, utils.load_database_atmosphere_no_interp(2000.0, 0.0, 1)),
+            ("test", 2, 1000.0, 0.0, True),
+            ("test", 1, 1000.0, 0.0, True),
+            ("test", 1, 1000.0, 5.0, True),
+            ("test", 1, 2000.0, 0.0, True),
+            ("test", 2, 1000.0, 0.0, False),
+            ("test", 1, 1000.0, 0.0, False),
+            ("test", 1, 2000.0, 0.0, False),
         ],
     )
     def test_atm(
@@ -180,11 +186,11 @@ class TestScenario:
         altitude: float,
         ground_range: float,
         interp: bool,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test atm with expected inputs and outputs as well as checking _atm attribute is set properly."""
         scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp)
         assert scenario._atm is None
         atm = scenario.atm
         assert scenario._atm is not None
-        assert np.isclose(atm, expected).all()
+        snapshot_custom.assert_match(atm)

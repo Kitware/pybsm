@@ -1,4 +1,3 @@
-import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from typing import Callable
@@ -9,19 +8,14 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
-
-try:
-    import cv2
-
-    is_usable = True
-except ImportError:
-    is_usable = False
+from tests.test_utils import CustomFloatSnapshotExtension
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
+@pytest.fixture
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+
+
 class TestOTFHelper:
     @pytest.mark.parametrize(
         ("lambda0", "z_path", "cn2"),
@@ -38,7 +32,10 @@ class TestOTFHelper:
         cn2: np.ndarray,
     ) -> None:
         """Cover cases where ValueError occurs."""
-        with pytest.raises(ValueError):  # noqa: PT011 - This just raises a ValueError
+        with pytest.raises(
+            ValueError,
+            match=r"zero-size array to reduction operation maximum which has no identity",
+        ):
             otf.coherence_diameter(lambda0, z_path, cn2)
 
     @pytest.mark.parametrize(
@@ -79,12 +76,12 @@ class TestOTFHelper:
         assert np.isinf(output)
 
     @pytest.mark.parametrize(
-        ("lambda0", "z_path", "cn2", "expected"),
+        ("lambda0", "z_path", "cn2"),
         [
-            (1.0, np.array([1.0, 2.0]), np.array([1.0]), 0.23749058343491444),
-            (2.0, np.array([1.0, 2.0]), np.array([1.0]), 0.5456100850379446),
-            (1.0, np.array([1.0, 2.0]), np.array([2.0]), 0.15668535178821985),
-            (1.0, np.array([1.0, 2.0, 3.0]), np.array([1.0]), 0.17546491199555045),
+            (1.0, np.array([1.0, 2.0]), np.array([1.0])),
+            (2.0, np.array([1.0, 2.0]), np.array([1.0])),
+            (1.0, np.array([1.0, 2.0]), np.array([2.0])),
+            (1.0, np.array([1.0, 2.0, 3.0]), np.array([1.0])),
         ],
     )
     def test_coherence_diameter(
@@ -92,11 +89,11 @@ class TestOTFHelper:
         lambda0: float,
         z_path: np.ndarray,
         cn2: np.ndarray,
-        expected: float,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test coherence_diameter with normal inputs and expected outputs."""
         output = otf.coherence_diameter(lambda0, z_path, cn2)
-        assert np.isclose(output, expected)
+        snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("h", "v", "cn2_at_1m"),
@@ -116,14 +113,14 @@ class TestOTFHelper:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("h", "v", "cn2_at_1m", "expected"),
+        ("h", "v", "cn2_at_1m"),
         [
-            (np.array([1.0]), 1.0, 0.0, np.array([0.0])),
-            (np.array([1.0]), 0.0, 1.0, np.array([0.9900498337491683])),
-            (np.array([0.0]), 1.0, 1.0, np.array([1.0])),
-            (np.array([1.0]), 1.0, 1.0, np.array([0.9900498337491683])),
-            (np.array([-1.0]), -1.0, -1.0, np.array([-1.0100501670841677])),
-            (np.array([1.0, 1.0]), 1.0, 0.0, np.array([0.0, 0.0])),
+            (np.array([1.0]), 1.0, 0.0),
+            (np.array([1.0]), 0.0, 1.0),
+            (np.array([0.0]), 1.0, 1.0),
+            (np.array([1.0]), 1.0, 1.0),
+            (np.array([-1.0]), -1.0, -1.0),
+            (np.array([1.0, 1.0]), 1.0, 0.0),
         ],
     )
     def test_hufnagel_valley_turbulence_profile(
@@ -131,11 +128,11 @@ class TestOTFHelper:
         h: np.ndarray,
         v: float,
         cn2_at_1m: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test hufnagel_valley_turbulence_profile with normal inputs and expected outputs."""
         output = otf.hufnagel_valley_turbulence_profile(h, v, cn2_at_1m)
-        assert np.isclose(output, expected).all()
+        snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("wavelengths", "weights", "my_function"),
@@ -179,37 +176,32 @@ class TestOTFHelper:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("wavelengths", "weights", "my_function", "expected"),
+        ("wavelengths", "weights", "my_function"),
         [
             (
                 np.array([0.0]),
                 np.array([1.0]),
                 lambda wavelengths: wavelengths,
-                np.array([0.0]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 lambda wavelengths: wavelengths,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0, 2.0]),
                 lambda wavelengths: wavelengths,
-                np.array([0.33333]),
             ),
             (
                 np.array([1.0, 2.0]),
                 np.array([1.0, 2.0]),
                 lambda wavelengths: wavelengths,
-                np.array([1.66666667]),
             ),
             (
                 np.array([1.0, 2.0]),
                 np.array([1.0, 2.0]),
                 lambda wavelengths: wavelengths * 2,
-                np.array([3.33333333]),
             ),
         ],
     )
@@ -218,11 +210,11 @@ class TestOTFHelper:
         wavelengths: np.ndarray,
         weights: np.ndarray,
         my_function: Callable,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test weighted_by_wavelength with normal inputs and expected outputs."""
         output = otf.weighted_by_wavelength(wavelengths, weights, my_function)
-        assert np.isclose(output, expected).all()
+        snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("D", "R", "R0"),
@@ -342,10 +334,6 @@ class TestOTFHelper:
             otf.image_domain_defocus_radii(D, dz, f)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestResample2D:
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
@@ -387,20 +375,20 @@ class TestResample2D:
             (np.ones((5, 5)), 0.0, 1.0),
         ],
     )
-    def test_resample_2d_cv2_error(
+    def test_resample_2d_scale_factor_error(
         self,
         img_in: np.ndarray,
         dx_in: float,
         dx_out: float,
     ) -> None:
-        """Cover cases where cv2.error occurs."""
-        with pytest.raises(cv2.error):
+        """Cover cases where ValueError occurs."""
+        with pytest.raises(ValueError, match=r"Invalid sample spacing for input image"):
             otf.resample_2D(img_in, dx_in, dx_out)
 
     @pytest.mark.parametrize(
-        ("img_in", "dx_in", "dx_out", "expected"),
+        ("img_in", "dx_in", "dx_out"),
         [
-            (np.ones((5, 5)), 1.0, 1.0, np.ones((5, 5))),
+            (np.ones((5, 5)), 1.0, 1.0),
         ],
     )
     def test_resample_2d(
@@ -408,17 +396,13 @@ class TestResample2D:
         img_in: np.ndarray,
         dx_in: float,
         dx_out: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test resample_2D with normal inputs and expected outputs."""
         output = otf.resample_2D(img_in, dx_in, dx_out)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestApplyOTFToImage:
     @pytest.mark.parametrize(
         ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
@@ -469,7 +453,7 @@ class TestApplyOTFToImage:
             otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otf_value, df, ifov)
 
     @pytest.mark.parametrize(
-        ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov", "expected"),
+        ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
         [
             (
                 np.ones((100, 100)),
@@ -478,7 +462,6 @@ class TestApplyOTFToImage:
                 np.ones((100, 100)),
                 1.0,
                 1.0,
-                (np.ones((100, 100)), np.array([1.0])),
             ),
         ],
     )
@@ -490,7 +473,7 @@ class TestApplyOTFToImage:
         otf_value: np.ndarray,
         df: float,
         ifov: float,
-        expected: tuple[np.ndarray, np.ndarray],
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test apply_otf_to_image with normal inputs and expected outputs."""
         output = otf.apply_otf_to_image(
@@ -501,14 +484,9 @@ class TestApplyOTFToImage:
             df,
             ifov,
         )
-        assert np.isclose(output[0], expected[0], atol=5e-20).all()
-        assert np.isclose(output[1], expected[1], atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
 class TestOTFToPSF:
     @pytest.mark.parametrize(
         ("otf_value", "df", "dx_out"),
@@ -546,10 +524,10 @@ class TestOTFToPSF:
             otf.otf_to_psf(otf_value, df, dx_out)
 
     @pytest.mark.parametrize(
-        ("otf_value", "df", "dx_out", "expected"),
+        ("otf_value", "df", "dx_out"),
         [
-            (np.ones((15, 15)), 1.0, 1.0, np.array([1.0])),
-            (np.ones((100, 100)), 1.0, 1.0, np.array([1.0])),
+            (np.ones((15, 15)), 1.0, 1.0),
+            (np.ones((100, 100)), 1.0, 1.0),
         ],
     )
     def test_otf_to_psf(
@@ -557,11 +535,11 @@ class TestOTFToPSF:
         otf_value: np.ndarray,
         df: float,
         dx_out: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test otf_to_psf with normal inputs and expected outputs."""
         output = otf.otf_to_psf(otf_value, df, dx_out)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestCTEOTF:
@@ -615,9 +593,9 @@ class TestCTEOTF:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "p_x", "p_y", "cte_n_x", "cte_n_y", "phases_n", "cte_eff", "f", "expected"),
+        ("u", "v", "p_x", "p_y", "cte_n_x", "cte_n_y", "phases_n", "cte_eff", "f"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 1, 1.0, 1.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 1, 1.0, 1.0),
             (
                 np.array([1.0]),
                 np.array([1.0]),
@@ -628,7 +606,6 @@ class TestCTEOTF:
                 0,
                 1.0,
                 1.0,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0]),
@@ -640,7 +617,6 @@ class TestCTEOTF:
                 2,
                 2.0,
                 2.0,
-                np.array([2980.95798704]),
             ),
             (
                 np.array([1.0]),
@@ -652,7 +628,6 @@ class TestCTEOTF:
                 1,
                 1.0,
                 1.0,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -664,7 +639,6 @@ class TestCTEOTF:
                 1,
                 1.0,
                 1.0,
-                np.array([1.0, 1.0]),
             ),
         ],
     )
@@ -679,11 +653,11 @@ class TestCTEOTF:
         phases_n: int,
         cte_eff: float,
         f: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestDefocusOTF:
@@ -708,35 +682,31 @@ class TestDefocusOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "w_x", "w_y", "expected"),
+        ("u", "v", "w_x", "w_y"),
         [
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 0.0,
                 1.0,
-                np.array([0.08480497]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 2.0,
                 1.0,
-                np.array([4.38638338e-06]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 1.0,
-                np.array([0.00719188]),
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
                 1.0,
-                np.array([0.00719188, 0.00719188]),
             ),
         ],
     )
@@ -746,11 +716,11 @@ class TestDefocusOTF:
         v: np.ndarray,
         w_x: float,
         w_y: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test defocus_OTF with normal inputs and expected outputs."""
         output = otf.defocus_OTF(u, v, w_x, w_y)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestDetectorOTFWithAggregation:
@@ -802,9 +772,9 @@ class TestDetectorOTFWithAggregation:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "w_x", "w_y", "p_x", "p_y", "f", "n", "expected"),
+        ("u", "v", "w_x", "w_y", "p_x", "p_y", "f", "n"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 1.0, 1, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 1.0, 1),
             (
                 np.array([1.0]),
                 np.array([1.0]),
@@ -814,7 +784,6 @@ class TestDetectorOTFWithAggregation:
                 0.0,
                 1.0,
                 1,
-                np.array([3.89817183e-17]),
             ),
             (
                 np.array([1.0]),
@@ -825,7 +794,6 @@ class TestDetectorOTFWithAggregation:
                 1.0,
                 1.0,
                 1,
-                np.array([3.89817183e-17]),
             ),
             (
                 np.array([1.0]),
@@ -836,7 +804,6 @@ class TestDetectorOTFWithAggregation:
                 1.0,
                 1.0,
                 1,
-                np.array([1.51957436e-33]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -847,7 +814,6 @@ class TestDetectorOTFWithAggregation:
                 1.0,
                 1.0,
                 2,
-                np.array([1.51957436e-33, 1.51957436e-33]),
             ),
         ],
     )
@@ -861,11 +827,11 @@ class TestDetectorOTFWithAggregation:
         p_y: float,
         f: float,
         n: int,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF_with_aggregation with normal inputs and expected outputs."""
         output = otf.detector_OTF_with_aggregation(u, v, w_x, w_y, p_x, p_y, f, n)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestDiffusionOTF:
@@ -920,7 +886,7 @@ class TestDiffusionOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "alpha", "ald", "al0", "f", "expected"),
+        ("u", "v", "alpha", "ald", "al0", "f"),
         [
             (
                 np.array([1.0]),
@@ -929,7 +895,6 @@ class TestDiffusionOTF:
                 0.0,
                 1.0,
                 1.0,
-                np.array([0.20116963]),
             ),
             (
                 np.array([1.0]),
@@ -938,7 +903,6 @@ class TestDiffusionOTF:
                 1.0,
                 1.0,
                 2.0,
-                np.array([0.85576647]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -947,7 +911,6 @@ class TestDiffusionOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.8199439, 0.8199439]),
             ),
         ],
     )
@@ -959,11 +922,11 @@ class TestDiffusionOTF:
         ald: float,
         al0: float,
         f: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.diffusion_OTF(u, v, alpha, ald, al0, f)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestGaussianOTF:
@@ -988,28 +951,25 @@ class TestGaussianOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "blur_size_x", "blur_size_y", "expected"),
+        ("u", "v", "blur_size_x", "blur_size_y"),
         [
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 1.0,
-                np.array([0.00186744]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 2.0,
-                np.array([1.50701728e-07]),
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 2.0,
                 2.0,
-                np.array([1.21615567e-11, 1.21615567e-11]),
             ),
         ],
     )
@@ -1019,11 +979,11 @@ class TestGaussianOTF:
         v: np.ndarray,
         blur_size_x: float,
         blur_size_y: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.gaussian_OTF(u, v, blur_size_x, blur_size_y)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestTdiOTF:
@@ -1075,7 +1035,7 @@ class TestTdiOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u_or_v", "w", "n_tdi", "phases_n", "beta", "f", "expected"),
+        ("u_or_v", "w", "n_tdi", "phases_n", "beta", "f"),
         [
             (
                 np.array([1.0]),
@@ -1084,7 +1044,6 @@ class TestTdiOTF:
                 1.0,
                 30,
                 1000.0,
-                np.array([1.99634659 + 0.0j]),
             ),
             (
                 np.array([1.0]),
@@ -1093,7 +1052,6 @@ class TestTdiOTF:
                 10.0,
                 1,
                 20.0,
-                np.array([3.89817183e-17 + 0.0j]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -1102,7 +1060,6 @@ class TestTdiOTF:
                 10.0,
                 10,
                 10.0,
-                np.array([1.28752754e-15 + 4.58661209e-16j, 1.28752754e-15 + 4.58661209e-16j]),
             ),
         ],
     )
@@ -1114,11 +1071,11 @@ class TestTdiOTF:
         phases_n: int,
         beta: float,
         f: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.tdi_OTF(u_or_v, w, n_tdi, phases_n, beta, f)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestWavefrontOTF2:
@@ -1142,28 +1099,25 @@ class TestWavefrontOTF2:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "cutoff", "w_rms", "expected"),
+        ("u", "v", "cutoff", "w_rms"),
         [
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 0.0,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 1.0,
-                np.array([73.31931329]),
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
                 1.0,
-                np.array([73.31931329, 73.31931329]),
             ),
         ],
     )
@@ -1173,32 +1127,32 @@ class TestWavefrontOTF2:
         v: np.ndarray,
         cutoff: float,
         w_rms: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.wavefront_OTF_2(u, v, cutoff, w_rms)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestSliceOTF:
     @pytest.mark.parametrize(
-        ("otf_input", "ang", "expected"),
+        ("otf_input", "ang"),
         [
-            (np.array([[1.0, 1.0], [1.0, 1.0]]), 0.0, np.array([[1.0, 1.0], [1.0, 1.0]])),
-            (np.array([[1.0, 0.0], [1.0, 0.0]]), 10.0, np.array([[0.5]])),
-            (np.array([[1.0, 0.0], [1.0, 0.0]]), 180.0, np.array([[0.5]])),
-            (np.array([[1.0, 1.0], [1.0, 1.0]]), 360.0, np.array([[1.0, 1.0], [1.0, 1.0]])),
+            (np.array([[1.0, 1.0], [1.0, 1.0]]), 0.0),
+            (np.array([[1.0, 0.0], [1.0, 0.0]]), 10.0),
+            (np.array([[1.0, 0.0], [1.0, 0.0]]), 180.0),
+            (np.array([[1.0, 1.0], [1.0, 1.0]]), 360.0),
         ],
     )
     def test(
         self,
         otf_input: np.ndarray,
         ang: float,
-        expected: float,
+        snapshot_custom: float,
     ) -> None:
         """Test slice_otf with normal inputs and expected outputs."""
         output = otf.slice_otf(otf_input, ang)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestPolychromaticTurbulenceOTF:
@@ -1387,7 +1341,6 @@ class TestPolychromaticTurbulenceOTF:
             "cn2_at_1m",
             "int_time",
             "aircraft_speed",
-            "expected",
         ),
         [
             (
@@ -1402,7 +1355,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.3340840371124818]),
             ),
             (
                 np.array([1.0]),
@@ -1416,7 +1368,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.3340840371124818]),
             ),
             (
                 np.array([]),
@@ -1430,7 +1381,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.3340840371124818]),
             ),
             (
                 np.array([]),
@@ -1444,7 +1394,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.7675235677237524]),
             ),
             (
                 np.array([]),
@@ -1458,7 +1407,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.62304372]),
             ),
         ],
     )
@@ -1475,7 +1423,7 @@ class TestPolychromaticTurbulenceOTF:
         cn2_at_1m: float,
         int_time: float,
         aircraft_speed: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test polychromatic_turbulence_OTF with empty input."""
         output = otf.polychromatic_turbulence_OTF(
@@ -1492,7 +1440,7 @@ class TestPolychromaticTurbulenceOTF:
             aircraft_speed,
         )
         assert output[0].size == 0
-        assert np.isclose(output[1], expected).all()
+        snapshot_custom.assert_match(output[1])
 
     @pytest.mark.parametrize(
         (
@@ -1507,7 +1455,6 @@ class TestPolychromaticTurbulenceOTF:
             "cn2_at_1m",
             "int_time",
             "aircraft_speed",
-            "expected",
         ),
         [
             (
@@ -1522,7 +1469,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.74665601e-09]), np.array([0.3340840371124818])),
             ),
             (
                 np.array([1.0, 2.0]),
@@ -1536,7 +1482,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.74665601e-09]), np.array([0.3340840371124818])),
             ),
             (
                 np.array([1.0]),
@@ -1550,7 +1495,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.57584742e-05]), np.array([0.62304372])),
             ),
             (
                 np.array([1.0]),
@@ -1564,7 +1508,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([9.15552002e-10]), np.array([0.11136134570416059])),
             ),
             (
                 np.array([1.0, 2.0]),
@@ -1578,7 +1521,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.57584742e-05, 5.10998239e-06]), np.array([0.62304372])),
             ),
             (
                 np.array([1.0]),
@@ -1592,7 +1534,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.57584742e-05, 1.95347951e-06]), np.array([0.62304372])),
             ),
             (
                 np.array([1.0, 2.0]),
@@ -1606,7 +1547,6 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                (np.array([2.57584742e-05, 1.95347951e-06]), np.array([0.62304372])),
             ),
             (
                 np.array([1.0]),
@@ -1620,7 +1560,6 @@ class TestPolychromaticTurbulenceOTF:
                 2.0,
                 2.0,
                 2.0,
-                (np.array([4.59610705e-49]), np.array([0.14605390401093207])),
             ),
         ],
     )
@@ -1637,7 +1576,7 @@ class TestPolychromaticTurbulenceOTF:
         cn2_at_1m: float,
         int_time: float,
         aircraft_speed: float,
-        expected: tuple[np.ndarray, np.ndarray],
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test polychromatic_turbulence_OTF with normal inputs and expected outputs."""
         output = otf.polychromatic_turbulence_OTF(
@@ -1653,8 +1592,7 @@ class TestPolychromaticTurbulenceOTF:
             int_time,
             aircraft_speed,
         )
-        assert np.isclose(output[0], expected[0]).all()
-        assert np.isclose(output[1], expected[1]).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestDetectorOTF:
@@ -1700,16 +1638,15 @@ class TestDetectorOTF:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "w_x", "w_y", "f", "expected"),
+        ("u", "v", "w_x", "w_y", "f"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 0.0,
                 1.0,
-                np.array([3.89817183e-17]),
             ),
             (
                 np.array([1.0]),
@@ -1717,7 +1654,6 @@ class TestDetectorOTF:
                 0.0,
                 1.0,
                 1.0,
-                np.array([3.89817183e-17]),
             ),
             (
                 np.array([1.0]),
@@ -1725,7 +1661,6 @@ class TestDetectorOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([1.51957436e-33]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -1733,7 +1668,6 @@ class TestDetectorOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([1.51957436e-33, 1.51957436e-33]),
             ),
         ],
     )
@@ -1744,11 +1678,11 @@ class TestDetectorOTF:
         w_x: float,
         w_y: float,
         f: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF with normal inputs and expected outputs."""
         output = otf.detector_OTF(u, v, w_x, w_y, f)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestDriftOTF:
@@ -1773,18 +1707,17 @@ class TestDriftOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "a_x", "a_y", "expected"),
+        ("u", "v", "a_x", "a_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, np.array([3.89817183e-17])),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, np.array([3.89817183e-17])),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, np.array([1.51957436e-33])),
+            (np.array([1.0]), np.array([1.0]), 0.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.07),
+            (np.array([1.0]), np.array([1.0]), 0.0, 1.07),
+            (np.array([1.0]), np.array([1.0]), 1.0, 1.03),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
                 1.0,
-                np.array([1.51957436e-33, 1.51957436e-33]),
             ),
         ],
     )
@@ -1794,11 +1727,11 @@ class TestDriftOTF:
         v: np.ndarray,
         a_x: float,
         a_y: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test drift_OTF with normal inputs and expected outputs."""
         output = otf.drift_OTF(u, v, a_x, a_y)
-        assert np.isclose(output, expected, atol=5e-34).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestJitterOTF:
@@ -1823,33 +1756,37 @@ class TestJitterOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "s_x", "s_y", "expected"),
+        ("u", "v", "s_x", "s_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, np.array([2.67528799e-09])),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, np.array([2.67528799e-09])),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                0.0,
+                0.0,
+            ),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                1.0,
+                0.0,
+            ),
+            (
+                np.array([1.0]),
+                np.array([1.0]),
+                0.0,
+                1.0,
+            ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
                 1.0,
-                np.array(
-                    [
-                        7.15716584e-18,
-                    ],
-                ),
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
                 1.0,
-                np.array(
-                    [
-                        7.15716584e-18,
-                        7.15716584e-18,
-                    ],
-                ),
             ),
         ],
     )
@@ -1859,11 +1796,11 @@ class TestJitterOTF:
         v: np.ndarray,
         s_x: float,
         s_y: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test jitter_OTF with normal inputs and expected outputs."""
         output = otf.jitter_OTF(u, v, s_x, s_y)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestCommonOTFs:
@@ -2209,11 +2146,11 @@ class TestTurbulenceOTF:
         assert np.isinf(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "D", "r0", "alpha", "expected"),
+        ("u", "v", "lambda0", "D", "r0", "alpha"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0, np.array([0.0])),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0),
+            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
@@ -2221,7 +2158,6 @@ class TestTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([2.11830623, 2.11830623]),
             ),
         ],
     )
@@ -2233,11 +2169,11 @@ class TestTurbulenceOTF:
         D: float,  # noqa: N803
         r0: float,
         alpha: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
         output = otf.turbulence_OTF(u, v, lambda0, D, r0, alpha)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestWindSpeedTurbulenceOTF:
@@ -2311,7 +2247,7 @@ class TestWindSpeedTurbulenceOTF:
             otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
 
     @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "D", "r0", "td", "vel", "expected"),
+        ("u", "v", "lambda0", "D", "r0", "td", "vel"),
         [
             (
                 np.array([1.0]),
@@ -2321,7 +2257,6 @@ class TestWindSpeedTurbulenceOTF:
                 1.0,
                 0.0,
                 0.0,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0]),
@@ -2331,7 +2266,6 @@ class TestWindSpeedTurbulenceOTF:
                 1.0,
                 1.0,
                 0.0,
-                np.array([1.0]),
             ),
             (
                 np.array([1.0, 1.0]),
@@ -2341,7 +2275,6 @@ class TestWindSpeedTurbulenceOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.02636412, 0.02636412]),
             ),
         ],
     )
@@ -2354,11 +2287,11 @@ class TestWindSpeedTurbulenceOTF:
         r0: float,
         td: float,
         vel: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test wind_speed_turbulence_OTF with normal inputs and expected outputs."""
         output = otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestFilterOTF:
@@ -2382,16 +2315,15 @@ class TestFilterOTF:
         assert output.size == 0
 
     @pytest.mark.parametrize(
-        ("u", "v", "kernel", "ifov", "expected"),
+        ("u", "v", "kernel", "ifov"),
         [
-            (np.array([1.0]), np.array([1.0]), np.array([[1.0]]), 1.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), np.array([[0.5, 0.5]]), 10.0, np.array([0.99975328])),
+            (np.array([1.0]), np.array([1.0]), np.array([[1.0]]), 1.0),
+            (np.array([1.0]), np.array([1.0]), np.array([[0.5, 0.5]]), 10.0),
             (
                 np.array([10.0, 10.0]),
                 np.array([0.5, 1.0]),
                 np.array([[1.0]]),
                 1.0,
-                np.array([1.0, 1.0]),
             ),
         ],
     )
@@ -2401,11 +2333,11 @@ class TestFilterOTF:
         v: np.ndarray,
         kernel: float,
         ifov: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
         output = otf.filter_OTF(u, v, kernel, ifov)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestWavefrontOTF:
@@ -2453,9 +2385,9 @@ class TestWavefrontOTF:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "pv", "L_x", "L_y", "expected"),
+        ("u", "v", "lambda0", "pv", "L_x", "L_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
             (
                 np.array([1.0]),
                 np.array([1.0]),
@@ -2463,10 +2395,9 @@ class TestWavefrontOTF:
                 1.0,
                 0.0,
                 0.0,
-                np.array([0.36787944]),
             ),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0),
             (
                 np.array([1.0]),
                 np.array([1.0]),
@@ -2474,7 +2405,6 @@ class TestWavefrontOTF:
                 1.0,
                 1.0,
                 0.0,
-                np.array([0.36787944]),
             ),
             (
                 np.array([1.0]),
@@ -2483,10 +2413,9 @@ class TestWavefrontOTF:
                 1.0,
                 0.0,
                 1.0,
-                np.array([0.36787944]),
             ),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0, np.array([1.0])),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0, np.array([1.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0),
+            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
@@ -2494,7 +2423,6 @@ class TestWavefrontOTF:
                 1.0,
                 1.0,
                 1.0,
-                np.array([0.42119275, 0.42119275]),
             ),
         ],
     )
@@ -2506,11 +2434,11 @@ class TestWavefrontOTF:
         pv: float,
         L_x: float,  # noqa: N803
         L_y: float,  # noqa: N803
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test wavefront_OTF with normal inputs and expected outputs."""
         output = otf.wavefront_OTF(u, v, lambda0, pv, L_x, L_y)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestCircularApertureOTF:
@@ -2576,17 +2504,16 @@ class TestCircularApertureOTF:
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "D", "eta", "expected"),
+        ("u", "v", "lambda0", "D", "eta"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, np.array([0.0])),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, np.array([0.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
                 1.0,
                 0.0,
-                np.array([0.0]),
             ),
             (
                 np.array([1.0, 2.0]),
@@ -2594,7 +2521,6 @@ class TestCircularApertureOTF:
                 1.0,
                 1.0,
                 0.5,
-                np.array([0.0, 0.0]),
             ),
         ],
     )
@@ -2605,11 +2531,11 @@ class TestCircularApertureOTF:
         lambda0: float,
         D: float,  # noqa: N803
         eta: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
         output = otf.circular_aperture_OTF(u, v, lambda0, D, eta)
-        assert np.isclose(output, expected, atol=5e-20).all()
+        snapshot_custom.assert_match(output)
 
 
 class TestCircularApertureOTFWithDefocus:
@@ -2656,9 +2582,9 @@ class TestCircularApertureOTFWithDefocus:
             otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
 
     @pytest.mark.parametrize(
-        ("u", "v", "wavelength", "D", "f", "defocus", "expected"),
+        ("u", "v", "wavelength", "D", "f", "defocus"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0, np.array([0.0])),
+            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
@@ -2666,7 +2592,6 @@ class TestCircularApertureOTFWithDefocus:
                 1.0,
                 0.0,
                 0.0,
-                np.array([0.0]),
             ),
             (
                 np.array([1.0, 2.0]),
@@ -2675,7 +2600,6 @@ class TestCircularApertureOTFWithDefocus:
                 1.0,
                 0.5,
                 0.0,
-                np.array([0.0, 0.0]),
             ),
         ],
     )
@@ -2687,19 +2611,8 @@ class TestCircularApertureOTFWithDefocus:
         D: float,  # noqa: N803
         f: float,
         defocus: float,
-        expected: np.ndarray,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
         output = otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
-        assert np.isclose(output, expected, atol=5e-20).all()
-
-
-@pytest.mark.skipif(
-    not is_usable,
-    reason="OpenCV not found. Please install 'pybsm[graphics]' or `pybsm[headless]`.",
-)
-@mock.patch("pybsm.otf.functional.is_usable", False)
-def test_missing_deps() -> None:
-    """Test that an exception is raised when required dependencies are not installed."""
-    with pytest.raises(ImportError, match=r"OpenCV not found"):
-        otf.resample_2D(np.ones((5, 5)), 1.0, 1.0)
+        snapshot_custom.assert_match(output)

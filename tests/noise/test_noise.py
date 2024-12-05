@@ -6,6 +6,12 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import noise
+from tests.test_utils import CustomFloatSnapshotExtension
+
+
+@pytest.fixture
+def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
 
 
 class TestNoise:
@@ -20,13 +26,14 @@ class TestNoise:
     )
     def test_noise_gain(
         self,
-        snapshot: SnapshotAssertion,
+        snapshot_custom: SnapshotAssertion,
         kernel: np.ndarray,
         expectation: AbstractContextManager,
     ) -> None:
         """Test noise_gain against gold standard results and confirm exceptions are appropriately raised."""
         with expectation:
-            assert noise.noise_gain(kernel) == snapshot
+            output = noise.noise_gain(kernel)
+            snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("pe_range", "bit_depth"),
@@ -51,18 +58,13 @@ class TestNoise:
         assert np.isinf(output)
 
     @pytest.mark.parametrize(
-        ("pe_range", "bit_depth", "expected"),
+        ("pe_range", "bit_depth"),
         [
-            (0.0, 1.0, 0.0),
-            (1.0, 1.0, 0.2886751345948129),
+            (0.0, 1.0),
+            (1.0, 1.0),
         ],
     )
-    def test_quantization_noise(
-        self,
-        pe_range: float,
-        bit_depth: float,
-        expected: float,
-    ) -> None:
+    def test_quantization_noise(self, pe_range: float, bit_depth: float, snapshot_custom: SnapshotAssertion) -> None:
         """Test quantization_noise with normal inputs and expected outputs."""
         output = noise.quantization_noise(pe_range, bit_depth)
-        assert np.isclose(output, expected)
+        snapshot_custom.assert_match(output)
