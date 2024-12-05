@@ -6,7 +6,6 @@
 #
 # 1) pybsm specific notebooks.
 # 2) Added the original example as a job
-# 3) Poetry install for opencv-python-headless
 #
 ###############################################################################
 

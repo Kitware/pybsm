@@ -5,7 +5,7 @@ pyBSM is a Python-based tool for sensor modeling. It provides common components 
 This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems [[1]](#1) as well as LeMaster, et al. in their work in validating the pyBSM package [[2]](#2).
 
 NOTE: A set of functions which infer OTFs from user data has been removed from
-the current distribution of pyBSM. They are archived under the v0.7.0 tag if 
+the current distribution of pyBSM. They are archived under the v0.7.0 tag if
 they are needed.
 
 ## References
@@ -29,34 +29,8 @@ Alternatively, you can use [Poetry](https://python-poetry.org/):
 poetry install
 ```
 
-Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://pybsm.readthedocs.io/en/latest/implementations.html).
-
 For more detailed installation instructions, visit the [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
 <!-- :auto installation: -->
-
-Installing using the previous commands will not install OpenCV. While pyBSM will still function, there are a handful of functions that require OpenCV.
-
-There are two options for installing pyBSM with OpenCV: graphics or headless. Graphics will install `opencv-python` as the OpenCV implementation while headless will install `opencv-python-headless` as the OpenCV implementation.
-
-To install pybsm with `opencv-python`
-* using pip:
-```bash
-pip install pybsm[graphics]
-```
-* using Poetry
-```bash
-poetry install --sync --with linting,tests,docs --extras graphics
-```
-
-To install pybsm with `opencv-python-headless`
-* using pip:
-```bash
-pip install pybsm[headless]
-```
-* using Poetry
-```bash
-poetry install --sync --with linting,tests,docs --extras headless
-```
 
 <!-- :auto getting-started: -->
 ## Getting Started

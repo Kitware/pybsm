@@ -923,7 +923,7 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     new_y = max([1, int(psf.shape[0] * dx_in / dx_out)])
     x_zoom_factor = new_x / psf.shape[1]
     y_zoom_factor = new_y / psf.shape[0]
-    psf = zoom(psf, (x_zoom_factor, y_zoom_factor), order=1).astype(np.float64)
+    psf = zoom(psf, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True).astype(np.float64)
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
@@ -1421,7 +1421,7 @@ def resample_2D(  # noqa: N802
             if imigin is not a 2D array
         ZeroDivisionError:
             if dx_out is 0
-        PIL.error:
+        ValueError:
             if dx_in is 0
 
     """
@@ -1429,7 +1429,7 @@ def resample_2D(  # noqa: N802
     x_zoom_factor = new_x / img_in.shape[1]
     y_zoom_factor = new_y / img_in.shape[0]
 
-    return zoom(img_in, (x_zoom_factor, y_zoom_factor), order=1).astype(np.float64)
+    return zoom(img_in, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True).astype(np.float64)
 
 
 def resampled_dimensions(
@@ -1457,7 +1457,7 @@ def resampled_dimensions(
             if imigin is not a 2D array
         ZeroDivisionError:
             if dx_out is 0
-        PIL.error:
+        ValueError:
             if dx_in is 0
 
     """
