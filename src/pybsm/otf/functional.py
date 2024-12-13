@@ -68,7 +68,7 @@ from typing import Callable
 # 3rd party imports
 import numpy as np
 from scipy import integrate, interpolate
-from scipy.ndimage import convolve, zoom
+from scipy.ndimage import correlate, zoom
 from scipy.special import jn
 
 # local imports
@@ -923,7 +923,7 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     new_y = max([1, int(psf.shape[0] * dx_in / dx_out)])
     x_zoom_factor = new_x / psf.shape[1]
     y_zoom_factor = new_y / psf.shape[0]
-    psf = zoom(psf, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True).astype(np.float64)
+    psf = zoom(psf, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True, mode="grid-constant").astype(np.float64)
 
     # ensure that the psf sums to 1
     psf = psf / psf.sum()
@@ -1264,13 +1264,13 @@ def apply_otf_to_image(
         sim_img = np.empty((new_x, new_y, 3))
         for channel in range(0, 3):
             # filter the image
-            blur_img[:, :, channel] = convolve(ref_img[:, :, channel], np.flipud(np.fliplr(psf)), mode="mirror")
+            blur_img[:, :, channel] = correlate(ref_img[:, :, channel], psf, mode="mirror")
 
             # resample the image to the camera's ifov
             sim_img[:, :, channel] = resample_2D(blur_img[:, :, channel], ref_gsd / ref_range, ifov)
     else:
         # filter the image
-        blur_img = convolve(ref_img, np.flipud(np.fliplr(psf)), mode="mirror")
+        blur_img = correlate(ref_img, psf, mode="mirror")
 
         # resample the image to the camera's ifov
         sim_img = resample_2D(blur_img, ref_gsd / ref_range, ifov)
@@ -1429,7 +1429,9 @@ def resample_2D(  # noqa: N802
     x_zoom_factor = new_x / img_in.shape[1]
     y_zoom_factor = new_y / img_in.shape[0]
 
-    return zoom(img_in, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True).astype(np.float64)
+    return zoom(img_in, (x_zoom_factor, y_zoom_factor), order=1, grid_mode=True, mode="grid-constant").astype(
+        np.float64,
+    )
 
 
 def resampled_dimensions(
