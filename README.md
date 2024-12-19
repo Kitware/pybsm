@@ -65,7 +65,7 @@ Pre-commit hooks ensure that code complies with required linting and formatting 
 To install and use pre-commit hooks:
 ```bash
 # Install required dependencies
-poetry install --sync --with linting,tests,docs
+poetry install --sync --with main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files
@@ -90,7 +90,10 @@ poetry run pre-commit run --all-files
 ## Contacts
 
 **Principal Investigator**: Brian Hu (Kitware) @brian.hu
+
 **Product Owner**: Austin Whitesell (MITRE) @awhitesell
+
 **Scrum Master / Tech Lead**: Brandon RichardWebster (Kitware) @b.richardwebster
+
 **Deputy Tech Lead**: Emily Veenhuis (Kitware) @emily.veenhuis
 <!-- :auto contacts: -->
