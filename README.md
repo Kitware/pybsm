@@ -46,7 +46,7 @@ Documentation for both release snapshots and the latest master branch is availab
 To build the Sphinx-based documentation locally for the latest reference:
 ```bash
 # Install dependencies
-poetry install --sync --with linting,tests,docs
+poetry install --sync --with main,linting,tests,docs
 # Navigate to the documentation root
 cd docs
 # Build the documentation
