@@ -26,7 +26,7 @@ pip install pybsm
 
 Alternatively, you can use [Poetry](https://python-poetry.org/):
 ```bash
-poetry install
+poetry install --with main,linting,tests,docs
 ```
 
 For more detailed installation instructions, visit the [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
