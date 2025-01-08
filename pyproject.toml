@@ -4,14 +4,12 @@ requires = ["poetry-core>=1.9"]
 build-backend = "poetry.core.masonry.api"
 # :auto build-system:
 
+# :auto package-meta:
 [tool.poetry]
 name = "pybsm"
-version = "0.10.1"
-description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 license = "Apache-2.0"
 documentation = "https://pybsm.readthedocs.io/"
 readme = "README.md"
-authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 packages = [{include = "pybsm", from="src"}]
 classifiers = [
     'Development Status :: 3 - Alpha',
@@ -25,6 +23,11 @@ classifiers = [
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
 ]
+# :auto package-meta:
+# package-specific meta, don't put this in "generated package-meta"
+version = "0.10.1"
+authors = ["Kitware, Inc. <nrtk@kitware.com>"]
+description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
 [tool.poetry.dependencies]
 # :auto python-version:
