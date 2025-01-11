@@ -25,7 +25,7 @@ classifiers = [
 ]
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
-version = "0.10.1"
+version = "0.10.2"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
