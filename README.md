@@ -2,7 +2,7 @@
 
 pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems.
 
-This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems [[1]](#1) as well as LeMaster, et al. in their work in validating the pyBSM package [[2]](#2).
+This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems \[1] as well as LeMaster, et al. in their work in validating the pyBSM package \[2].
 
 NOTE: A set of functions which infer OTFs from user data has been removed from
 the current distribution of pyBSM. They are archived under the v0.7.0 tag if
@@ -26,7 +26,7 @@ pip install pybsm
 
 Alternatively, you can use [Poetry](https://python-poetry.org/):
 ```bash
-poetry install
+poetry install --with main,linting,tests,docs
 ```
 
 For more detailed installation instructions, visit the [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
@@ -46,7 +46,7 @@ Documentation for both release snapshots and the latest master branch is availab
 To build the Sphinx-based documentation locally for the latest reference:
 ```bash
 # Install dependencies
-poetry install --sync --with linting,tests,docs
+poetry install --sync --with main,linting,tests,docs
 # Navigate to the documentation root
 cd docs
 # Build the documentation
@@ -65,7 +65,7 @@ Pre-commit hooks ensure that code complies with required linting and formatting 
 To install and use pre-commit hooks:
 ```bash
 # Install required dependencies
-poetry install --sync --with linting,tests,docs
+poetry install --sync --with main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files
@@ -90,7 +90,10 @@ poetry run pre-commit run --all-files
 ## Contacts
 
 **Principal Investigator**: Brian Hu (Kitware) @brian.hu
+
 **Product Owner**: Austin Whitesell (MITRE) @awhitesell
+
 **Scrum Master / Tech Lead**: Brandon RichardWebster (Kitware) @b.richardwebster
+
 **Deputy Tech Lead**: Emily Veenhuis (Kitware) @emily.veenhuis
 <!-- :auto contacts: -->

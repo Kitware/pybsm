@@ -1260,8 +1260,11 @@ def apply_otf_to_image(
     if ref_img.ndim == 3:
         # Initialize arrays
         blur_img = np.empty(ref_img.shape)
-        new_x, new_y = resampled_dimensions(blur_img[:, :, 0], ref_gsd / ref_range, ifov)
-        sim_img = np.empty((new_x, new_y, 3))
+        # Do an extra resample operation on a single channel to get the (h x w)
+        # dimensions of the simulated image
+        resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / ref_range, ifov)
+        sim_img = np.empty((*resampled_img.shape, 3))
+
         for channel in range(0, 3):
             # filter the image
             blur_img[:, :, channel] = correlate(ref_img[:, :, channel], psf, mode="mirror")
