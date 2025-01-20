@@ -288,7 +288,7 @@ def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov:
 
     grd_cases = slant_range * np.array([1.0 / u_r, 2.0 * ifov])
 
-    return np.max(grd_cases)
+    return float(np.max(grd_cases))
 
 
 def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
@@ -651,7 +651,7 @@ def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> floa
         index = index + 1
 
     # if er is monotonically increasing, use the edge response at 1.25 pixels from the edge
-    return er[1] if np.all(np.diff(er) > 0) else np.max(er)
+    return er[1] if np.all(np.diff(er) > 0) else float(np.max(er))
 
 
 def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float) -> float:

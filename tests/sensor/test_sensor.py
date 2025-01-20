@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 import pytest
@@ -7,7 +7,7 @@ from pybsm.simulation import Sensor
 
 
 class TestSensor:
-    def create_default_sensor(self, other_args: Optional[dict[str, int]] = None) -> None:
+    def create_default_sensor(self, other_args: Optional[dict[str, Any]] = None) -> Sensor:
         name = "test"
         d = 1.0
         f = 1.0

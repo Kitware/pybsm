@@ -13,7 +13,7 @@ from tests.test_utils import CustomFloatSnapshotExtension
 
 @pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestOTFHelper:
@@ -841,13 +841,13 @@ class TestDiffusionOTF:
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                0.0,
-                2.0,
-                2.0,
+                np.array([0.0]),
+                np.array([2.0]),
+                np.array([2.0]),
                 1.0,
             ),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0),
-            (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 0.0, 1.0, 1.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), np.array([0.0]), np.array([1.0]), np.array([1.0]), 0.0),
+            (np.array([1.0, 2.0]), np.array([1.0, 2.0]), np.array([0.0]), np.array([1.0]), np.array([1.0]), 0.0),
         ],
     )
     def test_nan(
@@ -855,8 +855,8 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
@@ -866,10 +866,10 @@ class TestDiffusionOTF:
     @pytest.mark.parametrize(
         ("u", "v", "alpha", "ald", "al0", "f"),
         [
-            (np.array([]), np.array([]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0),
+            (np.array([]), np.array([]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([1.0]), np.array([]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([]), np.array([1.0]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([]), np.array([1.0]), np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0),
         ],
     )
     def test_empty_array(
@@ -877,8 +877,8 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
     ) -> None:
         """Test diffusion_OTF with empty input."""
@@ -891,25 +891,25 @@ class TestDiffusionOTF:
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                1.0,
-                0.0,
-                1.0,
+                np.array([1.0]),
+                np.array([0.0]),
+                np.array([1.0]),
                 1.0,
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                1.0,
-                1.0,
-                1.0,
+                np.array([1.0]),
+                np.array([1.0]),
+                np.array([1.0]),
                 2.0,
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
-                1.0,
-                1.0,
-                1.0,
+                np.array([1.0, 1.0]),
+                np.array([1.0, 1.0]),
+                np.array([1.0, 1.0]),
                 1.0,
             ),
         ],
@@ -919,8 +919,8 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
@@ -1148,7 +1148,7 @@ class TestSliceOTF:
         self,
         otf_input: np.ndarray,
         ang: float,
-        snapshot_custom: float,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test slice_otf with normal inputs and expected outputs."""
         output = otf.slice_otf(otf_input, ang)
@@ -2307,7 +2307,7 @@ class TestFilterOTF:
         self,
         u: np.ndarray,
         v: np.ndarray,
-        kernel: float,
+        kernel: np.ndarray,
         ifov: float,
     ) -> None:
         """Test filter_OTF with empty input."""
@@ -2331,7 +2331,7 @@ class TestFilterOTF:
         self,
         u: np.ndarray,
         v: np.ndarray,
-        kernel: float,
+        kernel: np.ndarray,
         ifov: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:

@@ -133,8 +133,9 @@ def img_to_reflectance(
     f = interpolate.interp1d(
         pix_values,
         refl_values,
-        fill_value="extrapolate",
-        assume_sorted=0,
+        # pyright thinks fill_value expects a float or array-like. `extrapolate` is a valid option (https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d)
+        fill_value="extrapolate",  # type: ignore
+        assume_sorted=False,
     )
     ref_img = f(img)
     ref_img[ref_img > 1.0] = 1.0

@@ -74,7 +74,7 @@ for ii in np.arange(4, ground_ranges.shape[0]):
         "groundRange: " + str(ground_ranges[ii] / 1000) + " km",
         fontdict={"fontsize": 6},
     )
-    scenario.ground_range = ground_ranges[ii]
+    scenario.ground_range = float(ground_ranges[ii])
     img_out = simulation.simulate_image(ref_img, sensor, scenario)[2]
     img_out = simulation.stretch_contrast_convert_8bit(img_out)
     plt.imshow(img_out, cmap="gray")
