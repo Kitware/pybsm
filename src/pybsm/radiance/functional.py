@@ -571,12 +571,14 @@ def reflectance_to_photoelectrons(
     pe = np.zeros(ref.shape)
     atm = atm[atm[:, 0] >= sensor.opt_trans_wavelengths[0], :]
     atm = atm[atm[:, 0] <= sensor.opt_trans_wavelengths[-1], :]
+    weights = np.asarray([])
+    wavelengths = np.asarray([])
 
     for idx in np.arange(ref.size):
         # Calculate the total radiance from the target including both
         # reflection of the solar illumination and the radiative emission from
         # the object assumed to be at 300 K.
-        target_radiance = total_radiance(atm, ref[idx], 300.0)
+        target_radiance = total_radiance(atm=atm, reflectance=float(ref[idx]), temperature=300.0)
 
         wavelengths = atm[:, 0]
 

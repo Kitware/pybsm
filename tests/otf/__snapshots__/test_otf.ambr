@@ -89,13 +89,13 @@
 # name: TestDetectorOTFWithAggregation.test[u4-v4-1.0-1.0-1.0-1.0-1.0-2]
   array([1.51957436e-33, 1.51957436e-33])
 # ---
-# name: TestDiffusionOTF.test[u0-v0-1.0-0.0-1.0-1.0]
+# name: TestDiffusionOTF.test[u0-v0-alpha0-ald0-al00-1.0]
   array([0.20116963])
 # ---
-# name: TestDiffusionOTF.test[u1-v1-1.0-1.0-1.0-2.0]
+# name: TestDiffusionOTF.test[u1-v1-alpha1-ald1-al01-2.0]
   array([0.85576647])
 # ---
-# name: TestDiffusionOTF.test[u2-v2-1.0-1.0-1.0-1.0]
+# name: TestDiffusionOTF.test[u2-v2-alpha2-ald2-al02-1.0]
   array([0.8199439, 0.8199439])
 # ---
 # name: TestDriftOTF.test[u0-v0-0.0-0.0]

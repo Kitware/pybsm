@@ -406,10 +406,10 @@ def diffusion_OTF(  # noqa: N802
     u: np.ndarray,
     v: np.ndarray,
     alpha: np.ndarray,
-    ald: float,
-    al0: float,
+    ald: np.ndarray,
+    al0: np.ndarray,
     f: float,
-) -> float:
+) -> np.ndarray:
     """IBSM Equation 3-40.  Blur due to the effects of minority carrier diffusion in a CCD sensor.
 
     Included for completeness but this isn't a good description of modern detector structures.
@@ -434,10 +434,10 @@ def diffusion_OTF(  # noqa: N802
     """
 
     def diffusion_OTF_params(  # noqa: N802
-        al: float,
+        al: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-    ) -> float:
+        ald: np.ndarray,
+    ) -> np.ndarray:
         return 1.0 - np.exp(-alpha * ald) / (1.0 + alpha * al)
 
     rho = np.sqrt(u**2 + v**2)
@@ -938,7 +938,7 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
             for d in x.shape
         )
     ]
-
+    psf_out = np.asarray([])
     # find the support region of the blur kernel
     for ii in np.arange(10, np.min(otf.shape), 5):
         psf_out = get_middle(psf, ii)
