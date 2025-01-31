@@ -43,6 +43,7 @@ class RefImage:
 
     def __init__(
         self,
+        *,
         img: np.ndarray,
         gsd: float,
         pix_values: Optional[np.ndarray] = None,
@@ -101,9 +102,9 @@ class RefImage:
         opt_trans_wavelengths = np.array([380, 700]) * 1.0e-9  # m
 
         scenario = Scenario(
-            self.name,
-            1,
-            altitude,
+            name=self.name,
+            ihaze=1,
+            altitude=altitude,
             ground_range=0,
             aircraft_speed=0,
             ha_wind_speed=0,
@@ -128,7 +129,13 @@ class RefImage:
         # a coefficient of 4 for safety.
         D = 4 * np.median(opt_trans_wavelengths) / ifov  # noqa: N806
 
-        sensor = Sensor(self.name, D, f, p, opt_trans_wavelengths)
+        sensor = Sensor(
+            name=self.name,
+            D=D,
+            f=f,
+            p_x=p,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+        )
         return sensor, scenario
 
     def show(self) -> None:

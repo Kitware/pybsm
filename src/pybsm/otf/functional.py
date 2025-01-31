@@ -102,6 +102,7 @@ r_earth = 6378.164e3  # radius of the earth (m)
 
 
 def circular_aperture_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     lambda0: float,
@@ -169,6 +170,7 @@ def circular_aperture_OTF(  # noqa: N802
 
 
 def circular_aperture_OTF_with_defocus(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     wavelength: float,
@@ -238,6 +240,7 @@ def circular_aperture_OTF_with_defocus(  # noqa: N802
 
 
 def cte_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     p_x: float,
@@ -281,6 +284,7 @@ def cte_OTF(  # noqa: N802
     # or cte_n_y and pu is the product of pitch and spatial frequency - either
     # v*p_y or u*p_x
     def cte_OTF_xy(  # noqa: N802
+        *,
         n: float,
         pu: np.ndarray,
         phases_n: int,
@@ -291,10 +295,17 @@ def cte_OTF(  # noqa: N802
             -1.0 * phases_n * n * (1.0 - cte_eff) * (1.0 - np.cos(2.0 * np.pi * pu / f)),
         )
 
-    return cte_OTF_xy(cte_n_x, p_x * u, phases_n, cte_eff, f) * cte_OTF_xy(cte_n_y, p_y * v, phases_n, cte_eff, f)
+    return cte_OTF_xy(n=cte_n_x, pu=p_x * u, phases_n=phases_n, cte_eff=cte_eff, f=f) * cte_OTF_xy(
+        n=cte_n_y,
+        pu=p_y * v,
+        phases_n=phases_n,
+        cte_eff=cte_eff,
+        f=f,
+    )
 
 
 def defocus_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     w_x: float,
@@ -322,6 +333,7 @@ def defocus_OTF(  # noqa: N802
 
 
 def detector_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     w_x: float,
@@ -353,6 +365,7 @@ def detector_OTF(  # noqa: N802
 
 
 def detector_OTF_with_aggregation(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     w_x: float,
@@ -403,6 +416,7 @@ def detector_OTF_with_aggregation(  # noqa: N802
 
 
 def diffusion_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     alpha: np.ndarray,
@@ -448,6 +462,7 @@ def diffusion_OTF(  # noqa: N802
 
 
 def drift_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     a_x: float,
@@ -475,6 +490,7 @@ def drift_OTF(  # noqa: N802
 
 
 def filter_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     kernel: np.ndarray,
@@ -532,6 +548,7 @@ def filter_OTF(  # noqa: N802
 
 
 def gaussian_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     blur_size_x: float,
@@ -569,6 +586,7 @@ def gaussian_OTF(  # noqa: N802
 
 
 def jitter_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     s_x: float,
@@ -599,6 +617,7 @@ def jitter_OTF(  # noqa: N802
 
 
 def polychromatic_turbulence_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     wavelengths: np.ndarray,
@@ -657,37 +676,54 @@ def polychromatic_turbulence_OTF(  # noqa: N802
             or altitude are not equal
     """
     # calculate the Structure constant along the slant path
-    (z_path, h_path) = altitude_along_slant_path(0.0, altitude, slant_range)
-    cn2 = hufnagel_valley_turbulence_profile(h_path, ha_wind_speed, cn2_at_1m)
+    (z_path, h_path) = altitude_along_slant_path(
+        h_target=0.0,
+        h_sensor=altitude,
+        slant_range=slant_range,
+    )
+    cn2 = hufnagel_valley_turbulence_profile(
+        h=h_path,
+        v=ha_wind_speed,
+        cn2_at_1m=cn2_at_1m,
+    )
 
     # calculate the coherence diameter over the band
-    r0_at_1um = coherence_diameter(1.0e-6, z_path, cn2)
+    r0_at_1um = coherence_diameter(
+        lambda0=1.0e-6,
+        z_path=z_path,
+        cn2=cn2,
+    )
 
     def r0_function(wav: float) -> float:
         return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)
 
-    r0_band = weighted_by_wavelength(wavelengths, weights, r0_function)
+    r0_band = weighted_by_wavelength(
+        wavelengths=wavelengths,
+        weights=weights,
+        my_function=r0_function,
+    )
 
     # calculate the turbulence OTF
     turb_function = lambda wavelengths: wind_speed_turbulence_OTF(  # noqa: E731
-        u,
-        v,
-        wavelengths,
-        D,
-        r0_function(wavelengths),
-        int_time,
-        aircraft_speed,
+        u=u,
+        v=v,
+        lambda0=wavelengths,
+        D=D,
+        r0=r0_function(wavelengths),
+        t_d=int_time,
+        vel=aircraft_speed,
     )
     turbulence_OTF = weighted_by_wavelength(  # noqa: N806
-        wavelengths,
-        weights,
-        turb_function,
+        wavelengths=wavelengths,
+        weights=weights,
+        my_function=turb_function,
     )
 
     return turbulence_OTF, r0_band
 
 
 def tdi_OTF(  # noqa: N802
+    *,
     u_or_v: np.ndarray,
     w: float,
     n_tdi: float,
@@ -727,6 +763,7 @@ def tdi_OTF(  # noqa: N802
 
 
 def turbulence_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     lambda0: float,
@@ -764,6 +801,7 @@ def turbulence_OTF(  # noqa: N802
 
 
 def wavefront_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     lambda0: float,
@@ -810,6 +848,7 @@ def wavefront_OTF(  # noqa: N802
 
 
 def wavefront_OTF_2(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     cutoff: float,
@@ -846,6 +885,7 @@ def wavefront_OTF_2(  # noqa: N802
 
 
 def wind_speed_turbulence_OTF(  # noqa: N802
+    *,
     u: np.ndarray,
     v: np.ndarray,
     lambda0: float,
@@ -883,13 +923,20 @@ def wind_speed_turbulence_OTF(  # noqa: N802
         Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * t_d / r0)
-    return weight * turbulence_OTF(u, v, lambda0, D, r0, 0.5) + (1 - weight) * turbulence_OTF(u, v, lambda0, D, r0, 0.0)
+    return weight * turbulence_OTF(u=u, v=v, lambda0=lambda0, D=D, r0=r0, alpha=0.5) + (1 - weight) * turbulence_OTF(
+        u=u,
+        v=v,
+        lambda0=lambda0,
+        D=D,
+        r0=r0,
+        alpha=0.0,
+    )
 
 
 # ----------------------------- END OTF Models -------------------------------
 
 
-def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
+def otf_to_psf(*, otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     """Transform an optical transfer function into a point spread function (i.e., image space blur filter).
 
     :param otf:
@@ -950,6 +997,7 @@ def otf_to_psf(otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
 
 
 def weighted_by_wavelength(
+    *,
     wavelengths: np.ndarray,
     weights: np.ndarray,
     my_function: Callable,
@@ -987,7 +1035,7 @@ def weighted_by_wavelength(
     return weighted_fcn
 
 
-def coherence_diameter(lambda0: float, z_path: np.ndarray, cn2: np.ndarray) -> float:
+def coherence_diameter(*, lambda0: float, z_path: np.ndarray, cn2: np.ndarray) -> float:
     """Improvement / replacement for calculation of Fried's coherence diameter (m) for spherical wave propagation.
 
     This is an improvement / replacement for IBSM Equation 3-5: calculation of Fried's coherence diameter (m) for
@@ -1031,6 +1079,7 @@ def coherence_diameter(lambda0: float, z_path: np.ndarray, cn2: np.ndarray) -> f
 
 
 def hufnagel_valley_turbulence_profile(
+    *,
     h: np.ndarray,
     v: float,
     cn2_at_1m: float,
@@ -1067,6 +1116,7 @@ def hufnagel_valley_turbulence_profile(
 
 
 def object_domain_defocus_radii(
+    *,
     D: float,  # noqa: N803
     R: float,  # noqa: N803
     R0: float,  # noqa: N803
@@ -1091,7 +1141,7 @@ def object_domain_defocus_radii(
     return 0.62 * D * (1.0 / R - 1.0 / R0)
 
 
-def dark_current_from_density(jd: float, w_x: float, w_y: float) -> float:
+def dark_current_from_density(*, jd: float, w_x: float, w_y: float) -> float:
     """The dark current part of Equation 3-42.
 
     Use this function to calculate the total number of electrons generated from dark current during an
@@ -1114,7 +1164,7 @@ def dark_current_from_density(jd: float, w_x: float, w_y: float) -> float:
     return jd * w_x * w_y / qc  # recall that qc is defined as charge of an electron
 
 
-def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa: N803
+def image_domain_defocus_radii(*, D: float, dz: float, f: float) -> float:  # noqa: N803
     """IBSM Equation 3-27.  Axial defocus blur spot radii in the image domain.
 
     :param D:
@@ -1135,7 +1185,7 @@ def image_domain_defocus_radii(D: float, dz: float, f: float) -> float:  # noqa:
     return 0.62 * D * dz / (f**2.0)
 
 
-def slice_otf(otf: np.ndarray, ang: float) -> np.ndarray:
+def slice_otf(*, otf: np.ndarray, ang: float) -> np.ndarray:
     """Returns a one dimensional slice of a 2D OTF (or MTF) along the direction specified by the input angle.
 
     :param otf:
@@ -1162,6 +1212,7 @@ def slice_otf(otf: np.ndarray, ang: float) -> np.ndarray:
 
 
 def apply_otf_to_image(
+    *,
     ref_img: np.ndarray,
     ref_gsd: float,
     ref_range: float,
@@ -1255,14 +1306,18 @@ def apply_otf_to_image(
     # this function. Therefore, we can calculate the instantaneous field of view
     # (iFOV) of the assumed real camera, which is
     # 2*arctan(ref_gsd/2/ref_range).
-    psf = otf_to_psf(otf, df, 2 * np.arctan(ref_gsd / 2 / ref_range))
+    psf = otf_to_psf(otf=otf, df=df, dx_out=2 * np.arctan(ref_gsd / 2 / ref_range))
 
     if ref_img.ndim == 3:
         # Initialize arrays
         blur_img = np.empty(ref_img.shape)
         # Do an extra resample operation on a single channel to get the (h x w)
         # dimensions of the simulated image
-        resampled_img = resample_2D(blur_img[:, :, 0], ref_gsd / ref_range, ifov)
+        resampled_img = resample_2D(
+            img_in=blur_img[:, :, 0],
+            dx_in=ref_gsd / ref_range,
+            dx_out=ifov,
+        )
         sim_img = np.empty((*resampled_img.shape, 3))
 
         for channel in range(0, 3):
@@ -1270,21 +1325,26 @@ def apply_otf_to_image(
             blur_img[:, :, channel] = correlate(ref_img[:, :, channel], psf, mode="mirror")
 
             # resample the image to the camera's ifov
-            sim_img[:, :, channel] = resample_2D(blur_img[:, :, channel], ref_gsd / ref_range, ifov)
+            sim_img[:, :, channel] = resample_2D(
+                img_in=blur_img[:, :, channel],
+                dx_in=ref_gsd / ref_range,
+                dx_out=ifov,
+            )
     else:
         # filter the image
         blur_img = correlate(ref_img, psf, mode="mirror")
 
         # resample the image to the camera's ifov
-        sim_img = resample_2D(blur_img, ref_gsd / ref_range, ifov)
+        sim_img = resample_2D(img_in=blur_img, dx_in=ref_gsd / ref_range, dx_out=ifov)
 
     # resample psf (good for health checks on the simulation)
-    sim_psf = resample_2D(psf, ref_gsd / ref_range, ifov)
+    sim_psf = resample_2D(img_in=psf, dx_in=ref_gsd / ref_range, dx_out=ifov)
 
     return sim_img, sim_psf
 
 
 def common_OTFs(  # noqa: N802
+    *,
     sensor: Sensor,
     scenario: Scenario,
     uu: np.ndarray,
@@ -1335,63 +1395,76 @@ def common_OTFs(  # noqa: N802
 
     # aperture OTF
     ap_function = lambda wavelengths: circular_aperture_OTF(  # noqa: E731
-        uu,
-        vv,
-        wavelengths,
-        sensor.D,
-        sensor.eta,
+        u=uu,
+        v=vv,
+        lambda0=wavelengths,
+        D=sensor.D,
+        eta=sensor.eta,
     )
-    otf.ap_OTF = weighted_by_wavelength(mtf_wavelengths, mtf_weights, ap_function)
+    otf.ap_OTF = weighted_by_wavelength(
+        wavelengths=mtf_wavelengths,
+        weights=mtf_weights,
+        my_function=ap_function,
+    )
 
     # turbulence OTF
     if scenario.cn2_at_1m > 0.0:  # this option allows you to turn off turbulence completely
         # by setting cn2 at the ground level to 0
         otf.turb_OTF, otf.r0_band = polychromatic_turbulence_OTF(
-            uu,
-            vv,
-            mtf_wavelengths,
-            mtf_weights,
-            scenario.altitude,
-            slant_range,
-            sensor.D,
-            scenario.ha_wind_speed,
-            scenario.cn2_at_1m,
-            int_time * sensor.n_tdi,
-            scenario.aircraft_speed,
+            u=uu,
+            v=vv,
+            wavelengths=mtf_wavelengths,
+            weights=mtf_weights,
+            altitude=scenario.altitude,
+            slant_range=slant_range,
+            D=sensor.D,
+            ha_wind_speed=scenario.ha_wind_speed,
+            cn2_at_1m=scenario.cn2_at_1m,
+            int_time=int_time * sensor.n_tdi,
+            aircraft_speed=scenario.aircraft_speed,
         )
     else:
         otf.turb_OTF = np.ones(uu.shape)
         otf.r0_band = 1e6 * np.ones(uu.shape)
 
     # detector OTF
-    otf.det_OTF = detector_OTF(uu, vv, sensor.w_x, sensor.w_y, sensor.f)
+    otf.det_OTF = detector_OTF(u=uu, v=vv, w_x=sensor.w_x, w_y=sensor.w_y, f=sensor.f)
 
     # jitter OTF
-    otf.jit_OTF = jitter_OTF(uu, vv, sensor.s_x, sensor.s_y)
+    otf.jit_OTF = jitter_OTF(u=uu, v=vv, s_x=sensor.s_x, s_y=sensor.s_y)
 
     # drift OTF
     otf.drft_OTF = drift_OTF(
-        uu,
-        vv,
-        sensor.da_x * int_time * sensor.n_tdi,
-        sensor.da_y * int_time * sensor.n_tdi,
+        u=uu,
+        v=vv,
+        a_x=sensor.da_x * int_time * sensor.n_tdi,
+        a_y=sensor.da_y * int_time * sensor.n_tdi,
     )
 
     # wavefront OTF
     wav_function = lambda wavelengths: wavefront_OTF(  # noqa: E731
-        uu,
-        vv,
-        wavelengths,
-        sensor.pv * (sensor.pv_wavelength / wavelengths) ** 2,
-        sensor.L_x,
-        sensor.L_y,
+        u=uu,
+        v=vv,
+        lambda0=wavelengths,
+        pv=sensor.pv * (sensor.pv_wavelength / wavelengths) ** 2,
+        L_x=sensor.L_x,
+        L_y=sensor.L_y,
     )
-    otf.wav_OTF = weighted_by_wavelength(mtf_wavelengths, mtf_weights, wav_function)
+    otf.wav_OTF = weighted_by_wavelength(
+        wavelengths=mtf_wavelengths,
+        weights=mtf_weights,
+        my_function=wav_function,
+    )
 
     # filter OTF (e.g. a sharpening filter but it could be anything)
     if sensor.filter_kernel.shape[0] > 1:
         # note that we're assuming equal ifovs in the x and y directions
-        otf.filter_OTF = filter_OTF(uu, vv, sensor.filter_kernel, sensor.p_x / sensor.f)
+        otf.filter_OTF = filter_OTF(
+            u=uu,
+            v=vv,
+            kernel=sensor.filter_kernel,
+            ifov=sensor.p_x / sensor.f,
+        )
     else:
         otf.filter_OTF = np.ones(uu.shape)
 
@@ -1402,6 +1475,7 @@ def common_OTFs(  # noqa: N802
 
 
 def resample_2D(  # noqa: N802
+    *,
     img_in: np.ndarray,
     dx_in: float,
     dx_out: float,
@@ -1428,7 +1502,11 @@ def resample_2D(  # noqa: N802
             if dx_in is 0
 
     """
-    new_x, new_y = resampled_dimensions(img_in, dx_in, dx_out)
+    new_x, new_y = resampled_dimensions(
+        img_in=img_in,
+        dx_in=dx_in,
+        dx_out=dx_out,
+    )
     x_zoom_factor = new_x / img_in.shape[1]
     y_zoom_factor = new_y / img_in.shape[0]
 
@@ -1438,6 +1516,7 @@ def resample_2D(  # noqa: N802
 
 
 def resampled_dimensions(
+    *,
     img_in: np.ndarray,
     dx_in: float,
     dx_out: float,

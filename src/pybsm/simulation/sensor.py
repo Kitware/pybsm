@@ -138,6 +138,7 @@ class Sensor:
 
     def __init__(
         self,
+        *,
         name: str,
         D: float,  # noqa: N803
         f: float,

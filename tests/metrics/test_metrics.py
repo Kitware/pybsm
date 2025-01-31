@@ -13,5 +13,5 @@ class TestMetrics:
         name: str,
     ) -> None:
         """Check if created metrics matches expected parameters."""
-        metrics = Metrics(name)
+        metrics = Metrics(name=name)
         assert name == metrics.name

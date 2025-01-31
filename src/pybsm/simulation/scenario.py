@@ -66,6 +66,7 @@ class Scenario:
 
     def __init__(
         self,
+        *,
         name: str,
         ihaze: int,
         altitude: float,
@@ -202,15 +203,15 @@ class Scenario:
             # Read in and cache results.
             if self._interp:
                 self._atm = utils.load_database_atmosphere(
-                    self.altitude,
-                    self.ground_range,
-                    self.ihaze,
+                    altitude=self.altitude,
+                    ground_range=self.ground_range,
+                    ihaze=self.ihaze,
                 )
             else:
                 self._atm = utils.load_database_atmosphere_no_interp(
-                    self.altitude,
-                    self.ground_range,
-                    self.ihaze,
+                    altitude=self.altitude,
+                    ground_range=self.ground_range,
+                    ihaze=self.ihaze,
                 )
 
         return self._atm

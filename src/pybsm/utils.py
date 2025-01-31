@@ -35,6 +35,7 @@ dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def load_database_atmosphere_no_interp(
+    *,
     altitude: float,
     ground_range: float,
     ihaze: int,
@@ -126,6 +127,7 @@ def _get_ground_range_array(max_ground_range: float) -> np.ndarray:
 
 
 def _alt_atm_interp(
+    *,
     low_alt: float,
     high_alt: float,
     altitude: float,
@@ -134,9 +136,17 @@ def _alt_atm_interp(
 ) -> np.ndarray:
     # this is an internal function for interpolating atmospheres across
     # altitudes
-    low_atm = load_database_atmosphere_no_interp(low_alt, ground_range, ihaze)
+    low_atm = load_database_atmosphere_no_interp(
+        altitude=low_alt,
+        ground_range=ground_range,
+        ihaze=ihaze,
+    )
     if low_alt != high_alt:
-        high_atm = load_database_atmosphere_no_interp(high_alt, ground_range, ihaze)
+        high_atm = load_database_atmosphere_no_interp(
+            altitude=high_alt,
+            ground_range=ground_range,
+            ihaze=ihaze,
+        )
         low_weight = 1 - ((altitude - low_alt) / (high_alt - low_alt))
         high_weight = (altitude - low_alt) / (high_alt - low_alt)
         atm = low_weight * low_atm + high_weight * high_atm
@@ -146,6 +156,7 @@ def _alt_atm_interp(
 
 
 def load_database_atmosphere(
+    *,
     altitude: float,
     ground_range: float,
     ihaze: int,
@@ -219,7 +230,7 @@ def load_database_atmosphere(
             20000,
         ],
     )
-    ground_ranges = _get_ground_range_array(301e3)
+    ground_ranges = _get_ground_range_array(max_ground_range=301e3)
 
     if altitude < min(altitude_array) or altitude > max(altitude_array):
         raise IndexError("Altitude not within range of acceptable values (2,20000)")
@@ -234,9 +245,21 @@ def load_database_atmosphere(
 
     # first interpolate across the low and high altitudes
     # then interpolate across ground range
-    atm_low_range = _alt_atm_interp(low_alt, high_alt, altitude, low_range, ihaze)
+    atm_low_range = _alt_atm_interp(
+        low_alt=low_alt,
+        high_alt=high_alt,
+        altitude=altitude,
+        ground_range=low_range,
+        ihaze=ihaze,
+    )
     if low_range != high_range:
-        atm_high_range = _alt_atm_interp(low_alt, high_alt, altitude, high_range, ihaze)
+        atm_high_range = _alt_atm_interp(
+            low_alt=low_alt,
+            high_alt=high_alt,
+            altitude=altitude,
+            ground_range=high_range,
+            ihaze=ihaze,
+        )
         low_weight = 1 - ((ground_range - low_range) / (high_range - low_range))
         high_weight = (ground_range - low_range) / (high_range - low_range)
         atm = low_weight * atm_low_range + high_weight * atm_high_range

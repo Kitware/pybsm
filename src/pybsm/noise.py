@@ -59,7 +59,7 @@ def noise_gain(kernel: np.ndarray) -> float:
     return np.sqrt(np.sum(np.sum(kernel**2)))
 
 
-def quantization_noise(pe_range: float, bit_depth: float) -> float:
+def quantization_noise(*, pe_range: float, bit_depth: float) -> float:
     """Effective noise contribution from the number of photoelectrons quantized.
 
     Effective noise contribution from the number of photoelectrons quantized by a single count of the analog

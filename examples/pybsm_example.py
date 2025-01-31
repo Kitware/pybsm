@@ -21,18 +21,22 @@ img_file_name = str(
 img = plt.imread(img_file_name)  # cv2.imread(img_file_name)[:, :, ::-1]
 
 # the width of the tank is 319 cm and it spans ~160 pixels in the image
-ref_img = simulation.RefImage(img, gsd=(3.19 / 160.0))
+ref_img = simulation.RefImage(img=img, gsd=(3.19 / 160.0))
 ref_img.show()
 
 
 # This should be a no-op.
 sensor, scenario = ref_img.estimate_capture_parameters(altitude=10000)
-img_out = simulation.simulate_image(ref_img, sensor, scenario)[2]
-img_out = simulation.stretch_contrast_convert_8bit(img_out)
+img_out = simulation.simulate_image(
+    ref_img=ref_img,
+    sensor=sensor,
+    scenario=scenario,
+)[2]
+img_out = simulation.stretch_contrast_convert_8bit(img=img_out)
 
 plt.figure()
 ax1 = plt.subplot(1, 2, 1)
-plt.imshow(simulation.stretch_contrast_convert_8bit(ref_img.img), cmap="gray")
+plt.imshow(simulation.stretch_contrast_convert_8bit(img=ref_img.img), cmap="gray")
 ax2 = plt.subplot(1, 2, 2)
 plt.imshow(img_out, cmap="gray")
 plt.show()
@@ -54,9 +58,20 @@ altitude = 9000
 
 ground_range = 0.0
 
-scenario = simulation.Scenario("virtual_camera", ihaze, altitude, ground_range)
+scenario = simulation.Scenario(
+    name="virtual_camera",
+    ihaze=ihaze,
+    altitude=altitude,
+    ground_range=ground_range,
+)
 
-sensor = simulation.Sensor("virtual_camera", D, f, p, opt_trans_wavelengths)
+sensor = simulation.Sensor(
+    name="virtual_camera",
+    D=D,
+    f=f,
+    p_x=p,
+    opt_trans_wavelengths=opt_trans_wavelengths,
+)
 
 ground_ranges = np.arange(0, 101e3, 10e3)
 
@@ -65,7 +80,7 @@ ref_img.refl_values = np.array([0.05, 0.5])
 idx = 1
 plt.subplot(2, 4, 1)
 plt.title("Input image", fontdict={"fontsize": 8})
-plt.imshow(simulation.stretch_contrast_convert_8bit(ref_img.img), cmap="gray")
+plt.imshow(simulation.stretch_contrast_convert_8bit(img=ref_img.img), cmap="gray")
 for ii in np.arange(4, ground_ranges.shape[0]):
     idx += 1
     plt.subplot(2, 4, idx)
@@ -75,7 +90,11 @@ for ii in np.arange(4, ground_ranges.shape[0]):
         fontdict={"fontsize": 6},
     )
     scenario.ground_range = float(ground_ranges[ii])
-    img_out = simulation.simulate_image(ref_img, sensor, scenario)[2]
-    img_out = simulation.stretch_contrast_convert_8bit(img_out)
+    img_out = simulation.simulate_image(
+        ref_img=ref_img,
+        sensor=sensor,
+        scenario=scenario,
+    )[2]
+    img_out = simulation.stretch_contrast_convert_8bit(img=img_out)
     plt.imshow(img_out, cmap="gray")
 plt.show()

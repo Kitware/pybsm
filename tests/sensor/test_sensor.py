@@ -14,8 +14,21 @@ class TestSensor:
         px = 1.0
         opt_trans_wavelengths = np.array([0.0, 1.0])
         if not other_args:
-            return Sensor(name, d, f, px, opt_trans_wavelengths)
-        return Sensor(name, d, f, px, opt_trans_wavelengths, **other_args)
+            return Sensor(
+                name=name,
+                D=d,
+                f=f,
+                p_x=px,
+                opt_trans_wavelengths=opt_trans_wavelengths,
+            )
+        return Sensor(
+            name=name,
+            D=d,
+            f=f,
+            p_x=px,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+            **other_args,
+        )
 
     def check_sensor(
         self,
@@ -265,5 +278,11 @@ class TestSensor:
         opt_trans_wavelengths: np.ndarray,
     ) -> None:
         """Check if created sensor matches expected parameters."""
-        sensor = Sensor(name, d, f, p_x, opt_trans_wavelengths)
+        sensor = Sensor(
+            name=name,
+            D=d,
+            f=f,
+            p_x=p_x,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+        )
         self.check_sensor(sensor, name, d, f, p_x, opt_trans_wavelengths)

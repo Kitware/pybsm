@@ -36,7 +36,13 @@ class TestFunctional:
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            functional.giqe3(rer, gsd, eho, ng, snr)
+            functional.giqe3(
+                rer=rer,
+                gsd=gsd,
+                eho=eho,
+                ng=ng,
+                snr=snr,
+            )
 
     @pytest.mark.parametrize(
         ("rer", "gsd", "eho", "ng", "snr"),
@@ -54,7 +60,13 @@ class TestFunctional:
         snr: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.giqe3(rer, gsd, eho, ng, snr)
+        output = functional.giqe3(
+            rer=rer,
+            gsd=gsd,
+            eho=eho,
+            ng=ng,
+            snr=snr,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -75,7 +87,14 @@ class TestFunctional:
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            functional.giqe4(rer, gsd, eho, ng, snr, elev_angle)
+            functional.giqe4(
+                rer=rer,
+                gsd=gsd,
+                eho=eho,
+                ng=ng,
+                snr=snr,
+                elev_angle=elev_angle,
+            )
 
     @pytest.mark.parametrize(
         ("rer", "gsd", "eho", "ng", "snr", "elev_angle"),
@@ -94,7 +113,14 @@ class TestFunctional:
         elev_angle: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.giqe4(rer, gsd, eho, ng, snr, elev_angle)
+        output = functional.giqe4(
+            rer=rer,
+            gsd=gsd,
+            eho=eho,
+            ng=ng,
+            snr=snr,
+            elev_angle=elev_angle,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -111,7 +137,13 @@ class TestFunctional:
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            functional.giqe5(rer_1, rer_2, gsd, snr, elev_angle)
+            functional.giqe5(
+                rer_1=rer_1,
+                rer_2=rer_2,
+                gsd=gsd,
+                snr=snr,
+                elev_angle=elev_angle,
+            )
 
     @pytest.mark.parametrize(
         ("rer_1", "rer_2", "gsd", "snr", "elev_angle"),
@@ -130,7 +162,13 @@ class TestFunctional:
         elev_angle: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.giqe5(rer_1, rer_2, gsd, snr, elev_angle)
+        output = functional.giqe5(
+            rer_1=rer_1,
+            rer_2=rer_2,
+            gsd=gsd,
+            snr=snr,
+            elev_angle=elev_angle,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -149,7 +187,12 @@ class TestFunctional:
         ifov: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.edge_response(pixel_pos, mtf_slice, df, ifov)
+        output = functional.edge_response(
+            pixel_pos=pixel_pos,
+            mtf_slice=mtf_slice,
+            df=df,
+            ifov=ifov,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -167,7 +210,11 @@ class TestFunctional:
         ifov: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.relative_edge_response(mtf_slice, df, ifov)
+        output = functional.relative_edge_response(
+            mtf_slice=mtf_slice,
+            df=df,
+            ifov=ifov,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -185,7 +232,11 @@ class TestFunctional:
         ifov: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.edge_height_overshoot(mtf_slice, df, ifov)
+        output = functional.edge_height_overshoot(
+            mtf_slice=mtf_slice,
+            df=df,
+            ifov=ifov,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -205,7 +256,12 @@ class TestFunctional:
         ifov_y: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.giqe5_RER(mtf, df, ifov_x, ifov_y)
+        output = functional.giqe5_RER(
+            mtf=mtf,
+            df=df,
+            ifov_x=ifov_x,
+            ifov_y=ifov_y,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -225,7 +281,12 @@ class TestFunctional:
         ifov_y: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.giqe_edge_terms(mtf, df, ifov_x, ifov_y)
+        output = functional.giqe_edge_terms(
+            mtf=mtf,
+            df=df,
+            ifov_x=ifov_x,
+            ifov_y=ifov_y,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -245,7 +306,13 @@ class TestFunctional:
         expectation: AbstractContextManager,
     ) -> None:
         with expectation:
-            functional.ground_resolved_distance(mtf_slice, df, snr, ifov, slant_range)
+            functional.ground_resolved_distance(
+                mtf_slice=mtf_slice,
+                df=df,
+                snr=snr,
+                ifov=ifov,
+                slant_range=slant_range,
+            )
 
     @pytest.mark.parametrize(
         ("mtf_slice", "df", "snr", "ifov", "slant_range"),
@@ -264,25 +331,64 @@ class TestFunctional:
         slant_range: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
-        output = functional.ground_resolved_distance(mtf_slice, df, snr, ifov, slant_range)
+        output = functional.ground_resolved_distance(
+            mtf_slice=mtf_slice,
+            df=df,
+            snr=snr,
+            ifov=ifov,
+            slant_range=slant_range,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([2.91, 3.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([2.91, 3.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 True,
             ),
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 False,
             ),
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 None,
             ),
         ],
@@ -294,25 +400,58 @@ class TestFunctional:
         interp: Optional[bool],
         snapshot: SnapshotAssertion,
     ) -> None:
-        output = functional.niirs(sensor, scenario, interp)
+        output = functional.niirs(sensor=sensor, scenario=scenario, interp=interp)
         assert snapshot == output
 
     @pytest.mark.parametrize(
         ("sensor", "scenario", "interp"),
         [
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([2.91, 3.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([2.91, 3.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 True,
             ),
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 False,
             ),
             (
-                Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6),
-                Scenario("test_scenario", 1, 9000, 0.0),
+                Sensor(
+                    name="test_sensor",
+                    D=275e-3,
+                    f=4,
+                    p_x=0.008e-3,
+                    opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=9000,
+                    ground_range=0.0,
+                ),
                 None,
             ),
         ],
@@ -324,15 +463,26 @@ class TestFunctional:
         interp: Optional[bool],
         snapshot: SnapshotAssertion,
     ) -> None:
-        output = functional.niirs5(sensor, scenario, interp)
+        output = functional.niirs5(sensor=sensor, scenario=scenario, interp=interp)
         assert snapshot == output
 
     @mock.patch("pybsm.metrics.functional.plt")
     def test_plot_common_MTFs(self, mock_plt: mock.MagicMock, snapshot: SnapshotAssertion) -> None:  # noqa: N802
-        sensor = Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6)
-        scenario = Scenario("test_scenario", 1, 9000, 0.0)
-        metric = functional.niirs(sensor, scenario)
-        functional.plot_common_MTFs(metric, orientation_angle=np.pi / 2)
+        sensor = Sensor(
+            name="test_sensor",
+            D=275e-3,
+            f=4,
+            p_x=0.008e-3,
+            opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+        )
+        scenario = Scenario(
+            name="test_scenario",
+            ihaze=1,
+            altitude=9000,
+            ground_range=0.0,
+        )
+        metric = functional.niirs(sensor=sensor, scenario=scenario)
+        functional.plot_common_MTFs(metrics=metric, orientation_angle=np.pi / 2)
         assert mock_plt.plot.call_count == 2
         call_args, _ = mock_plt.annotate.call_args
         assert call_args == snapshot
@@ -363,10 +513,21 @@ class TestFunctional:
         mock_fig = mock.MagicMock()
         mock_ax = mock.MagicMock()
         mock_plt.subplots.return_value = (mock_fig, mock_ax)
-        sensor = Sensor("test_sensor", 275e-3, 4, 0.008e-3, np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6)
-        scenario = Scenario("test_scenario", 1, 9000, 0.0)
-        metric = functional.niirs(sensor, scenario)
-        functional.plot_noise_terms(metric, 1)
+        sensor = Sensor(
+            name="test_sensor",
+            D=275e-3,
+            f=4,
+            p_x=0.008e-3,
+            opt_trans_wavelengths=np.array([0.58 - 0.08, 0.58 + 0.08]) * 1.0e-6,
+        )
+        scenario = Scenario(
+            name="test_scenario",
+            ihaze=1,
+            altitude=9000,
+            ground_range=0.0,
+        )
+        metric = functional.niirs(sensor=sensor, scenario=scenario)
+        functional.plot_noise_terms(metrics=metric, max_val=1)
         assert mock_plt.subplots.call_count == 1
         mock_plt.title.assert_called_once()
 
