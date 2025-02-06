@@ -26,7 +26,11 @@ class TestGeospatial:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            geospatial.nadir_angle(h_target, h_sensor, slant_range)
+            geospatial.nadir_angle(
+                h_target=h_target,
+                h_sensor=h_sensor,
+                slant_range=slant_range,
+            )
 
     @pytest.mark.parametrize(
         ("h_target", "h_sensor", "slant_range"),
@@ -44,7 +48,11 @@ class TestGeospatial:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test nadir_angle with normal inputs and expected outputs."""
-        output = geospatial.nadir_angle(h_target, h_sensor, slant_range)
+        output = geospatial.nadir_angle(
+            h_target=h_target,
+            h_sensor=h_sensor,
+            slant_range=slant_range,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -62,7 +70,11 @@ class TestGeospatial:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            geospatial.altitude_along_slant_path(h_target, h_sensor, slant_range)
+            geospatial.altitude_along_slant_path(
+                h_target=h_target,
+                h_sensor=h_sensor,
+                slant_range=slant_range,
+            )
 
     @pytest.mark.parametrize(
         ("h_target", "h_sensor", "slant_range"),
@@ -80,7 +92,11 @@ class TestGeospatial:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test altitude_along_slant_path with normal inputs and expected outputs."""
-        output = geospatial.altitude_along_slant_path(h_target, h_sensor, slant_range)
+        output = geospatial.altitude_along_slant_path(
+            h_target=h_target,
+            h_sensor=h_sensor,
+            slant_range=slant_range,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -94,7 +110,7 @@ class TestGeospatial:
     )
     def test_ground_sample_distance(self, snapshot_custom: SnapshotAssertion, ifov: float, slant_range: float) -> None:
         """Test ground_sample_distance with normal inputs and expected outputs."""
-        output = geospatial.ground_sample_distance(ifov, slant_range)
+        output = geospatial.ground_sample_distance(ifov=ifov, slant_range=slant_range)
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -113,5 +129,9 @@ class TestGeospatial:
         ground_range: float,
     ) -> None:
         """Test curved_earth_slant_range with normal inputs and expected outputs."""
-        output = geospatial.curved_earth_slant_range(h_target, h_sensor, ground_range)
+        output = geospatial.curved_earth_slant_range(
+            h_target=h_target,
+            h_sensor=h_sensor,
+            ground_range=ground_range,
+        )
         snapshot_custom.assert_match(output)

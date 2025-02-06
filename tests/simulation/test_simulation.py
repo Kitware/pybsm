@@ -39,7 +39,11 @@ class TestSimulation:
     ) -> None:
         """Cover cases where ValueError occurs."""
         with pytest.raises(ValueError):  # noqa: PT011
-            simulation.img_to_reflectance(img, pix_values, refl_values)
+            simulation.img_to_reflectance(
+                img=img,
+                pix_values=pix_values,
+                refl_values=refl_values,
+            )
 
     @pytest.mark.parametrize(
         ("img", "pix_values", "refl_values"),
@@ -55,7 +59,11 @@ class TestSimulation:
         refl_values: np.ndarray,
     ) -> None:
         """Cover cases where nan occurs."""
-        output = simulation.img_to_reflectance(img, pix_values, refl_values)
+        output = simulation.img_to_reflectance(
+            img=img,
+            pix_values=pix_values,
+            refl_values=refl_values,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -81,7 +89,11 @@ class TestSimulation:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test img_to_reflectance with normal inputs and expected outputs."""
-        output = simulation.img_to_reflectance(img, pix_values, refl_values)
+        output = simulation.img_to_reflectance(
+            img=img,
+            pix_values=pix_values,
+            refl_values=refl_values,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -100,11 +112,11 @@ class TestSimulation:
     ) -> None:
         """Cover cases where ValueError occurs."""
         with expectation:
-            simulation.instantaneous_FOV(w, f)
+            simulation.instantaneous_FOV(w=w, f=f)
 
     @pytest.mark.parametrize(("w", "f"), [(1, 1), (2, 1), (1, 2)])
     def test_instantaneous_FOV(self, w: int, f: int, snapshot: SnapshotAssertion) -> None:  # noqa: N802
-        output = simulation.instantaneous_FOV(w, f)
+        output = simulation.instantaneous_FOV(w=w, f=f)
         assert output == snapshot
 
     @pytest.mark.parametrize(
@@ -115,7 +127,10 @@ class TestSimulation:
         ],
     )
     def test_wiener_filter(self, otf: np.ndarray, noise_to_signal_power_spectrum: float, expected: np.ndarray) -> None:
-        output = simulation.wiener_filter(otf, noise_to_signal_power_spectrum)
+        output = simulation.wiener_filter(
+            otf=otf,
+            noise_to_signal_power_spectrum=noise_to_signal_power_spectrum,
+        )
         print(output)
         assert np.array_equal(output, expected)
 
@@ -131,7 +146,10 @@ class TestSimulation:
         otf: np.ndarray,
         noise_to_signal_power_spectrum: float,
     ) -> None:
-        output = simulation.wiener_filter(otf, noise_to_signal_power_spectrum)
+        output = simulation.wiener_filter(
+            otf=otf,
+            noise_to_signal_power_spectrum=noise_to_signal_power_spectrum,
+        )
         assert np.isnan(output).any()
 
     @pytest.mark.parametrize(
@@ -154,7 +172,7 @@ class TestSimulation:
         snapshot: SnapshotAssertion,
     ) -> None:
         img = np.array(Image.open(img_file_path))
-        output = [simulation.stretch_contrast_convert_8bit(img, perc)]
+        output = [simulation.stretch_contrast_convert_8bit(img=img, perc=perc)]
         assert output == snapshot
 
     @pytest.mark.parametrize(
@@ -194,12 +212,17 @@ class TestSimulation:
         expected_true_img = np.array(Image.open(true_img_file_path))
         expected_blur_img = np.array(Image.open(blur_img_file_path))
         expected_noisy_img = np.array(Image.open(noisy_img_file_path))
-        ref_img = simulation.RefImage(img, gsd)
+        ref_img = simulation.RefImage(img=img, gsd=gsd)
         sensor, scenario = ref_img.estimate_capture_parameters(altitude=altitude)
-        true_img, blur_img, noisy_img = simulation.simulate_image(ref_img, sensor, scenario, rng)
-        true_img = simulation.stretch_contrast_convert_8bit(true_img)
-        blur_img = simulation.stretch_contrast_convert_8bit(blur_img)
-        noisy_img = simulation.stretch_contrast_convert_8bit(noisy_img)
+        true_img, blur_img, noisy_img = simulation.simulate_image(
+            ref_img=ref_img,
+            sensor=sensor,
+            scenario=scenario,
+            rng=rng,
+        )
+        true_img = simulation.stretch_contrast_convert_8bit(img=true_img)
+        blur_img = simulation.stretch_contrast_convert_8bit(img=blur_img)
+        noisy_img = simulation.stretch_contrast_convert_8bit(img=noisy_img)
         assert np.array_equal(true_img, expected_true_img)
         assert np.array_equal(blur_img, expected_blur_img)
         assert np.array_equal(noisy_img, expected_noisy_img)
@@ -225,11 +248,21 @@ class TestSimulation:
         altitude: int,
     ) -> None:
         img = np.array(Image.open(img_file_path))
-        ref_img = simulation.RefImage(img, gsd)
+        ref_img = simulation.RefImage(img=img, gsd=gsd)
         sensor, scenario = ref_img.estimate_capture_parameters(altitude=altitude)
-        _, _, noisy_img_1 = simulation.simulate_image(ref_img, sensor, scenario, rng=None)
-        _, _, noisy_img_2 = simulation.simulate_image(ref_img, sensor, scenario, rng=None)
-        noisy_img_1 = simulation.stretch_contrast_convert_8bit(noisy_img_1)
-        noisy_img_2 = simulation.stretch_contrast_convert_8bit(noisy_img_2)
+        _, _, noisy_img_1 = simulation.simulate_image(
+            ref_img=ref_img,
+            sensor=sensor,
+            scenario=scenario,
+            rng=None,
+        )
+        _, _, noisy_img_2 = simulation.simulate_image(
+            ref_img=ref_img,
+            sensor=sensor,
+            scenario=scenario,
+            rng=None,
+        )
+        noisy_img_1 = simulation.stretch_contrast_convert_8bit(img=noisy_img_1)
+        noisy_img_2 = simulation.stretch_contrast_convert_8bit(img=noisy_img_2)
         assert not np.array_equal(noisy_img_1, noisy_img_2)
         assert np.isclose(noisy_img_1.all(), noisy_img_2.all())

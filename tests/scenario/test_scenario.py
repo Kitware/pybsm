@@ -73,7 +73,14 @@ class TestScenario:
         other_args: dict[str, float],
     ) -> None:
         """Test initialization with and without default parameters."""
-        scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp, **other_args)
+        scenario = Scenario(
+            name=name,
+            ihaze=ihaze,
+            altitude=altitude,
+            ground_range=ground_range,
+            interp=interp,
+            **other_args,
+        )
         self.check_scenario(scenario, name, ihaze, altitude, ground_range, **other_args)
 
     @pytest.mark.parametrize(
@@ -88,7 +95,12 @@ class TestScenario:
         Test that setting the ihaze attribute appropriately updates the internal value and clears the
         internal atm attribute.
         """
-        scenario = Scenario("test", original_ihaze, 0.0, 0.0)
+        scenario = Scenario(
+            name="test",
+            ihaze=original_ihaze,
+            altitude=0.0,
+            ground_range=0.0,
+        )
         self.check_scenario(scenario, "test", original_ihaze, 0.0, 0.0)
         scenario._atm = np.array([0])
         scenario.ihaze = new_ihaze
@@ -109,7 +121,12 @@ class TestScenario:
         Test setting altitude attribute appropriately updates the internal value as well as
         clear the internal atm attribute.
         """
-        scenario = Scenario("test", 0, original_altitude, 0.0)
+        scenario = Scenario(
+            name="test",
+            ihaze=0,
+            altitude=original_altitude,
+            ground_range=0.0,
+        )
         self.check_scenario(scenario, "test", 0, original_altitude, 0.0)
         scenario._atm = np.array([0])
         scenario.altitude = new_altitude
@@ -134,7 +151,12 @@ class TestScenario:
         Test that setting the ground_range attribute appropriately updates the internal value as well as
         clear the internal atm attribute.
         """
-        scenario = Scenario("test", 0, 0.0, original_ground_range)
+        scenario = Scenario(
+            name="test",
+            ihaze=0,
+            altitude=0.0,
+            ground_range=original_ground_range,
+        )
         self.check_scenario(scenario, "test", 0, 0.0, original_ground_range)
         scenario._atm = np.array([0])
         scenario.ground_range = new_ground_range
@@ -165,7 +187,13 @@ class TestScenario:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            Scenario(name, ihaze, altitude, ground_range, interp).atm  # noqa: B018
+            Scenario(  # noqa: B018
+                name=name,
+                ihaze=ihaze,
+                altitude=altitude,
+                ground_range=ground_range,
+                interp=interp,
+            ).atm
 
     @pytest.mark.parametrize(
         ("name", "ihaze", "altitude", "ground_range", "interp"),
@@ -189,7 +217,13 @@ class TestScenario:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test atm with expected inputs and outputs as well as checking _atm attribute is set properly."""
-        scenario = Scenario(name, ihaze, altitude, ground_range, interp=interp)
+        scenario = Scenario(
+            name=name,
+            ihaze=ihaze,
+            altitude=altitude,
+            ground_range=ground_range,
+            interp=interp,
+        )
         assert scenario._atm is None
         atm = scenario.atm
         assert scenario._atm is not None

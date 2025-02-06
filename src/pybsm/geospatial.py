@@ -38,6 +38,7 @@ r_earth = 6378.164e3  # radius of the earth (m)
 
 
 def altitude_along_slant_path(
+    *,
     h_target: float,
     h_sensor: float,
     slant_range: float,
@@ -68,7 +69,11 @@ def altitude_along_slant_path(
 
     """
     # this is simple law of cosines problem
-    nadir = nadir_angle(h_target, h_sensor, slant_range)
+    nadir = nadir_angle(
+        h_target=h_target,
+        h_sensor=h_sensor,
+        slant_range=slant_range,
+    )
     a = r_earth + h_sensor
     b = np.linspace(0.0, slant_range, 10000)  # arbitrary choice of 100,000 data points
     c = np.sqrt(a**2 + b**2 - 2 * a * b * np.cos(nadir))
@@ -84,7 +89,7 @@ def altitude_along_slant_path(
     return (z_path, h_path)
 
 
-def ground_sample_distance(ifov: float, slant_range: float) -> float:
+def ground_sample_distance(*, ifov: float, slant_range: float) -> float:
     """IBSM Equation 3-62, the ground sample distance.
 
     The ground sample distance, i.e. the footprint of a single detector in object space.
@@ -101,7 +106,7 @@ def ground_sample_distance(ifov: float, slant_range: float) -> float:
     return slant_range * ifov
 
 
-def nadir_angle(h_target: float, h_sensor: float, slant_range: float) -> float:
+def nadir_angle(*, h_target: float, h_sensor: float, slant_range: float) -> float:
     """Work through the law of cosines to calculate the sensor nadir angle above a circular earth.
 
     Work through the law of cosines to calculate the sensor nadir angle above a
@@ -131,6 +136,7 @@ def nadir_angle(h_target: float, h_sensor: float, slant_range: float) -> float:
 
 
 def curved_earth_slant_range(
+    *,
     h_target: float,
     h_sensor: float,
     ground_range: float,
