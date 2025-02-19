@@ -72,6 +72,7 @@ sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 sphinx-click = ">=5.0.0"
 livereload = ">=2.6.3"
+myst-nb = "^1.1.2"
 # :auto docs:
 
 # :auto tests:
@@ -207,12 +208,12 @@ typeCheckingMode = "standard"
 include = [
     "src/pybsm",
     "tests",
-    "examples"
+    "demos",
+    "scripts",
+    "docs",
     ]
 exclude = [
     "**/__pycache__",
-    "demos",
-    "scripts",
     "docs/_build",
     "docs/_implementations",
     ]
