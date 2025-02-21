@@ -18,7 +18,9 @@ def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
 
 
 BASE_FILE_PATH = Path(__file__).parent.parent.parent
-IMAGE_FILE_PATH = BASE_FILE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+IMAGE_FILE_PATH = (
+    BASE_FILE_PATH / "docs" / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+)
 
 
 class TestSimulation:

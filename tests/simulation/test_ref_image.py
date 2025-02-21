@@ -11,7 +11,7 @@ from syrupy.assertion import SnapshotAssertion
 from pybsm.simulation import RefImage
 
 BASE_PATH = Path(__file__).parent.parent.parent
-IMAGE_PATH = BASE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+IMAGE_PATH = BASE_PATH / "docs" / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class TestRefImage:

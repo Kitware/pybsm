@@ -18,7 +18,7 @@ notebooks:
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "examples"
+      - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
           "pybsm_visualization.ipynb"
         ]
@@ -35,4 +35,4 @@ original-example:
   before_script:
     - !reference [.test-setup, before_script]
   script:
-    - poetry run python examples/pybsm_example.py
+    - poetry run python docs/examples/pybsm_example.py

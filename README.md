@@ -21,20 +21,22 @@ Ensure the source tree is acquired locally before proceeding.
 
 To install the current version via `pip`:
 ```bash
-pip install pybsm
+pip install pybsm[<extra1>,<extra2>,...]
 ```
 
 Alternatively, you can use [Poetry](https://python-poetry.org/):
 ```bash
-poetry install --with main,linting,tests,docs
+poetry install --with main,linting,tests,docs --extras "<extra1> <extra2> ..."
 ```
+
+Certain plugins may require additional runtime dependencies. Details on these requirements can be found [here](https://pybsm.readthedocs.io/en/latest/implementations.html).
 
 For more detailed installation instructions, visit the [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
 <!-- :auto installation: -->
 
 <!-- :auto getting-started: -->
 ## Getting Started
-Explore usage examples of the `pybsm` package in various contexts using the Jupyter notebooks provided in the `./examples/` directory.
+Explore usage examples of the `pybsm` package in various contexts using the Jupyter notebooks provided in the `./docs/examples/` directory.
 
 Contributions are encouraged! For more details, refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 <!-- :auto getting-started: -->
@@ -78,7 +80,7 @@ poetry run pre-commit run --all-files
 - Follow the [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
 - Adopt the Git Flow branching strategy.
 - Detailed release information is available in [docs/release_process.rst](./docs/release_process.rst).
-- Additional contribution guidelines can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Additional contribution guidelines and issue reporting steps can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
 <!-- :auto contributing: -->
 
 <!-- :auto license: -->
