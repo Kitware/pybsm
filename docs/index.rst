@@ -5,6 +5,11 @@
 
 Welcome to pyBSM's documentation!
 =================================
+
+.. :auto acknowledgment:
+
+.. :auto acknowledgment:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
