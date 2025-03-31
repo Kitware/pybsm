@@ -58,6 +58,14 @@ firefox _build/html/index.html
 ```
 <!-- :auto documentation: -->
 
+<!-- :auto contributing: -->
+## Contributing
+- Follow the [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
+- Adopt the Git Flow branching strategy.
+- Detailed release information is available in [docs/release_process.rst](./docs/release_process.rst).
+- Additional contribution guidelines and issue reporting steps can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
+<!-- :auto contributing: -->
+
 <!-- :auto developer-tools: -->
 ## Developer Tools
 
@@ -75,14 +83,6 @@ poetry run pre-commit run --all-files
 ```
 <!-- :auto developer-tools: -->
 
-<!-- :auto contributing: -->
-## Contributing
-- Follow the [JATIC Design Principles](https://cdao.pages.jatic.net/public/program/design-principles/).
-- Adopt the Git Flow branching strategy.
-- Detailed release information is available in [docs/release_process.rst](./docs/release_process.rst).
-- Additional contribution guidelines and issue reporting steps can be found in [CONTRIBUTING.md](./CONTRIBUTING.md).
-<!-- :auto contributing: -->
-
 <!-- :auto license: -->
 ## License
 [Apache 2.0](./LICENSE)
@@ -99,3 +99,7 @@ poetry run pre-commit run --all-files
 
 **Deputy Tech Lead**: Emily Veenhuis (Kitware) @emily.veenhuis
 <!-- :auto contacts: -->
+
+<!-- :auto acknowledgment: -->
+
+<!-- :auto acknowledgment: -->
