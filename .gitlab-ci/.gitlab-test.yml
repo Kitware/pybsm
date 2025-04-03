@@ -31,7 +31,7 @@ notebooks:
 # we've updated this and/or the unit tests, we're using the notebook below.
 original-example:
   extends: [.test-setup, .python-versions]
-  needs: [pytest] # if unit tests don't pass, don't run the original script
+  needs: [pytest-core] # if unit tests don't pass, don't run the original script
   dependencies: []
   image: python:${PYTHON_VERSION}
   before_script:
