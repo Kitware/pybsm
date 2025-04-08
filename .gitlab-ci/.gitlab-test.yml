@@ -9,10 +9,14 @@
 #
 ###############################################################################
 
-.test-setup:
-  before_script:
-    - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests
+# Don't run both core and extras because pyBSM doesn't have any extras, so equivalent jobs
+# We have to run pytest-extras over pytest-core to compute coverage consistent with other repos
+pytest-core:
+  rules:
+    - when: never
+pytest-extras:
+  rules:
+    - !reference [.test-setup, rules]
 
 notebooks:
   extends: .notebooks
@@ -31,7 +35,7 @@ notebooks:
 # we've updated this and/or the unit tests, we're using the notebook below.
 original-example:
   extends: [.test-setup, .python-versions]
-  needs: [pytest-core] # if unit tests don't pass, don't run the original script
+  needs: [pytest-extras] # if unit tests don't pass, don't run the original script
   dependencies: []
   image: python:${PYTHON_VERSION}
   before_script:
