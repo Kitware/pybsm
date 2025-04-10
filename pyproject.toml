@@ -52,7 +52,6 @@ setuptools = ">=65.6.1"
 optional = true
 
 [tool.poetry.group.linting.dependencies]
-mypy = ">=0.991,!=1.11.0"
 pre-commit = ">=2.20"
 ruff = "^0.5.6"
 types-setuptools = ">=65.6.0.1"
@@ -188,17 +187,7 @@ docstring-code-line-length = "dynamic"
 # :auto ruff:
 
 # :auto mypy:
-[tool.mypy]
-python_version = "3.9"
-disallow_untyped_defs = true
-ignore_errors = false
-ignore_missing_imports = true
-strict_optional = false
-incremental = false
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
+# remove this section, including the auto mypy comment
 # :auto mypy:
 
 # :auto pyright:
