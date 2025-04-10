@@ -4,6 +4,10 @@ Pending Release Notes
 Updates / New Features
 ----------------------
 
+CI/CD
+
+* Removed ``mypy`` check and dependency.
+
 Documentation
 
 * Moved ``examples`` directory to ``docs/examples``
