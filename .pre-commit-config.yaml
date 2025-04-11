@@ -5,6 +5,9 @@ repos:
     - id: trailing-whitespace
       types: [file, python]
     - id: check-added-large-files
+      args:
+        # the unit here is acutally KiB (1024 bytes)
+        - '--maxkb=51200'  # match github max of 50MiB
 -   repo: local
     hooks:
       - id: ruff-lint
@@ -24,11 +27,6 @@ repos:
         require_serial: true
         language: system
         types_or: [python, pyi, jupyter]
-      - id: mypy
-        name: mypy
-        entry: poetry run mypy --config-file pyproject.toml
-        types: [file, python]
-        language: system
       - id: pyright
         name: pyright
         require_serial: true
