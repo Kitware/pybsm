@@ -14,6 +14,8 @@ Documentation
 
 * Updated ``index.rst``, ``installation.rst``, and ``README.md``  based on ``devel-jatic``.
 
+* Added warning to use Poetry only in a virtual environment per Poetry documentation.
+
 Other
 
 * Refactored codebase to make use of the ``*`` keyword-only separator.
