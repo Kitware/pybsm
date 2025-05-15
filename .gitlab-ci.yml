@@ -5,3 +5,9 @@ include:
 
   # job overrides specific to this repo
   - local: .gitlab-ci/.gitlab-test.yml
+
+trigger_compliance:
+  extends: .trigger_compliance
+  rules: !reference [.trigger_compliance, rules]
+  variables:
+    PACKAGE_NAME: "pybsm"
