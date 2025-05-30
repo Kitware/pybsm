@@ -13,11 +13,12 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
+from __future__ import annotations
+
 # standard library imports
 import inspect
 import os
 import warnings
-from typing import Optional
 
 import matplotlib.pyplot as plt
 
@@ -291,7 +292,7 @@ def ground_resolved_distance(*, mtf_slice: np.ndarray, df: float, snr: float, if
     return float(np.max(grd_cases))
 
 
-def niirs(*, sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
+def niirs(*, sensor: Sensor, scenario: Scenario, interp: bool | None = False) -> Metrics:
     """Returns NIIRS values and all intermediate calculations.
 
     This function implements the original MATLAB-based NIIRS model and can serve as a
@@ -480,7 +481,7 @@ def niirs(*, sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False)
     return nm
 
 
-def niirs5(*, sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
+def niirs5(*, sensor: Sensor, scenario: Scenario, interp: bool | None = False) -> Metrics:
     """Returns NIIRS values calculate using GIQE 5 and all intermediate calculations.
 
     See pybsm.metrics.functional.niirs for the GIQE 3 version.  This version of the

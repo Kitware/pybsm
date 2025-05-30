@@ -13,12 +13,13 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
+from __future__ import annotations
+
 # standard library imports
 import inspect
 import logging
 import os
 import warnings
-from typing import Optional, Union
 
 # 3rd party imports
 import numpy as np
@@ -152,7 +153,7 @@ def simulate_image(
     ref_img: RefImage,
     sensor: Sensor,
     scenario: Scenario,
-    rng: Optional[Union[np.random.Generator, int]] = 1,
+    rng: np.random.Generator | int | None = 1,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates radiometrically accurate imagery collected through a sensor.
 
@@ -297,7 +298,7 @@ def simulate_image(
 def stretch_contrast_convert_8bit(
     *,
     img: np.ndarray,
-    perc: Optional[list[float]] = None,
+    perc: list[float] | None = None,
 ) -> np.ndarray:
     """
     Adjusts the contrast of an image and converts it to an 8-bit format.

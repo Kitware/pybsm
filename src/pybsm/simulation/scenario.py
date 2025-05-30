@@ -13,9 +13,9 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
-# 3rd party imports
-from typing import Optional
+from __future__ import annotations
 
+# 3rd party imports
 import numpy as np
 
 # local imports
@@ -78,7 +78,7 @@ class Scenario:
         background_temperature: float = 293,
         ha_wind_speed: float = 21,
         cn2_at_1m: float = 1.7e-14,
-        interp: Optional[bool] = False,
+        interp: bool | None = False,
     ) -> None:
         """
         Initializes a scenario object.
@@ -136,7 +136,7 @@ class Scenario:
         self.cn2_at_1m = cn2_at_1m
 
         # Will be loaded on demand for a particular altitude.
-        self._atm: Optional[np.ndarray] = None
+        self._atm: np.ndarray | None = None
         self._interp = interp
 
     @property

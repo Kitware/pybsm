@@ -18,6 +18,8 @@ Documentation
 
 * Clarified that ``poetry<2.0`` is currently required.
 
+* Added CI/CD pipeline documentation.
+
 Other
 
 * Refactored codebase to make use of the ``*`` keyword-only separator.
@@ -26,3 +28,7 @@ Fixes
 -----
 
 * Fixed pyright errors
+
+* Removed ``Optional`` and ``Union`` type hints.
+
+* Update pytest and ruff configurations

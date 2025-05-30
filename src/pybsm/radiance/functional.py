@@ -655,7 +655,7 @@ def reflectance_to_photoelectrons(
     sat = pe.max() / sensor.max_n
     if sat > 1:
         logging.info(
-            f"Reducing integration time from {int_time} to {int_time/sat} to avoid overexposure",
+            f"Reducing integration time from {int_time} to {int_time / sat} to avoid overexposure",
         )
         pe = pe / sat
 
