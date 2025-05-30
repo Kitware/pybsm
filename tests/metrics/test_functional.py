@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import unittest.mock as mock
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Optional
 
 import numpy as np
 import pytest
@@ -397,7 +398,7 @@ class TestFunctional:
         self,
         sensor: Sensor,
         scenario: Scenario,
-        interp: Optional[bool],
+        interp: bool | None,
         snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.niirs(sensor=sensor, scenario=scenario, interp=interp)
@@ -460,7 +461,7 @@ class TestFunctional:
         self,
         sensor: Sensor,
         scenario: Scenario,
-        interp: Optional[bool],
+        interp: bool | None,
         snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.niirs5(sensor=sensor, scenario=scenario, interp=interp)

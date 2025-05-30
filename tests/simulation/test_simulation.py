@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import pytest
@@ -205,7 +206,7 @@ class TestSimulation:
         img_file_path: str,
         gsd: float,
         altitude: int,
-        rng: Union[np.random.Generator, int],
+        rng: np.random.Generator | int,
         true_img_file_path: Path,
         blur_img_file_path: Path,
         noisy_img_file_path: Path,

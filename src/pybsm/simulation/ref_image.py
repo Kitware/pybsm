@@ -13,9 +13,9 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
-# 3rd party imports
-from typing import Optional
+from __future__ import annotations
 
+# 3rd party imports
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -46,8 +46,8 @@ class RefImage:
         *,
         img: np.ndarray,
         gsd: float,
-        pix_values: Optional[np.ndarray] = None,
-        refl_values: Optional[np.ndarray] = None,
+        pix_values: np.ndarray | None = None,
+        refl_values: np.ndarray | None = None,
         name: str = "ref_image",
     ) -> None:
         """
