@@ -132,12 +132,13 @@ def giqe4(*, rer: float, gsd: float, eho: float, ng: float, snr: float, elev_ang
 
 def giqe5(*, rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015.
+    (originally published by https://gwg.nga.mil/)
+    https://github.com/Kitware/pybsm/blob/main/docs/GIQE-5_for_Public_Release.pdf
 
-    https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
     This version of the GIQE replaces the earlier versions and should be used
     in all future analyses.  See also "Airborne Validation of the General Image
     Quality Equation 5"
-    https://www.osapublishing.org/ao/abstract.cfm?uri=ao-59-32-9978
+    https://opg.optica.org/ao/abstract.cfm?uri=ao-59-32-9978
 
     :param rer_1:
         relative edge response in two directions (e.g., along- and across-

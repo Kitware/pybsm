@@ -47,4 +47,4 @@ References
    systems." Proceedings of the SPIE 10204.
 
 2. LeMaster, Daniel A., et al. Validating pyBSM: A Python Package for Modeling Imaging Systems. 05 2018, p. 19,
-   https://doi.org10.1117/12.2305228.
+   https://doi.org/10.1117/12.2305228.
