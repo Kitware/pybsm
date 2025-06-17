@@ -23,6 +23,7 @@ necessarily representing the official policies or endorsements, either expressed
 
    introduction
    installation
+   explanation
    functionality
    review_process
    releasing
