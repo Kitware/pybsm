@@ -1,19 +1,27 @@
 # pyBSM
 
-pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems.
+pyBSM is a Python-based tool for sensor modeling. It provides common components
+useful for simulating the image formation process through different imaging
+systems.
 
-This repo builds off of the work done by LeMaster and Eismann in creating the original pyBSM package for modeling image systems \[1] as well as LeMaster, et al. in their work in validating the pyBSM package \[2].
+This repo builds off of the work done by LeMaster and Eismann in creating the
+original pyBSM package for modeling image systems [1] as well as LeMaster, et
+al. in their work in validating the pyBSM package [2].
 
 NOTE: A set of functions which infer OTFs from user data has been removed from
 the current distribution of pyBSM. They are archived under the v0.7.0 tag if
 they are needed.
 
 ## References
-<a id="1">[1]</a>
-LeMaster, Daniel A., and Michael T. Eismann. ‘pyBSM: A Python Package for Modeling Imaging Systems’. Society of Photo-Optical Instrumentation Engineers (SPIE) Conference Series, edited by Eric J. Kelmelis, vol. 10204, 2017, p. 1020405, https://doi.org10.1117/12.2262561. Society of Photo-Optical Instrumentation Engineers (SPIE) Conference Series.
 
-<a id="2">[2]</a>
-LeMaster, Daniel, et al. Validating pyBSM: A Python Package for Modeling Imaging Systems. 05 2018, p. 19, https://doi.org10.1117/12.2305228.
+<a id="1">[1]</a> LeMaster, Daniel A., and Michael T. Eismann. ‘pyBSM: A Python
+Package for Modeling Imaging Systems’. Society of Photo-Optical Instrumentation
+Engineers (SPIE) Conference Series, edited by Eric J. Kelmelis, vol. 10204,
+2017, p. 1020405, https://doi.org10.1117/12.2262561. Society of Photo-Optical
+Instrumentation Engineers (SPIE) Conference Series.
+
+<a id="2">[2]</a> LeMaster, Daniel, et al. Validating pyBSM: A Python Package
+for Modeling Imaging Systems. 05 2018, p. 19, https://doi.org10.1117/12.2305228.
 
 <!-- :auto installation: -->
 
@@ -46,8 +54,8 @@ For more detailed installation instructions, visit the
 
 ## Getting Started
 
-Explore usage examples of the `pybsm` package in various contexts using
-the Jupyter notebooks provided in the `./docs/examples/` directory.
+Explore usage examples of the `pybsm` package in various contexts using the
+Jupyter notebooks provided in the `./docs/examples/` directory.
 
 <!-- :auto getting-started: -->
 
