@@ -34,3 +34,8 @@ Fixes
 * Update pytest and ruff configurations
 
 * Fixed broken links in the docs
+
+* Add Colab link to example notebook
+
+* Add README for notebook directory
+
