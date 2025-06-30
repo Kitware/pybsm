@@ -43,7 +43,7 @@ conda install -c conda-forge pybsm
 
 Certain plugins may require additional runtime dependencies. Details on these
 requirements can be found
-[here](https://pybsm.readthedocs.io/en/latest/implementations.html).
+[here](https://pybsm.readthedocs.io/en/latest/installation.html).
 
 For more detailed installation instructions, visit the
 [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
@@ -54,8 +54,8 @@ For more detailed installation instructions, visit the
 
 ## Getting Started
 
-Explore usage examples of the `pybsm` package in various contexts using
-the Jupyter notebooks provided in the `./docs/examples/` directory.
+Explore usage examples of the `pybsm` package in various contexts using the
+Jupyter notebooks provided in the `./docs/examples/` directory.
 
 <!-- :auto getting-started: -->
 

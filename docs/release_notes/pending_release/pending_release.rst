@@ -1,14 +1,4 @@
-Pending Release Notes
-=====================
-
-Updates / New Features
-----------------------
-
-CI/CD
-
 * Removed ``mypy`` check and dependency.
-
-Documentation
 
 * Moved ``examples`` directory to ``docs/examples``
 
@@ -20,22 +10,16 @@ Documentation
 
 * Added CI/CD pipeline documentation.
 
-Other
-
 * Refactored codebase to make use of the ``*`` keyword-only separator.
 
-Fixes
------
+* FIX: Fixed pyright errors
 
-* Fixed pyright errors
+* FIX: Removed ``Optional`` and ``Union`` type hints.
 
-* Removed ``Optional`` and ``Union`` type hints.
+* FIX: Update pytest and ruff configurations
 
-* Update pytest and ruff configurations
+* FIX: Fixed broken links in the docs
 
-* Fixed broken links in the docs
+* FIX: Add Colab link to example notebook
 
-* Add Colab link to example notebook
-
-* Add README for notebook directory
-
+* FIX: Add README for notebook directory
