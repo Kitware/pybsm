@@ -142,7 +142,7 @@ preview = true  # needed for RUF027
 explicit-preview-rules = true
 
 # From program suggested config
-ignore = ["C408","C416","COM812"]
+ignore = ["ANN101","ANN102","C408","C416"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
