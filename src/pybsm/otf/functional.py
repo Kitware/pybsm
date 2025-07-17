@@ -1202,13 +1202,13 @@ def slice_otf(*, otf: np.ndarray, ang: float) -> np.ndarray:
     v = np.linspace(1.0, -1.0, otf.shape[1])
     r = np.arange(0.0, 1.0, u[1] - u[0])
 
-    f = interpolate.interp2d(u, v, otf)
+    f = interpolate.RegularGridInterpolator((u, v), otf.T, method="linear", bounds_error=False)
 
     # the interpolator, f, calculates a bunch of points that we don't really
     # need since everything but the diagonal is thrown away.  It works but
     # it's inefficient.
 
-    return np.diag(f(r * np.cos(ang), r * np.sin(ang)))
+    return f((r * np.cos(ang), r * np.sin(ang))).T
 
 
 def apply_otf_to_image(

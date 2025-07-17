@@ -41,9 +41,7 @@ numpy = [
     {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
 ]
 matplotlib = ">=3.5.2"
-# simulation.img2reflectance currently uses interpolate.interp1d but will be removed in scipy==1.14.0
-# https://github.com/scipy/scipy/blob/44e4ebaac992fde33f04638b99629d23973cb9b2/scipy/interpolate/_interpolate.py#L118
-scipy = ">=1.10.0,<1.14"  # CVE-2023-25399
+scipy = ">=1.10.0"  # CVE-2023-25399
 setuptools = ">=78.1.1"  # CVE-2025-47273
 
 # :auto linting:
