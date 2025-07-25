@@ -63,7 +63,7 @@ the OTF response (unitless) for that those spatial frequencies.
 import inspect
 import os
 import warnings
-from typing import Callable
+from collections.abc import Callable
 
 # 3rd party imports
 import numpy as np
@@ -147,16 +147,16 @@ def circular_aperture_OTF(  # noqa: N802
     a = (2.0 / np.pi) * (np.arccos(rho / r0) - (rho / r0) * np.sqrt(1.0 - (rho / r0) ** 2.0))
     a = np.nan_to_num(a)
 
-    # region where (rho < (eta*r0)):
+    # area where (rho < (eta*r0)):
     b = (2.0 * eta**2.0 / np.pi) * (
         np.arccos(rho / eta / r0) - (rho / eta / r0) * np.sqrt(1.0 - (rho / eta / r0) ** 2.0)
     )
     b = np.nan_to_num(b)
 
-    # region where (rho < ((1.0-eta)*r0/2.0)):
+    # area where (rho < ((1.0-eta)*r0/2.0)):
     c_1 = -2.0 * eta**2.0 * (rho < (1.0 - eta) * r0 / 2.0)
 
-    # region where (rho <= ((1.0+eta)*r0/2.0)):
+    # area where (rho <= ((1.0+eta)*r0/2.0)):
     phi = np.arccos((1.0 + eta**2.0 - (2.0 * rho / r0) ** 2) / 2.0 / eta)
     c_2 = 2.0 * eta * np.sin(phi) / np.pi + (1.0 + eta**2.0) * phi / np.pi - 2.0 * eta**2.0
     c_2 = c_2 - (2.0 * (1.0 - eta**2.0) / np.pi) * np.arctan(
