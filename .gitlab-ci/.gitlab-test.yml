@@ -9,16 +9,22 @@
 #
 ###############################################################################
 
-.test-setup:
-  before_script:
-    - !reference [.shared-setup, before_script]
-    - poetry install --sync --only main,tests
+# Don't run both core and extras because pyBSM doesn't have any extras, so equivalent jobs
+# We have to run pytest-extras over pytest-core to compute coverage consistent with other repos
+pytest-core:
+  rules:
+    - when: never
+pytest-extras:
+  rules:
+    - !reference [.test-setup, rules]
 
 notebooks:
+  extends: .notebooks
+  rules: !reference [.notebooks, rules]
   parallel:
     matrix:
       # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "examples"
+      - NOTEBOOK_DIR: "docs/examples"
         NOTEBOOK_FILE: [
           "pybsm_visualization.ipynb"
         ]
@@ -29,10 +35,16 @@ notebooks:
 # we've updated this and/or the unit tests, we're using the notebook below.
 original-example:
   extends: [.test-setup, .python-versions]
-  needs: [pytest] # if unit tests don't pass, don't run the original script
+  needs: [pytest-extras] # if unit tests don't pass, don't run the original script
   dependencies: []
   image: python:${PYTHON_VERSION}
   before_script:
     - !reference [.test-setup, before_script]
   script:
-    - poetry run python examples/pybsm_example.py
+    - poetry run python docs/examples/pybsm_example.py
+
+# This is a temporary override while we wait for devel-jatic to support 3.13
+.python-versions:
+  parallel:
+    matrix:
+      - PYTHON_VERSION: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]

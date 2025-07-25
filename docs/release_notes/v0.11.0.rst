@@ -1,0 +1,31 @@
+0.11.0
+======
+
+Includes code and documentation cleanup, replaces deprecated ``scipy`` usage,
+removes ``mypy``, adds Python 3.13 support, clarifies Poetry requirements,
+and fixes ``pyright`` errors and broken links.
+
+Updates / New Features
+----------------------
+
+* Replaced deprecated ``scipy.interp2d`` with ``RegularGridInterpolator``
+
+* Dropped ``mypy`` and its checks
+
+* Relocated ``examples/`` to ``docs/examples/`` and added a notebook README
+
+* Updated documentation (``README.md``, install guide, etc.) and added a Colab link
+
+* Clarified ``poetry<2.0`` requirement and recommended use within a virtual environment
+
+* Introduced Python 3.13 testing, updated ``pytest`` and ``ruff`` configs
+
+* Refactored to use ``*`` keyword-only separator and removed outdated type
+  hints (``Optional``, ``Union``)
+
+Fixes
+-----
+
+* Fixed ``pyright`` errors
+
+* Fixed broken documentation links

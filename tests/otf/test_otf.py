@@ -1,6 +1,6 @@
+from collections.abc import Callable
 from contextlib import AbstractContextManager
 from contextlib import nullcontext as does_not_raise
-from typing import Callable
 
 import numpy as np
 import pytest
@@ -13,7 +13,7 @@ from tests.test_utils import CustomFloatSnapshotExtension
 
 @pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestOTFHelper:
@@ -36,7 +36,7 @@ class TestOTFHelper:
             ValueError,
             match=r"zero-size array to reduction operation maximum which has no identity",
         ):
-            otf.coherence_diameter(lambda0, z_path, cn2)
+            otf.coherence_diameter(lambda0=lambda0, z_path=z_path, cn2=cn2)
 
     @pytest.mark.parametrize(
         ("lambda0", "z_path", "cn2"),
@@ -54,7 +54,7 @@ class TestOTFHelper:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.coherence_diameter(lambda0, z_path, cn2)
+            otf.coherence_diameter(lambda0=lambda0, z_path=z_path, cn2=cn2)
 
     @pytest.mark.parametrize(
         ("lambda0", "z_path", "cn2"),
@@ -72,7 +72,7 @@ class TestOTFHelper:
         cn2: np.ndarray,
     ) -> None:
         """Cover cases where infinite output occurs."""
-        output = otf.coherence_diameter(lambda0, z_path, cn2)
+        output = otf.coherence_diameter(lambda0=lambda0, z_path=z_path, cn2=cn2)
         assert np.isinf(output)
 
     @pytest.mark.parametrize(
@@ -92,7 +92,7 @@ class TestOTFHelper:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test coherence_diameter with normal inputs and expected outputs."""
-        output = otf.coherence_diameter(lambda0, z_path, cn2)
+        output = otf.coherence_diameter(lambda0=lambda0, z_path=z_path, cn2=cn2)
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -109,7 +109,7 @@ class TestOTFHelper:
         cn2_at_1m: float,
     ) -> None:
         """Test hufnagel_valley_turbulence_profile with empty input."""
-        output = otf.hufnagel_valley_turbulence_profile(h, v, cn2_at_1m)
+        output = otf.hufnagel_valley_turbulence_profile(h=h, v=v, cn2_at_1m=cn2_at_1m)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -131,7 +131,7 @@ class TestOTFHelper:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test hufnagel_valley_turbulence_profile with normal inputs and expected outputs."""
-        output = otf.hufnagel_valley_turbulence_profile(h, v, cn2_at_1m)
+        output = otf.hufnagel_valley_turbulence_profile(h=h, v=v, cn2_at_1m=cn2_at_1m)
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -151,7 +151,11 @@ class TestOTFHelper:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            otf.weighted_by_wavelength(wavelengths, weights, my_function)
+            otf.weighted_by_wavelength(
+                wavelengths=wavelengths,
+                weights=weights,
+                my_function=my_function,
+            )
 
     @pytest.mark.parametrize(
         ("wavelengths", "weights", "my_function"),
@@ -172,7 +176,11 @@ class TestOTFHelper:
         my_function: Callable,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.weighted_by_wavelength(wavelengths, weights, my_function)
+        output = otf.weighted_by_wavelength(
+            wavelengths=wavelengths,
+            weights=weights,
+            my_function=my_function,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -213,7 +221,11 @@ class TestOTFHelper:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test weighted_by_wavelength with normal inputs and expected outputs."""
-        output = otf.weighted_by_wavelength(wavelengths, weights, my_function)
+        output = otf.weighted_by_wavelength(
+            wavelengths=wavelengths,
+            weights=weights,
+            my_function=my_function,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -241,7 +253,7 @@ class TestOTFHelper:
         snapshot: SnapshotAssertion,
     ) -> None:
         """Test object_domain_defocus_radii with normal inputs and expected outputs."""
-        output = otf.object_domain_defocus_radii(D, R, R0)
+        output = otf.object_domain_defocus_radii(D=D, R=R, R0=R0)
         assert output == snapshot
 
     @pytest.mark.parametrize(
@@ -260,7 +272,7 @@ class TestOTFHelper:
         expected: AbstractContextManager,
     ) -> None:
         with expected:
-            otf.object_domain_defocus_radii(D, R, R0)
+            otf.object_domain_defocus_radii(D=D, R=R, R0=R0)
 
     @pytest.mark.parametrize(
         ("jd", "w_x", "w_y"),
@@ -288,7 +300,7 @@ class TestOTFHelper:
         snapshot: SnapshotAssertion,
     ) -> None:
         """Test dark_current_from_density with normal inputs and expected outputs."""
-        output = otf.dark_current_from_density(jd, w_x, w_y)
+        output = otf.dark_current_from_density(jd=jd, w_x=w_x, w_y=w_y)
         assert output == snapshot
 
     @pytest.mark.parametrize(
@@ -316,7 +328,7 @@ class TestOTFHelper:
         snapshot: SnapshotAssertion,
     ) -> None:
         """Test image_domain_defocus_radii with normal inputs and expected outputs."""
-        output = otf.image_domain_defocus_radii(D, dz, f)
+        output = otf.image_domain_defocus_radii(D=D, dz=dz, f=f)
         assert output == snapshot
 
     @pytest.mark.parametrize(
@@ -331,7 +343,7 @@ class TestOTFHelper:
         expected: AbstractContextManager,
     ) -> None:
         with expected:
-            otf.image_domain_defocus_radii(D, dz, f)
+            otf.image_domain_defocus_radii(D=D, dz=dz, f=f)
 
 
 class TestResample2D:
@@ -350,7 +362,7 @@ class TestResample2D:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            otf.resample_2D(img_in, dx_in, dx_out)
+            otf.resample_2D(img_in=img_in, dx_in=dx_in, dx_out=dx_out)
 
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
@@ -367,7 +379,7 @@ class TestResample2D:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.resample_2D(img_in, dx_in, dx_out)
+            otf.resample_2D(img_in=img_in, dx_in=dx_in, dx_out=dx_out)
 
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
@@ -383,7 +395,7 @@ class TestResample2D:
     ) -> None:
         """Cover cases where ValueError occurs."""
         with pytest.raises(ValueError, match=r"Invalid sample spacing for input image"):
-            otf.resample_2D(img_in, dx_in, dx_out)
+            otf.resample_2D(img_in=img_in, dx_in=dx_in, dx_out=dx_out)
 
     @pytest.mark.parametrize(
         ("img_in", "dx_in", "dx_out"),
@@ -399,7 +411,7 @@ class TestResample2D:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test resample_2D with normal inputs and expected outputs."""
-        output = otf.resample_2D(img_in, dx_in, dx_out)
+        output = otf.resample_2D(img_in=img_in, dx_in=dx_in, dx_out=dx_out)
         snapshot_custom.assert_match(output)
 
 
@@ -429,7 +441,14 @@ class TestApplyOTFToImage:
     ) -> None:
         """Cover cases where ZeroDivisionError occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otf_value, df, ifov)
+            otf.apply_otf_to_image(
+                ref_img=ref_img,
+                ref_gsd=ref_gsd,
+                ref_range=ref_range,
+                otf=otf_value,
+                df=df,
+                ifov=ifov,
+            )
 
     @pytest.mark.parametrize(
         ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
@@ -450,7 +469,14 @@ class TestApplyOTFToImage:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            otf.apply_otf_to_image(ref_img, ref_gsd, ref_range, otf_value, df, ifov)
+            otf.apply_otf_to_image(
+                ref_img=ref_img,
+                ref_gsd=ref_gsd,
+                ref_range=ref_range,
+                otf=otf_value,
+                df=df,
+                ifov=ifov,
+            )
 
     @pytest.mark.parametrize(
         ("ref_img", "ref_gsd", "ref_range", "otf_value", "df", "ifov"),
@@ -477,12 +503,12 @@ class TestApplyOTFToImage:
     ) -> None:
         """Test apply_otf_to_image with normal inputs and expected outputs."""
         output = otf.apply_otf_to_image(
-            ref_img,
-            ref_gsd,
-            ref_range,
-            otf_value,
-            df,
-            ifov,
+            ref_img=ref_img,
+            ref_gsd=ref_gsd,
+            ref_range=ref_range,
+            otf=otf_value,
+            df=df,
+            ifov=ifov,
         )
         snapshot_custom.assert_match(output)
 
@@ -503,7 +529,7 @@ class TestOTFToPSF:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            otf.otf_to_psf(otf_value, df, dx_out)
+            otf.otf_to_psf(otf=otf_value, df=df, dx_out=dx_out)
 
     @pytest.mark.parametrize(
         ("otf_value", "df", "dx_out"),
@@ -521,7 +547,7 @@ class TestOTFToPSF:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.otf_to_psf(otf_value, df, dx_out)
+            otf.otf_to_psf(otf=otf_value, df=df, dx_out=dx_out)
 
     @pytest.mark.parametrize(
         ("otf_value", "df", "dx_out"),
@@ -538,7 +564,7 @@ class TestOTFToPSF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test otf_to_psf with normal inputs and expected outputs."""
-        output = otf.otf_to_psf(otf_value, df, dx_out)
+        output = otf.otf_to_psf(otf=otf_value, df=df, dx_out=dx_out)
         snapshot_custom.assert_match(output)
 
 
@@ -565,7 +591,17 @@ class TestCTEOTF:
         f: float,
     ) -> None:
         """Test cte_OTF with empty input."""
-        output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
+        output = otf.cte_OTF(
+            u=u,
+            v=v,
+            p_x=p_x,
+            p_y=p_y,
+            cte_n_x=cte_n_x,
+            cte_n_y=cte_n_y,
+            phases_n=phases_n,
+            cte_eff=cte_eff,
+            f=f,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -589,7 +625,17 @@ class TestCTEOTF:
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
+        output = otf.cte_OTF(
+            u=u,
+            v=v,
+            p_x=p_x,
+            p_y=p_y,
+            cte_n_x=cte_n_x,
+            cte_n_y=cte_n_y,
+            phases_n=phases_n,
+            cte_eff=cte_eff,
+            f=f,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -656,7 +702,17 @@ class TestCTEOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
-        output = otf.cte_OTF(u, v, p_x, p_y, cte_n_x, cte_n_y, phases_n, cte_eff, f)
+        output = otf.cte_OTF(
+            u=u,
+            v=v,
+            p_x=p_x,
+            p_y=p_y,
+            cte_n_x=cte_n_x,
+            cte_n_y=cte_n_y,
+            phases_n=phases_n,
+            cte_eff=cte_eff,
+            f=f,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -678,7 +734,7 @@ class TestDefocusOTF:
         w_y: float,
     ) -> None:
         """Test defocus_OTF with empty input."""
-        output = otf.defocus_OTF(u, v, w_x, w_y)
+        output = otf.defocus_OTF(u=u, v=v, w_x=w_x, w_y=w_y)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -719,7 +775,7 @@ class TestDefocusOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test defocus_OTF with normal inputs and expected outputs."""
-        output = otf.defocus_OTF(u, v, w_x, w_y)
+        output = otf.defocus_OTF(u=u, v=v, w_x=w_x, w_y=w_y)
         snapshot_custom.assert_match(output)
 
 
@@ -745,7 +801,16 @@ class TestDetectorOTFWithAggregation:
         n: int,
     ) -> None:
         """Test detector_OTF_with_aggregation with empty input."""
-        output = otf.detector_OTF_with_aggregation(u, v, w_x, w_y, p_x, p_y, f, n)
+        output = otf.detector_OTF_with_aggregation(
+            u=u,
+            v=v,
+            w_x=w_x,
+            w_y=w_y,
+            p_x=p_x,
+            p_y=p_y,
+            f=f,
+            n=n,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -768,7 +833,16 @@ class TestDetectorOTFWithAggregation:
         n: int,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.detector_OTF_with_aggregation(u, v, w_x, w_y, p_x, p_y, f, n)
+        output = otf.detector_OTF_with_aggregation(
+            u=u,
+            v=v,
+            w_x=w_x,
+            w_y=w_y,
+            p_x=p_x,
+            p_y=p_y,
+            f=f,
+            n=n,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -830,7 +904,16 @@ class TestDetectorOTFWithAggregation:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF_with_aggregation with normal inputs and expected outputs."""
-        output = otf.detector_OTF_with_aggregation(u, v, w_x, w_y, p_x, p_y, f, n)
+        output = otf.detector_OTF_with_aggregation(
+            u=u,
+            v=v,
+            w_x=w_x,
+            w_y=w_y,
+            p_x=p_x,
+            p_y=p_y,
+            f=f,
+            n=n,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -841,13 +924,13 @@ class TestDiffusionOTF:
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                0.0,
-                2.0,
-                2.0,
+                np.array([0.0]),
+                np.array([2.0]),
+                np.array([2.0]),
                 1.0,
             ),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0),
-            (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 0.0, 1.0, 1.0, 0.0),
+            (np.array([1.0]), np.array([1.0]), np.array([0.0]), np.array([1.0]), np.array([1.0]), 0.0),
+            (np.array([1.0, 2.0]), np.array([1.0, 2.0]), np.array([0.0]), np.array([1.0]), np.array([1.0]), 0.0),
         ],
     )
     def test_nan(
@@ -855,21 +938,21 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.diffusion_OTF(u, v, alpha, ald, al0, f)
+        output = otf.diffusion_OTF(u=u, v=v, alpha=alpha, ald=ald, al0=al0, f=f)
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
         ("u", "v", "alpha", "ald", "al0", "f"),
         [
-            (np.array([]), np.array([]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0),
-            (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0, 1.0),
+            (np.array([]), np.array([]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([1.0]), np.array([]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([]), np.array([1.0]), np.array([0.0]), np.array([0.0]), np.array([1.0]), 1.0),
+            (np.array([]), np.array([1.0]), np.array([1.0]), np.array([1.0]), np.array([1.0]), 1.0),
         ],
     )
     def test_empty_array(
@@ -877,12 +960,12 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
     ) -> None:
         """Test diffusion_OTF with empty input."""
-        output = otf.diffusion_OTF(u, v, alpha, ald, al0, f)
+        output = otf.diffusion_OTF(u=u, v=v, alpha=alpha, ald=ald, al0=al0, f=f)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -891,25 +974,25 @@ class TestDiffusionOTF:
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                1.0,
-                0.0,
-                1.0,
+                np.array([1.0]),
+                np.array([0.0]),
+                np.array([1.0]),
                 1.0,
             ),
             (
                 np.array([1.0]),
                 np.array([1.0]),
-                1.0,
-                1.0,
-                1.0,
+                np.array([1.0]),
+                np.array([1.0]),
+                np.array([1.0]),
                 2.0,
             ),
             (
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
-                1.0,
-                1.0,
-                1.0,
+                np.array([1.0, 1.0]),
+                np.array([1.0, 1.0]),
+                np.array([1.0, 1.0]),
                 1.0,
             ),
         ],
@@ -919,13 +1002,13 @@ class TestDiffusionOTF:
         u: np.ndarray,
         v: np.ndarray,
         alpha: np.ndarray,
-        ald: float,
-        al0: float,
+        ald: np.ndarray,
+        al0: np.ndarray,
         f: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
-        output = otf.diffusion_OTF(u, v, alpha, ald, al0, f)
+        output = otf.diffusion_OTF(u=u, v=v, alpha=alpha, ald=ald, al0=al0, f=f)
         snapshot_custom.assert_match(output)
 
 
@@ -947,7 +1030,7 @@ class TestGaussianOTF:
         blur_size_y: float,
     ) -> None:
         """Test gaussian_OTF with empty input."""
-        output = otf.gaussian_OTF(u, v, blur_size_x, blur_size_y)
+        output = otf.gaussian_OTF(u=u, v=v, blur_size_x=blur_size_x, blur_size_y=blur_size_y)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -982,7 +1065,7 @@ class TestGaussianOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
-        output = otf.gaussian_OTF(u, v, blur_size_x, blur_size_y)
+        output = otf.gaussian_OTF(u=u, v=v, blur_size_x=blur_size_x, blur_size_y=blur_size_y)
         snapshot_custom.assert_match(output)
 
 
@@ -1012,7 +1095,14 @@ class TestTdiOTF:
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.tdi_OTF(u_or_v, w, n_tdi, phases_n, beta, f)
+        output = otf.tdi_OTF(
+            u_or_v=u_or_v,
+            w=w,
+            n_tdi=n_tdi,
+            phases_n=phases_n,
+            beta=beta,
+            f=f,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -1031,7 +1121,14 @@ class TestTdiOTF:
         f: float,
     ) -> None:
         """Test tdi_OTF with empty input."""
-        output = otf.tdi_OTF(u_or_v, w, n_tdi, phases_n, beta, f)
+        output = otf.tdi_OTF(
+            u_or_v=u_or_v,
+            w=w,
+            n_tdi=n_tdi,
+            phases_n=phases_n,
+            beta=beta,
+            f=f,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -1074,7 +1171,14 @@ class TestTdiOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
-        output = otf.tdi_OTF(u_or_v, w, n_tdi, phases_n, beta, f)
+        output = otf.tdi_OTF(
+            u_or_v=u_or_v,
+            w=w,
+            n_tdi=n_tdi,
+            phases_n=phases_n,
+            beta=beta,
+            f=f,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -1095,7 +1199,7 @@ class TestWavefrontOTF2:
         w_rms: float,
     ) -> None:
         """Test wavefront_OTF_2 with empty input."""
-        output = otf.wavefront_OTF_2(u, v, cutoff, w_rms)
+        output = otf.wavefront_OTF_2(u=u, v=v, cutoff=cutoff, w_rms=w_rms)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -1130,7 +1234,7 @@ class TestWavefrontOTF2:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
-        output = otf.wavefront_OTF_2(u, v, cutoff, w_rms)
+        output = otf.wavefront_OTF_2(u=u, v=v, cutoff=cutoff, w_rms=w_rms)
         snapshot_custom.assert_match(output)
 
 
@@ -1148,10 +1252,10 @@ class TestSliceOTF:
         self,
         otf_input: np.ndarray,
         ang: float,
-        snapshot_custom: float,
+        snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test slice_otf with normal inputs and expected outputs."""
-        output = otf.slice_otf(otf_input, ang)
+        output = otf.slice_otf(otf=otf_input, ang=ang)
         snapshot_custom.assert_match(output)
 
 
@@ -1216,17 +1320,17 @@ class TestPolychromaticTurbulenceOTF:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
             otf.polychromatic_turbulence_OTF(
-                u,
-                v,
-                wavelengths,
-                weights,
-                altitude,
-                slant_range,
-                D,
-                ha_wind_speed,
-                cn2_at_1m,
-                int_time,
-                aircraft_speed,
+                u=u,
+                v=v,
+                wavelengths=wavelengths,
+                weights=weights,
+                altitude=altitude,
+                slant_range=slant_range,
+                D=D,
+                ha_wind_speed=ha_wind_speed,
+                cn2_at_1m=cn2_at_1m,
+                int_time=int_time,
+                aircraft_speed=aircraft_speed,
             )
 
     @pytest.mark.parametrize(
@@ -1315,17 +1419,17 @@ class TestPolychromaticTurbulenceOTF:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
             otf.polychromatic_turbulence_OTF(
-                u,
-                v,
-                wavelengths,
-                weights,
-                altitude,
-                slant_range,
-                D,
-                ha_wind_speed,
-                cn2_at_1m,
-                int_time,
-                aircraft_speed,
+                u=u,
+                v=v,
+                wavelengths=wavelengths,
+                weights=weights,
+                altitude=altitude,
+                slant_range=slant_range,
+                D=D,
+                ha_wind_speed=ha_wind_speed,
+                cn2_at_1m=cn2_at_1m,
+                int_time=int_time,
+                aircraft_speed=aircraft_speed,
             )
 
     @pytest.mark.parametrize(
@@ -1427,17 +1531,17 @@ class TestPolychromaticTurbulenceOTF:
     ) -> None:
         """Test polychromatic_turbulence_OTF with empty input."""
         output = otf.polychromatic_turbulence_OTF(
-            u,
-            v,
-            wavelengths,
-            weights,
-            altitude,
-            slant_range,
-            D,
-            ha_wind_speed,
-            cn2_at_1m,
-            int_time,
-            aircraft_speed,
+            u=u,
+            v=v,
+            wavelengths=wavelengths,
+            weights=weights,
+            altitude=altitude,
+            slant_range=slant_range,
+            D=D,
+            ha_wind_speed=ha_wind_speed,
+            cn2_at_1m=cn2_at_1m,
+            int_time=int_time,
+            aircraft_speed=aircraft_speed,
         )
         assert output[0].size == 0
         snapshot_custom.assert_match(output[1])
@@ -1580,17 +1684,17 @@ class TestPolychromaticTurbulenceOTF:
     ) -> None:
         """Test polychromatic_turbulence_OTF with normal inputs and expected outputs."""
         output = otf.polychromatic_turbulence_OTF(
-            u,
-            v,
-            wavelengths,
-            weights,
-            altitude,
-            slant_range,
-            D,
-            ha_wind_speed,
-            cn2_at_1m,
-            int_time,
-            aircraft_speed,
+            u=u,
+            v=v,
+            wavelengths=wavelengths,
+            weights=weights,
+            altitude=altitude,
+            slant_range=slant_range,
+            D=D,
+            ha_wind_speed=ha_wind_speed,
+            cn2_at_1m=cn2_at_1m,
+            int_time=int_time,
+            aircraft_speed=aircraft_speed,
         )
         snapshot_custom.assert_match(output)
 
@@ -1614,7 +1718,7 @@ class TestDetectorOTF:
         f: float,
     ) -> None:
         """Test detector_OTF with empty input."""
-        output = otf.detector_OTF(u, v, w_x, w_y, f)
+        output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -1634,7 +1738,7 @@ class TestDetectorOTF:
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.detector_OTF(u, v, w_x, w_y, f)
+        output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -1681,7 +1785,7 @@ class TestDetectorOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF with normal inputs and expected outputs."""
-        output = otf.detector_OTF(u, v, w_x, w_y, f)
+        output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
         snapshot_custom.assert_match(output)
 
 
@@ -1703,7 +1807,7 @@ class TestDriftOTF:
         a_y: float,
     ) -> None:
         """Test drift_OTF with empty input."""
-        output = otf.drift_OTF(u, v, a_x, a_y)
+        output = otf.drift_OTF(u=u, v=v, a_x=a_x, a_y=a_y)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -1730,7 +1834,7 @@ class TestDriftOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test drift_OTF with normal inputs and expected outputs."""
-        output = otf.drift_OTF(u, v, a_x, a_y)
+        output = otf.drift_OTF(u=u, v=v, a_x=a_x, a_y=a_y)
         snapshot_custom.assert_match(output)
 
 
@@ -1752,7 +1856,7 @@ class TestJitterOTF:
         s_y: float,
     ) -> None:
         """Test jitter_OTF with empty input."""
-        output = otf.jitter_OTF(u, v, s_x, s_y)
+        output = otf.jitter_OTF(u=u, v=v, s_x=s_x, s_y=s_y)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -1799,7 +1903,7 @@ class TestJitterOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test jitter_OTF with normal inputs and expected outputs."""
-        output = otf.jitter_OTF(u, v, s_x, s_y)
+        output = otf.jitter_OTF(u=u, v=v, s_x=s_x, s_y=s_y)
         snapshot_custom.assert_match(output)
 
 
@@ -1841,8 +1945,19 @@ class TestCommonOTFs:
         ),
         [
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([1.0]),
                 np.array([1.0]),
@@ -1851,8 +1966,19 @@ class TestCommonOTFs:
                 0.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([1.0]),
                 np.array([1.0]),
@@ -1876,14 +2002,14 @@ class TestCommonOTFs:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
             otf.common_OTFs(
-                sensor,
-                scenario,
-                uu,
-                vv,
-                mtf_wavelengths,
-                mtf_weights,
-                slant_range,
-                int_time,
+                sensor=sensor,
+                scenario=scenario,
+                uu=uu,
+                vv=vv,
+                mtf_wavelengths=mtf_wavelengths,
+                mtf_weights=mtf_weights,
+                slant_range=slant_range,
+                int_time=int_time,
             )
 
     @pytest.mark.parametrize(
@@ -1899,8 +2025,19 @@ class TestCommonOTFs:
         ),
         [
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([]),
                 np.array([]),
                 np.array([]),
@@ -1909,8 +2046,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([]),
                 np.array([]),
@@ -1919,8 +2067,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([]),
                 np.array([1.0]),
                 np.array([]),
@@ -1929,8 +2088,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([]),
                 np.array([]),
                 np.array([1.0]),
@@ -1939,8 +2109,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([]),
                 np.array([]),
                 np.array([]),
@@ -1949,8 +2130,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([1.0]),
                 np.array([1.0]),
@@ -1959,8 +2151,19 @@ class TestCommonOTFs:
                 1.0,
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([1.0]),
                 np.array([]),
@@ -1984,14 +2187,14 @@ class TestCommonOTFs:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
             otf.common_OTFs(
-                sensor,
-                scenario,
-                uu,
-                vv,
-                mtf_wavelengths,
-                mtf_weights,
-                slant_range,
-                int_time,
+                sensor=sensor,
+                scenario=scenario,
+                uu=uu,
+                vv=vv,
+                mtf_wavelengths=mtf_wavelengths,
+                mtf_weights=mtf_weights,
+                slant_range=slant_range,
+                int_time=int_time,
             )
 
     @pytest.mark.parametrize(
@@ -2008,8 +2211,19 @@ class TestCommonOTFs:
         ),
         [
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0]),
                 np.array([1.0]),
                 np.array([1.0]),
@@ -2029,8 +2243,19 @@ class TestCommonOTFs:
                 },
             ),
             (
-                Sensor("test_scene", 1.0, 1.0, 1.0, np.array([0.0, 1.0])),
-                Scenario("test_scenario", 1, 1.0, 1.0),
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
@@ -2065,14 +2290,14 @@ class TestCommonOTFs:
     ) -> None:
         """Test common_OTFs with normal inputs and expected outputs."""
         output = otf.common_OTFs(
-            sensor,
-            scenario,
-            uu,
-            vv,
-            mtf_wavelengths,
-            mtf_weights,
-            slant_range,
-            int_time,
+            sensor=sensor,
+            scenario=scenario,
+            uu=uu,
+            vv=vv,
+            mtf_wavelengths=mtf_wavelengths,
+            mtf_weights=mtf_weights,
+            slant_range=slant_range,
+            int_time=int_time,
         )
         self.check_otf(output, **expected)
 
@@ -2097,7 +2322,14 @@ class TestTurbulenceOTF:
         alpha: float,
     ) -> None:
         """Test turbulence_OTF with empty input."""
-        output = otf.turbulence_OTF(u, v, lambda0, D, r0, alpha)
+        output = otf.turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            alpha=alpha,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2122,7 +2354,14 @@ class TestTurbulenceOTF:
         alpha: float,
     ) -> None:
         """Test turbulence_OTF where output is nan."""
-        output = otf.turbulence_OTF(u, v, lambda0, D, r0, alpha)
+        output = otf.turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            alpha=alpha,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -2142,7 +2381,14 @@ class TestTurbulenceOTF:
         alpha: float,
     ) -> None:
         """Test turbulence_OTF where output is inf."""
-        output = otf.turbulence_OTF(u, v, lambda0, D, r0, alpha)
+        output = otf.turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            alpha=alpha,
+        )
         assert np.isinf(output).all()
 
     @pytest.mark.parametrize(
@@ -2172,7 +2418,14 @@ class TestTurbulenceOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
-        output = otf.turbulence_OTF(u, v, lambda0, D, r0, alpha)
+        output = otf.turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            alpha=alpha,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -2197,7 +2450,15 @@ class TestWindSpeedTurbulenceOTF:
         vel: float,
     ) -> None:
         """Test wind_speed_turbulence_OTF with empty input."""
-        output = otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
+        output = otf.wind_speed_turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            t_d=td,
+            vel=vel,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2221,7 +2482,15 @@ class TestWindSpeedTurbulenceOTF:
         vel: float,
     ) -> None:
         """Test wind_speed_turbulence_OTF where output is nan."""
-        output = otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
+        output = otf.wind_speed_turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            t_d=td,
+            vel=vel,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -2244,7 +2513,15 @@ class TestWindSpeedTurbulenceOTF:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
+            otf.wind_speed_turbulence_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                r0=r0,
+                t_d=td,
+                vel=vel,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "r0", "td", "vel"),
@@ -2290,7 +2567,15 @@ class TestWindSpeedTurbulenceOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test wind_speed_turbulence_OTF with normal inputs and expected outputs."""
-        output = otf.wind_speed_turbulence_OTF(u, v, lambda0, D, r0, td, vel)
+        output = otf.wind_speed_turbulence_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            r0=r0,
+            t_d=td,
+            vel=vel,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -2307,11 +2592,11 @@ class TestFilterOTF:
         self,
         u: np.ndarray,
         v: np.ndarray,
-        kernel: float,
+        kernel: np.ndarray,
         ifov: float,
     ) -> None:
         """Test filter_OTF with empty input."""
-        output = otf.filter_OTF(u, v, kernel, ifov)
+        output = otf.filter_OTF(u=u, v=v, kernel=kernel, ifov=ifov)
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2331,12 +2616,12 @@ class TestFilterOTF:
         self,
         u: np.ndarray,
         v: np.ndarray,
-        kernel: float,
+        kernel: np.ndarray,
         ifov: float,
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
-        output = otf.filter_OTF(u, v, kernel, ifov)
+        output = otf.filter_OTF(u=u, v=v, kernel=kernel, ifov=ifov)
         snapshot_custom.assert_match(output)
 
 
@@ -2360,7 +2645,14 @@ class TestWavefrontOTF:
         L_y: float,  # noqa: N803
     ) -> None:
         """Test wavefront_OTF with empty input."""
-        output = otf.wavefront_OTF(u, v, lambda0, pv, L_x, L_y)
+        output = otf.wavefront_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            pv=pv,
+            L_x=L_x,
+            L_y=L_y,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2381,7 +2673,14 @@ class TestWavefrontOTF:
         L_y: float,  # noqa: N803
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.wavefront_OTF(u, v, lambda0, pv, L_x, L_y)
+        output = otf.wavefront_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            pv=pv,
+            L_x=L_x,
+            L_y=L_y,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -2437,7 +2736,14 @@ class TestWavefrontOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test wavefront_OTF with normal inputs and expected outputs."""
-        output = otf.wavefront_OTF(u, v, lambda0, pv, L_x, L_y)
+        output = otf.wavefront_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            pv=pv,
+            L_x=L_x,
+            L_y=L_y,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -2460,7 +2766,13 @@ class TestCircularApertureOTF:
         eta: float,
     ) -> None:
         """Test circular_aperture_OTF with empty input."""
-        output = otf.circular_aperture_OTF(u, v, lambda0, D, eta)
+        output = otf.circular_aperture_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            eta=eta,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2482,7 +2794,13 @@ class TestCircularApertureOTF:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.circular_aperture_OTF(u, v, lambda0, D, eta)
+            otf.circular_aperture_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                eta=eta,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "eta"),
@@ -2500,7 +2818,13 @@ class TestCircularApertureOTF:
         eta: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.circular_aperture_OTF(u, v, lambda0, D, eta)
+        output = otf.circular_aperture_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            eta=eta,
+        )
         assert np.isnan(output).all()
 
     @pytest.mark.parametrize(
@@ -2534,7 +2858,13 @@ class TestCircularApertureOTF:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
-        output = otf.circular_aperture_OTF(u, v, lambda0, D, eta)
+        output = otf.circular_aperture_OTF(
+            u=u,
+            v=v,
+            lambda0=lambda0,
+            D=D,
+            eta=eta,
+        )
         snapshot_custom.assert_match(output)
 
 
@@ -2558,7 +2888,14 @@ class TestCircularApertureOTFWithDefocus:
         defocus: float,
     ) -> None:
         """Test circular_aperture_OTF_with_defocus with empty input."""
-        output = otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
+        output = otf.circular_aperture_OTF_with_defocus(
+            u=u,
+            v=v,
+            wavelength=wavelength,
+            D=D,
+            f=f,
+            defocus=defocus,
+        )
         assert output.size == 0
 
     @pytest.mark.parametrize(
@@ -2579,7 +2916,14 @@ class TestCircularApertureOTFWithDefocus:
     ) -> None:
         """Cover cases where ZeroDivision occurs."""
         with pytest.raises(ZeroDivisionError):
-            otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
+            otf.circular_aperture_OTF_with_defocus(
+                u=u,
+                v=v,
+                wavelength=wavelength,
+                D=D,
+                f=f,
+                defocus=defocus,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "wavelength", "D", "f", "defocus"),
@@ -2614,5 +2958,12 @@ class TestCircularApertureOTFWithDefocus:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
-        output = otf.circular_aperture_OTF_with_defocus(u, v, wavelength, D, f, defocus)
+        output = otf.circular_aperture_OTF_with_defocus(
+            u=u,
+            v=v,
+            wavelength=wavelength,
+            D=D,
+            f=f,
+            defocus=defocus,
+        )
         snapshot_custom.assert_match(output)

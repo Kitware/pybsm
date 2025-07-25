@@ -11,7 +11,7 @@ from syrupy.assertion import SnapshotAssertion
 from pybsm.simulation import RefImage
 
 BASE_PATH = Path(__file__).parent.parent.parent
-IMAGE_PATH = BASE_PATH / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
+IMAGE_PATH = BASE_PATH / "docs" / "examples" / "data" / "M-41 Walker Bulldog (USA) width 319cm height 272cm.tiff"
 
 
 class TestRefImage:
@@ -37,7 +37,12 @@ class TestRefImage:
         img = plt.imread(IMAGE_PATH)
         gsd = 3.19 / 160.0
         with expectation:
-            ref = RefImage(img, gsd, pix_values, refl_values)
+            ref = RefImage(
+                img=img,
+                gsd=gsd,
+                pix_values=pix_values,
+                refl_values=refl_values,
+            )
             assert np.array_equal(ref.img, img)
             assert ref.gsd == gsd
             if pix_values is not None:
@@ -49,8 +54,8 @@ class TestRefImage:
     def test_estimate_capture_parameters(self, altitude: float, snapshot: SnapshotAssertion) -> None:
         img = plt.imread(IMAGE_PATH)
         gsd = 3.19 / 160.0
-        ref_image = RefImage(img, gsd)
-        output = ref_image.estimate_capture_parameters(altitude)
+        ref_image = RefImage(img=img, gsd=gsd)
+        output = ref_image.estimate_capture_parameters(altitude=altitude)
         assert output == snapshot
 
     @mock.patch("pybsm.simulation.ref_image.plt")
@@ -58,7 +63,7 @@ class TestRefImage:
         img = plt.imread(IMAGE_PATH)
         gsd = 3.19 / 160.0
         # Create the instance of TestClass
-        obj = RefImage(img, gsd)
+        obj = RefImage(img=img, gsd=gsd)
 
         # Call the show method
         obj.show()

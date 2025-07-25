@@ -1,6 +1,6 @@
 # :auto build-system:
 [build-system]
-requires = ["poetry-core>=1.9,<2.0"]
+requires = ["poetry-core>=1.8.5,<2.0"]
 build-backend = "poetry.core.masonry.api"
 # :auto build-system:
 
@@ -22,10 +22,11 @@ classifiers = [
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
 ]
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
-version = "0.10.2"
+version = "0.11.0"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
@@ -34,17 +35,19 @@ description = "pyBSM is a Python-based tool for sensor modeling. It provides com
 python = "^3.9"
 # :auto python-version:
 
-# Python capped to <3.13 because of:
+# Hinge because:
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
 numpy = [
     {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
-    {version = "^1.26", python = ">=3.12,<3.13" } # numpy==1.26 is the first release supporting python 3.12
+    {version = "^1.26", python = ">=3.12,<3.13" },  # numpy==1.26 is the first release supporting python 3.12
+    {version = ">=2.1", python = ">=3.13" } # numpy==2.1 is the first release supporting python 3.13
 ]
 matplotlib = ">=3.5.2"
-# simulation.img2reflectance currently uses interpolate.interp1d but will be removed in scipy==1.14.0
-# https://github.com/scipy/scipy/blob/44e4ebaac992fde33f04638b99629d23973cb9b2/scipy/interpolate/_interpolate.py#L118
-scipy = ">=1.10.0,<1.14"  # CVE-2023-25399
-setuptools = ">=65.6.1"
+scipy = [
+    {version = ">=1.10.0", python = "<3.13" },   # CVE-2023-25399
+    {version = ">=1.14.1", python = ">=3.13" }, # scipy==1.14.1 is the first release supporting python 3.13
+]
+setuptools = ">=78.1.1"  # CVE-2025-47273
 
 # :auto linting:
 # Linting
@@ -52,11 +55,11 @@ setuptools = ">=65.6.1"
 optional = true
 
 [tool.poetry.group.linting.dependencies]
-mypy = ">=0.991,!=1.11.0"
 pre-commit = ">=2.20"
-ruff = "^0.5.6"
+ruff = "^0.11.0"
 types-setuptools = ">=65.6.0.1"
 sphinx-lint = ">=1.0.0"
+pyright = {version=">=1.1.320",extras=["nodejs"]}
 # :auto linting:
 
 # :auto docs:
@@ -71,6 +74,7 @@ sphinx-rtd-theme = ">=1.1.1"
 sphinx-prompt = ">=1.5.0"
 sphinx-click = ">=5.0.0"
 livereload = ">=2.6.3"
+myst-nb = "^1.1.2"
 # :auto docs:
 
 # :auto tests:
@@ -86,6 +90,7 @@ syrupy = ">=4.0.0"
 # Jupyter notebook testing
 notebook = ">=7.2.2"
 papermill = ">=2.4.0"
+pyright = {version=">=1.1.320",extras=["nodejs"]}
 # :auto tests:
 
 # :auto pytest:
@@ -98,6 +103,7 @@ addopts = [
     "--cov=./tests",                    # Also cover our tests for dead spots
     "--cov-report=term",                # Coverage report to terminal
     "--cov-report=xml:coverage.xml",    # for external tool reporting
+    "--snapshot-warn-unused",           # Prevent test failure when skipping tests
 ]
 testpaths = [
     "tests",
@@ -133,17 +139,13 @@ select = [
     "F", "E", "W", "C90", "I", "N", "D1", "D200", "D201", "D211", "D403", "D419", "UP",
     "YTT", "ANN", "S",  "BLE", "B", "A", "COM", "C4", "T10", "ISC", "ICN", "PYI", "PT", "Q",
     "RSE", "RET", "SLF", "SIM", "TID252", "ARG", "FIX", "PD", "FLY", "NPY", "RUF027",
-    "RUF100", "PERF"
+    "RUF100", "PERF", "UP045", "RUF013"
 ]
 preview = true  # needed for RUF027
 explicit-preview-rules = true
 
-ignore = [
-  "ANN101",
-  "ANN102",
-  # -- Ignore these rules, since they contradict our coding standards
-  "C408",  # JATIC guidelines prefer "list()", rather than "[]", to create an empty list
-]
+# From program suggested config
+ignore = ["ANN101","ANN102","C408","C416"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -184,16 +186,21 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 # :auto ruff:
 
-# :auto mypy:
-[tool.mypy]
-python_version = "3.9"
-disallow_untyped_defs = true
-ignore_errors = false
-ignore_missing_imports = true
-strict_optional = false
-incremental = false
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
-# :auto mypy:
+# :auto pyright:
+[tool.pyright]
+pythonVersion = "3.9"
+reportMissingImports = "warning"
+typeCheckingMode = "standard"
+include = [
+    "src/pybsm",
+    "tests",
+    "demos",
+    "scripts",
+    "docs",
+    ]
+exclude = [
+    "**/__pycache__",
+    "docs/_build",
+    "docs/_implementations",
+    ]
+# :auto pyright:

@@ -7,7 +7,7 @@ from tests.test_utils import CustomFloatSnapshotExtension
 
 @pytest.fixture
 def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(lambda: CustomFloatSnapshotExtension())
+    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestUtils:
@@ -29,7 +29,11 @@ class TestUtils:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            utils.load_database_atmosphere_no_interp(altitude, ground_range, ihaze)
+            utils.load_database_atmosphere_no_interp(
+                altitude=altitude,
+                ground_range=ground_range,
+                ihaze=ihaze,
+            )
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range"),
@@ -46,7 +50,11 @@ class TestUtils:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere_no_interp with normal inputs and expected outputs."""
-        output = utils.load_database_atmosphere_no_interp(altitude, ground_range, ihaze)
+        output = utils.load_database_atmosphere_no_interp(
+            altitude=altitude,
+            ground_range=ground_range,
+            ihaze=ihaze,
+        )
         snapshot_custom.assert_match(output)
 
     @pytest.mark.parametrize(
@@ -65,7 +73,11 @@ class TestUtils:
     ) -> None:
         """Cover cases where IndexError occurs."""
         with pytest.raises(IndexError):
-            utils.load_database_atmosphere(altitude, ground_range, ihaze)
+            utils.load_database_atmosphere(
+                altitude=altitude,
+                ground_range=ground_range,
+                ihaze=ihaze,
+            )
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range"),
@@ -88,5 +100,9 @@ class TestUtils:
         snapshot_custom: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere with normal inputs and expected outputs."""
-        output = utils.load_database_atmosphere(altitude, ground_range, ihaze)
+        output = utils.load_database_atmosphere(
+            altitude=altitude,
+            ground_range=ground_range,
+            ihaze=ihaze,
+        )
         snapshot_custom.assert_match(output)

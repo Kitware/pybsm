@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 import pytest
@@ -7,15 +9,28 @@ from pybsm.simulation import Sensor
 
 
 class TestSensor:
-    def create_default_sensor(self, other_args: Optional[dict[str, int]] = None) -> None:
+    def create_default_sensor(self, other_args: dict[str, Any] | None = None) -> Sensor:
         name = "test"
         d = 1.0
         f = 1.0
         px = 1.0
         opt_trans_wavelengths = np.array([0.0, 1.0])
         if not other_args:
-            return Sensor(name, d, f, px, opt_trans_wavelengths)
-        return Sensor(name, d, f, px, opt_trans_wavelengths, **other_args)
+            return Sensor(
+                name=name,
+                D=d,
+                f=f,
+                p_x=px,
+                opt_trans_wavelengths=opt_trans_wavelengths,
+            )
+        return Sensor(
+            name=name,
+            D=d,
+            f=f,
+            p_x=px,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+            **other_args,
+        )
 
     def check_sensor(
         self,
@@ -265,5 +280,11 @@ class TestSensor:
         opt_trans_wavelengths: np.ndarray,
     ) -> None:
         """Check if created sensor matches expected parameters."""
-        sensor = Sensor(name, d, f, p_x, opt_trans_wavelengths)
+        sensor = Sensor(
+            name=name,
+            D=d,
+            f=f,
+            p_x=p_x,
+            opt_trans_wavelengths=opt_trans_wavelengths,
+        )
         self.check_sensor(sensor, name, d, f, p_x, opt_trans_wavelengths)

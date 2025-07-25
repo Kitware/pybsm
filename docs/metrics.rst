@@ -10,4 +10,3 @@ Metrics
 
    pybsm.metrics.functional
    pybsm.metrics.metrics
-

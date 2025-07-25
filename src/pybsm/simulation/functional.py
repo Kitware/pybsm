@@ -13,12 +13,13 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
+from __future__ import annotations
+
 # standard library imports
 import inspect
 import logging
 import os
 import warnings
-from typing import Optional, Union
 
 # 3rd party imports
 import numpy as np
@@ -46,7 +47,7 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def instantaneous_FOV(w: int, f: int) -> float:  # noqa: N802
+def instantaneous_FOV(*, w: int, f: int) -> float:  # noqa: N802
     """The instantaneous field of view; i.e., the angular footprint of a single detector in object space.
 
     :param w:
@@ -69,6 +70,7 @@ def instantaneous_FOV(w: int, f: int) -> float:  # noqa: N802
 
 
 def wiener_filter(
+    *,
     otf: np.ndarray,
     noise_to_signal_power_spectrum: float,
 ) -> np.ndarray:
@@ -100,6 +102,7 @@ def wiener_filter(
 
 
 def img_to_reflectance(
+    *,
     img: np.ndarray,
     pix_values: np.ndarray,
     refl_values: np.ndarray,
@@ -133,8 +136,10 @@ def img_to_reflectance(
     f = interpolate.interp1d(
         pix_values,
         refl_values,
-        fill_value="extrapolate",
-        assume_sorted=0,
+        # pyright thinks fill_value expects a float or array-like. `extrapolate` is a valid option
+        # (https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d)
+        fill_value="extrapolate",  # type: ignore
+        assume_sorted=False,
     )
     ref_img = f(img)
     ref_img[ref_img > 1.0] = 1.0
@@ -144,10 +149,11 @@ def img_to_reflectance(
 
 
 def simulate_image(
+    *,
     ref_img: RefImage,
     sensor: Sensor,
     scenario: Scenario,
-    rng: Optional[Union[np.random.Generator, int]] = 1,
+    rng: np.random.Generator | int | None = 1,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Simulates radiometrically accurate imagery collected through a sensor.
 
@@ -203,7 +209,11 @@ def simulate_image(
         ref,
         pe,
         spectral_weights,
-    ) = radiance.reflectance_to_photoelectrons(scenario.atm, sensor, int_time)
+    ) = radiance.reflectance_to_photoelectrons(
+        atm=scenario.atm,
+        sensor=sensor,
+        int_time=int_time,
+    )
 
     wavelengths = spectral_weights[0]
     weights = spectral_weights[1]
@@ -225,14 +235,14 @@ def simulate_image(
     uu, vv = np.meshgrid(u_rng, v_rng)
 
     system_otf = otf.common_OTFs(
-        sensor,
-        scenario,
-        uu,
-        vv,
-        mtf_wavelengths,
-        mtf_weights,
-        slant_range,
-        int_time,
+        sensor=sensor,
+        scenario=scenario,
+        uu=uu,
+        vv=vv,
+        mtf_wavelengths=mtf_wavelengths,
+        mtf_weights=mtf_weights,
+        slant_range=slant_range,
+        int_time=int_time,
     ).system_OTF
 
     df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2  # noqa: PD901
@@ -245,14 +255,17 @@ def simulate_image(
     # Standard deviation of additive Gaussian noise (e.g. read noise,
     # quantization). Should be the RSS value if multiple terms are combined.
     # This should not include photon noise.
-    quantization_noise = noise.quantization_noise(sensor.max_n, sensor.bit_depth)
+    quantization_noise = noise.quantization_noise(
+        pe_range=sensor.max_n,
+        bit_depth=sensor.bit_depth,
+    )
     g_noise = np.sqrt(quantization_noise**2.0 + sensor.read_noise**2.0)
 
     # Convert to reference image into a floating point reflectance image.
     reflectance_img = img_to_reflectance(
-        ref_img.img,
-        ref_img.pix_values,
-        ref_img.refl_values,
+        img=ref_img.img,
+        pix_values=ref_img.pix_values,
+        refl_values=ref_img.refl_values,
     )
 
     # Convert the reflectance image to photoelectrons.
@@ -261,12 +274,12 @@ def simulate_image(
 
     # blur and resample the image
     blur_img, _ = otf.apply_otf_to_image(
-        true_img,
-        ref_img.gsd,
-        slant_range,
-        system_otf,
-        df,
-        ifov,
+        ref_img=true_img,
+        ref_gsd=ref_img.gsd,
+        ref_range=slant_range,
+        otf=system_otf,
+        df=df,
+        ifov=ifov,
     )
 
     # add photon noise (all sources) and dark current noise
@@ -283,8 +296,9 @@ def simulate_image(
 
 
 def stretch_contrast_convert_8bit(
+    *,
     img: np.ndarray,
-    perc: Optional[list[float]] = None,
+    perc: list[float] | None = None,
 ) -> np.ndarray:
     """
     Adjusts the contrast of an image and converts it to an 8-bit format.
@@ -307,7 +321,7 @@ def stretch_contrast_convert_8bit(
     Example:
         >>> import numpy as np
         >>> img = np.random.rand(100, 100) * 65535  # Example 16-bit image
-        >>> stretched_img = stretch_contrast_convert_8bit(img)
+        >>> stretched_img = stretch_contrast_convert_8bit(img=img)
     """
     if perc is None:
         perc = [0.1, 99.9]

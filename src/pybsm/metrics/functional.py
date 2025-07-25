@@ -13,11 +13,12 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
+from __future__ import annotations
+
 # standard library imports
 import inspect
 import os
 import warnings
-from typing import Optional
 
 import matplotlib.pyplot as plt
 
@@ -46,7 +47,7 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def giqe3(rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
+def giqe3(*, rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
     """IBSM Equation 3-56.  The General Image Quality Equation version 3.0.
 
         The GIQE returns values on the National Image Interpretability Rating
@@ -78,7 +79,7 @@ def giqe3(rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
     return 11.81 + 3.32 * np.log10(rer / (gsd / 0.0254)) - 1.48 * eho - ng / snr
 
 
-def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float) -> tuple[float, float]:
+def giqe4(*, rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle: float) -> tuple[float, float]:
     """General Image Quality Equation version 4 from Leachtenauer, et al.
 
     "General Image Quality Equation: GIQE," Applied Optics, Vol 36, No 32,
@@ -129,14 +130,15 @@ def giqe4(rer: float, gsd: float, eho: float, ng: float, snr: float, elev_angle:
     return niirs, gsd_gp
 
 
-def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> tuple[float, float, float]:
+def giqe5(*, rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015.
+    (originally published by https://gwg.nga.mil/)
+    https://github.com/Kitware/pybsm/blob/main/docs/GIQE-5_for_Public_Release.pdf
 
-    https://gwg.nga.mil/ntb/baseline/docs/GIQE-5_for_Public_Release.pdf
     This version of the GIQE replaces the earlier versions and should be used
     in all future analyses.  See also "Airborne Validation of the General Image
     Quality Equation 5"
-    https://www.osapublishing.org/ao/abstract.cfm?uri=ao-59-32-9978
+    https://opg.optica.org/ao/abstract.cfm?uri=ao-59-32-9978
 
     :param rer_1:
         relative edge response in two directions (e.g., along- and across-
@@ -188,7 +190,7 @@ def giqe5(rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float)
     return niirs, gsd_w, rer
 
 
-def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:  # noqa: N802
+def giqe5_RER(*, mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:  # noqa: N802
     """Calculates the relative edge response from a 2-D MTF.
 
     This function is primarily for use with the GIQE 5. It implements IBSM equations 3-57 and
@@ -210,16 +212,16 @@ def giqe5_RER(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple
         rer_90:
             relative edge response at 90 degrees orientation (unitless)
     """
-    u_slice = otf.functional.slice_otf(mtf, 0)
-    v_slice = otf.functional.slice_otf(mtf, np.pi / 2)
+    u_slice = otf.functional.slice_otf(otf=mtf, ang=0)
+    v_slice = otf.functional.slice_otf(otf=mtf, ang=np.pi / 2)
 
-    rer_0 = relative_edge_response(u_slice, df, ifov_x)
-    rer_90 = relative_edge_response(v_slice, df, ifov_y)
+    rer_0 = relative_edge_response(mtf_slice=u_slice, df=df, ifov=ifov_x)
+    rer_90 = relative_edge_response(mtf_slice=v_slice, df=df, ifov=ifov_y)
 
     return rer_0, rer_90
 
 
-def giqe_edge_terms(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:
+def giqe_edge_terms(*, mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) -> tuple[float, float]:
     """Calculates the geometric mean relative edge response and edge high overshoot,from a 2-D MTF.
 
     This function is primarily for use with the GIQE. It implements IBSM equations 3-57 and 3-58.
@@ -240,21 +242,21 @@ def giqe_edge_terms(mtf: np.ndarray, df: float, ifov_x: float, ifov_y: float) ->
         eho:
             geometric mean edge height overshoot (unitless)
     """
-    u_slice = otf.functional.slice_otf(mtf, 0)
-    v_slice = otf.functional.slice_otf(mtf, np.pi / 2)
+    u_slice = otf.functional.slice_otf(otf=mtf, ang=0)
+    v_slice = otf.functional.slice_otf(otf=mtf, ang=np.pi / 2)
 
-    mtf_slice_er = relative_edge_response(u_slice, df, ifov_x)
-    v_rer = relative_edge_response(v_slice, df, ifov_y)
+    mtf_slice_er = relative_edge_response(mtf_slice=u_slice, df=df, ifov=ifov_x)
+    v_rer = relative_edge_response(mtf_slice=v_slice, df=df, ifov=ifov_y)
     rer = np.sqrt(mtf_slice_er * v_rer)
 
-    u_eho = edge_height_overshoot(u_slice, df, ifov_x)
-    v_eho = edge_height_overshoot(v_slice, df, ifov_y)
+    u_eho = edge_height_overshoot(mtf_slice=u_slice, df=df, ifov=ifov_x)
+    v_eho = edge_height_overshoot(mtf_slice=v_slice, df=df, ifov=ifov_y)
     eho = np.sqrt(u_eho * v_eho)
 
     return rer, eho
 
 
-def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov: float, slant_range: float) -> float:
+def ground_resolved_distance(*, mtf_slice: np.ndarray, df: float, snr: float, ifov: float, slant_range: float) -> float:
     """IBSM Equation 3-54.
 
     The ground resolved distance is the period of the smallest square wave pattern that can be resolved in an image.
@@ -288,10 +290,10 @@ def ground_resolved_distance(mtf_slice: np.ndarray, df: float, snr: float, ifov:
 
     grd_cases = slant_range * np.array([1.0 / u_r, 2.0 * ifov])
 
-    return np.max(grd_cases)
+    return float(np.max(grd_cases))
 
 
-def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
+def niirs(*, sensor: Sensor, scenario: Scenario, interp: bool | None = False) -> Metrics:
     """Returns NIIRS values and all intermediate calculations.
 
     This function implements the original MATLAB-based NIIRS model and can serve as a
@@ -308,17 +310,29 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
             many intermediate calculations
     """
     # initialize the output
-    nm = Metrics("niirs " + sensor.name + " " + scenario.name)
+    nm = Metrics(name="niirs " + sensor.name + " " + scenario.name)
     nm.sensor = sensor
     nm.scenario = scenario
-    nm.slant_range = geospatial.curved_earth_slant_range(0.0, scenario.altitude, scenario.ground_range)
+    nm.slant_range = geospatial.curved_earth_slant_range(
+        h_target=0.0,
+        h_sensor=scenario.altitude,
+        ground_range=scenario.ground_range,
+    )
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
     if interp:
-        nm.atm = utils.load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+        nm.atm = utils.load_database_atmosphere(
+            altitude=scenario.altitude,
+            ground_range=scenario.ground_range,
+            ihaze=scenario.ihaze,
+        )
     else:
-        nm.atm = utils.load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
+        nm.atm = utils.load_database_atmosphere_no_interp(
+            altitude=scenario.altitude,
+            ground_range=scenario.ground_range,
+            ihaze=scenario.ihaze,
+        )
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]
@@ -340,11 +354,19 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
 
     # get aperture radiances for reflective target and background with GIQE
     # type target parameters
-    nm.tgt_radiance, nm.bkg_radiance = radiance.giqe_radiance(nm.atm, is_emissive)
+    nm.tgt_radiance, nm.bkg_radiance = radiance.giqe_radiance(
+        atm=nm.atm,
+        is_emissive=is_emissive,
+    )
     nm.radiance_wavelengths = nm.atm[:, 0]
 
     # now calculate now characteristics ****for a single frame******
-    nm.snr = radiance.photon_detector_SNR(sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance)
+    nm.snr = radiance.photon_detector_SNR(
+        sensor=sensor,
+        radiance_wavelengths=nm.radiance_wavelengths,
+        target_radiance=nm.tgt_radiance,
+        background_radiance=nm.bkg_radiance,
+    )
 
     # break out photon noise sources (not required for NIIRS but useful for
     # analysis) photon noise due to the scene itself (target,background, and
@@ -352,11 +374,11 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     tgt_noise = np.sqrt(
         integrate.trapezoid(
             radiance.photon_detection_rate(
-                nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
-                nm.sensor.w_x,
-                nm.sensor.w_y,
-                nm.radiance_wavelengths,
-                nm.snr.qe,
+                E=nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
+                w_x=nm.sensor.w_x,
+                w_y=nm.sensor.w_y,
+                wavelengths=nm.radiance_wavelengths,
+                qe=nm.snr.qe,
             ),
             nm.radiance_wavelengths,
         )
@@ -366,11 +388,11 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     bkg_noise = np.sqrt(
         integrate.trapezoid(
             radiance.photon_detection_rate(
-                nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
-                nm.sensor.w_x,
-                nm.sensor.w_y,
-                nm.radiance_wavelengths,
-                nm.snr.qe,
+                E=nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
+                w_x=nm.sensor.w_x,
+                w_y=nm.sensor.w_y,
+                wavelengths=nm.radiance_wavelengths,
+                qe=nm.snr.qe,
             ),
             nm.radiance_wavelengths,
         )
@@ -380,16 +402,16 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     scene_and_path_noise = np.max([tgt_noise, bkg_noise])
     # calculate noise due to just the path scattered or emitted radiation
     scatter_rate, _, _ = radiance.signal_rate(
-        nm.radiance_wavelengths,
-        nm.atm[:, 2] + nm.atm[:, 4],
-        nm.snr.opt_trans,
-        nm.sensor.D,
-        nm.sensor.f,
-        nm.sensor.w_x,
-        nm.sensor.w_y,
-        nm.snr.qe,
-        np.zeros(1),
-        0.0,
+        wavelengths=nm.radiance_wavelengths,
+        target_radiance=nm.atm[:, 2] + nm.atm[:, 4],
+        optical_transmission=nm.snr.opt_trans,
+        D=nm.sensor.D,
+        f=nm.sensor.f,
+        w_x=nm.sensor.w_x,
+        w_y=nm.sensor.w_y,
+        qe=nm.snr.qe,
+        other_irradiance=np.zeros(1),
+        dark_current=0.0,
     )
     nm.snr.path_noise = np.sqrt(scatter_rate * nm.snr.int_time * sensor.n_tdi)
     nm.snr.scene_noise = np.sqrt(scene_and_path_noise**2 - nm.snr.path_noise**2)
@@ -407,14 +429,14 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm.df = u_rng[1] - u_rng[0]  # spatial frequency step size
 
     nm.otf = otf.functional.common_OTFs(
-        sensor,
-        scenario,
-        nm.uu,
-        nm.vv,
-        nm.mtf_wavelengths,
-        nm.mtf_weights,
-        nm.slant_range,
-        nm.snr.int_time,
+        sensor=sensor,
+        scenario=scenario,
+        uu=nm.uu,
+        vv=nm.vv,
+        mtf_wavelengths=nm.mtf_wavelengths,
+        mtf_weights=nm.mtf_weights,
+        slant_range=nm.slant_range,
+        int_time=nm.snr.int_time,
     )
 
     # ########CALCULATE NIIRS##############
@@ -423,35 +445,44 @@ def niirs(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) ->
     nm.gsd_x = nm.ifov_x * nm.slant_range
     nm.gsd_y = nm.ifov_y * nm.slant_range
     nm.gsd_gm = np.sqrt(nm.gsd_x * nm.gsd_y)
-    nm.rer_gm, nm.eho_gm = giqe_edge_terms(np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y)
+    nm.rer_gm, nm.eho_gm = giqe_edge_terms(
+        mtf=np.abs(nm.otf.system_OTF),
+        df=nm.df,
+        ifov_x=nm.ifov_x,
+        ifov_y=nm.ifov_y,
+    )
 
-    nm.ng = noise.noise_gain(sensor.filter_kernel)
+    nm.ng = noise.noise_gain(kernel=sensor.filter_kernel)
     # note that NIIRS is calculated using the SNR ***after frame stacking****
     # if any
     nm.niirs = giqe3(
-        nm.rer_gm,
-        nm.gsd_gm,
-        nm.eho_gm,
-        nm.ng,
-        np.sqrt(sensor.frame_stacks) * nm.snr.snr,
+        rer=nm.rer_gm,
+        gsd=nm.gsd_gm,
+        eho=nm.eho_gm,
+        ng=nm.ng,
+        snr=np.sqrt(sensor.frame_stacks) * nm.snr.snr,
     )
 
     # NEW FOR VERSION 0.2 - GIQE 4
-    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(0.0, scenario.altitude, nm.slant_range)
+    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(
+        h_target=0.0,
+        h_sensor=scenario.altitude,
+        slant_range=nm.slant_range,
+    )
     nm.niirs_4, nm.gsd_gp = giqe4(
-        nm.rer_gm,
-        nm.gsd_gm,
-        nm.eho_gm,
-        nm.ng,
-        np.sqrt(sensor.frame_stacks) * nm.snr.snr,
-        nm.elev_angle,
+        rer=nm.rer_gm,
+        gsd=nm.gsd_gm,
+        eho=nm.eho_gm,
+        ng=nm.ng,
+        snr=np.sqrt(sensor.frame_stacks) * nm.snr.snr,
+        elev_angle=nm.elev_angle,
     )
     # see pybsm.metrics.functional.niirs5 for GIQE 5
 
     return nm
 
 
-def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -> Metrics:
+def niirs5(*, sensor: Sensor, scenario: Scenario, interp: bool | None = False) -> Metrics:
     """Returns NIIRS values calculate using GIQE 5 and all intermediate calculations.
 
     See pybsm.metrics.functional.niirs for the GIQE 3 version.  This version of the
@@ -469,17 +500,29 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
             many intermediate calculations
     """
     # initialize the output
-    nm = Metrics("niirs " + sensor.name + " " + scenario.name)
+    nm = Metrics(name="niirs " + sensor.name + " " + scenario.name)
     nm.sensor = sensor
     nm.scenario = scenario
-    nm.slant_range = geospatial.curved_earth_slant_range(0.0, scenario.altitude, scenario.ground_range)
+    nm.slant_range = geospatial.curved_earth_slant_range(
+        h_target=0.0,
+        h_sensor=scenario.altitude,
+        ground_range=scenario.ground_range,
+    )
 
     # #########CONTRAST SNR CALCULATION#########
     # load the atmosphere model
     if interp:
-        nm.atm = utils.load_database_atmosphere(scenario.altitude, scenario.ground_range, scenario.ihaze)
+        nm.atm = utils.load_database_atmosphere(
+            altitude=scenario.altitude,
+            ground_range=scenario.ground_range,
+            ihaze=scenario.ihaze,
+        )
     else:
-        nm.atm = utils.load_database_atmosphere_no_interp(scenario.altitude, scenario.ground_range, scenario.ihaze)
+        nm.atm = utils.load_database_atmosphere_no_interp(
+            altitude=scenario.altitude,
+            ground_range=scenario.ground_range,
+            ihaze=scenario.ihaze,
+        )
     # crop out out-of-band data (saves time integrating later)
     nm.atm = nm.atm[nm.atm[:, 0] >= nm.sensor.opt_trans_wavelengths[0], :]
     nm.atm = nm.atm[nm.atm[:, 0] <= nm.sensor.opt_trans_wavelengths[-1], :]
@@ -501,11 +544,19 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
 
     # get aperture radiances for reflective target and background with GIQE
     # type target parameters
-    nm.tgt_radiance, nm.bkg_radiance = radiance.giqe_radiance(nm.atm, is_emissive)
+    nm.tgt_radiance, nm.bkg_radiance = radiance.giqe_radiance(
+        atm=nm.atm,
+        is_emissive=is_emissive,
+    )
     nm.radiance_wavelengths = nm.atm[:, 0]
 
     # now calculate now characteristics ****for a single frame******
-    nm.snr = radiance.photon_detector_SNR(sensor, nm.radiance_wavelengths, nm.tgt_radiance, nm.bkg_radiance)
+    nm.snr = radiance.photon_detector_SNR(
+        sensor=sensor,
+        radiance_wavelengths=nm.radiance_wavelengths,
+        target_radiance=nm.tgt_radiance,
+        background_radiance=nm.bkg_radiance,
+    )
 
     # break out photon noise sources (not required for NIIRS but useful for
     # analysis) photon noise due to the scene itself (target,background, and
@@ -513,11 +564,11 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     tgt_noise = np.sqrt(
         integrate.trapezoid(
             radiance.photon_detection_rate(
-                nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
-                nm.sensor.w_x,
-                nm.sensor.w_y,
-                nm.radiance_wavelengths,
-                nm.snr.qe,
+                E=nm.snr.tgt_FPA_irradiance - nm.snr.other_irradiance,
+                w_x=nm.sensor.w_x,
+                w_y=nm.sensor.w_y,
+                wavelengths=nm.radiance_wavelengths,
+                qe=nm.snr.qe,
             ),
             nm.radiance_wavelengths,
         )
@@ -527,11 +578,11 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     bkg_noise = np.sqrt(
         integrate.trapezoid(
             radiance.photon_detection_rate(
-                nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
-                nm.sensor.w_x,
-                nm.sensor.w_y,
-                nm.radiance_wavelengths,
-                nm.snr.qe,
+                E=nm.snr.bkg_FPA_irradiance - nm.snr.other_irradiance,
+                w_x=nm.sensor.w_x,
+                w_y=nm.sensor.w_y,
+                wavelengths=nm.radiance_wavelengths,
+                qe=nm.snr.qe,
             ),
             nm.radiance_wavelengths,
         )
@@ -541,16 +592,16 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
     scene_and_path_noise = np.max([tgt_noise, bkg_noise])
     # calculate noise due to just the path scattered or emitted radiation
     scatter_rate, _, _ = radiance.signal_rate(
-        nm.radiance_wavelengths,
-        nm.atm[:, 2] + nm.atm[:, 4],
-        nm.snr.opt_trans,
-        nm.sensor.D,
-        nm.sensor.f,
-        nm.sensor.w_x,
-        nm.sensor.w_y,
-        nm.snr.qe,
-        np.zeros(1),
-        0.0,
+        wavelengths=nm.radiance_wavelengths,
+        target_radiance=nm.atm[:, 2] + nm.atm[:, 4],
+        optical_transmission=nm.snr.opt_trans,
+        D=nm.sensor.D,
+        f=nm.sensor.f,
+        w_x=nm.sensor.w_x,
+        w_y=nm.sensor.w_y,
+        qe=nm.snr.qe,
+        other_irradiance=np.zeros(1),
+        dark_current=0.0,
     )
     nm.snr.path_noise = np.sqrt(scatter_rate * nm.snr.int_time * sensor.n_tdi)
     nm.snr.scene_noise = np.sqrt(scene_and_path_noise**2 - nm.snr.path_noise**2)
@@ -569,37 +620,46 @@ def niirs5(sensor: Sensor, scenario: Scenario, interp: Optional[bool] = False) -
 
     sensor.filter_kernel = np.array([1])  # ensures that sharpening is turned off.  Not valid for GIQE5
     nm.otf = otf.functional.common_OTFs(
-        sensor,
-        scenario,
-        nm.uu,
-        nm.vv,
-        nm.mtf_wavelengths,
-        nm.mtf_weights,
-        nm.slant_range,
-        nm.snr.int_time,
+        sensor=sensor,
+        scenario=scenario,
+        uu=nm.uu,
+        vv=nm.vv,
+        mtf_wavelengths=nm.mtf_wavelengths,
+        mtf_weights=nm.mtf_weights,
+        slant_range=nm.slant_range,
+        int_time=nm.snr.int_time,
     )
 
     # ##########CALCULATE NIIRS##############
     nm.ifov_x = sensor.p_x / sensor.f
     nm.ifov_y = sensor.p_y / sensor.f
     nm.gsd_x = nm.ifov_x * nm.slant_range  # GIQE5 assumes all square detectors
-    nm.rer_0, nm.rer_90 = giqe5_RER(np.abs(nm.otf.system_OTF), nm.df, nm.ifov_x, nm.ifov_y)
+    nm.rer_0, nm.rer_90 = giqe5_RER(
+        mtf=np.abs(nm.otf.system_OTF),
+        df=nm.df,
+        ifov_x=nm.ifov_x,
+        ifov_y=nm.ifov_y,
+    )
 
     # note that NIIRS is calculated using the SNR ***after frame stacking****
     # if any
-    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(0.0, scenario.altitude, nm.slant_range)
+    nm.elev_angle = np.pi / 2 - geospatial.nadir_angle(
+        h_target=0.0,
+        h_sensor=scenario.altitude,
+        slant_range=nm.slant_range,
+    )
     nm.niirs, nm.gsd_w, nm.rer = giqe5(
-        nm.rer_0,
-        nm.rer_90,
-        nm.gsd_x,
-        np.sqrt(sensor.frame_stacks) * nm.snr.snr,
-        nm.elev_angle,
+        rer_1=nm.rer_0,
+        rer_2=nm.rer_90,
+        gsd=nm.gsd_x,
+        snr=np.sqrt(sensor.frame_stacks) * nm.snr.snr,
+        elev_angle=nm.elev_angle,
     )
 
     return nm
 
 
-def relative_edge_response(mtf_slice: np.ndarray, df: float, ifov: float) -> float:
+def relative_edge_response(*, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
     """IBSM Equation 3-61. The slope of the edge response of the system taken at +/-0.5 pixels from a theoretical edge.
 
     Edge response is used in the calculation of NIIRS via the General Image Quality Equation.
@@ -617,10 +677,15 @@ def relative_edge_response(mtf_slice: np.ndarray, df: float, ifov: float) -> flo
         rer:
             relative edge response (unitless)
     """
-    return edge_response(0.5, mtf_slice, df, ifov) - edge_response(-0.5, mtf_slice, df, ifov)
+    return edge_response(pixel_pos=0.5, mtf_slice=mtf_slice, df=df, ifov=ifov) - edge_response(
+        pixel_pos=-0.5,
+        mtf_slice=mtf_slice,
+        df=df,
+        ifov=ifov,
+    )
 
 
-def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> float:
+def edge_height_overshoot(*, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
     """IBSM Equation 3-60.  Edge Height Overshoot is a measure of image distortion caused by sharpening.
 
     Note that there is a typo in Equation 3-60.  The correct definition is given in Leachtenauer et al.,
@@ -647,14 +712,14 @@ def edge_height_overshoot(mtf_slice: np.ndarray, df: float, ifov: float) -> floa
     index = 0
 
     for dist in rng:
-        er[index] = edge_response(dist, mtf_slice, df, ifov)
+        er[index] = edge_response(pixel_pos=dist, mtf_slice=mtf_slice, df=df, ifov=ifov)
         index = index + 1
 
     # if er is monotonically increasing, use the edge response at 1.25 pixels from the edge
-    return er[1] if np.all(np.diff(er) > 0) else np.max(er)
+    return er[1] if np.all(np.diff(er) > 0) else float(np.max(er))
 
 
-def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
+def edge_response(*, pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: float) -> float:
     """IBSM Equation 3-63.  Imagine a perfectly sharp edge in object space.
 
     After the edge is blurred by the system MTF, the edge response is the normalized
@@ -682,7 +747,7 @@ def edge_response(pixel_pos: float, mtf_slice: np.ndarray, df: float, ifov: floa
     return 0.5 + (1.0 / np.pi) * integrate.trapezoid(y, w)
 
 
-def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  # noqa: N802
+def plot_common_MTFs(*, metrics: Metrics, orientation_angle: float = 0.0) -> int:  # noqa: N802
     """Generates a plot of common MTF components.
 
     Generates a plot of common MTF components: aperture, turbulence, detector, jitter, drift, wavefront,
@@ -701,17 +766,20 @@ def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  
     """
     # spatial frequencies in the image plane in (cycles/mm)
     rad_freq = np.sqrt(metrics.uu**2 + metrics.vv**2)
-    sf = otf.functional.slice_otf(0.001 * (1.0 / metrics.sensor.f) * rad_freq, orientation_angle)
+    sf = otf.functional.slice_otf(
+        otf=0.001 * (1.0 / metrics.sensor.f) * rad_freq,
+        ang=orientation_angle,
+    )
 
     # extract MTFs
-    ap_mtf = np.abs(otf.functional.slice_otf(metrics.otf.ap_OTF, orientation_angle))
-    turb_mtf = np.abs(otf.functional.slice_otf(metrics.otf.turb_OTF, orientation_angle))
-    det_mtf = np.abs(otf.functional.slice_otf(metrics.otf.det_OTF, orientation_angle))
-    jit_mtf = np.abs(otf.functional.slice_otf(metrics.otf.jit_OTF, orientation_angle))
-    dri_mtf = np.abs(otf.functional.slice_otf(metrics.otf.drft_OTF, orientation_angle))
-    wav_mtf = np.abs(otf.functional.slice_otf(metrics.otf.wav_OTF, orientation_angle))
-    sys_mtf = np.abs(otf.functional.slice_otf(metrics.otf.system_OTF, orientation_angle))
-    fil_mtf = np.abs(otf.functional.slice_otf(metrics.otf.filter_OTF, orientation_angle))
+    ap_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.ap_OTF, ang=orientation_angle))
+    turb_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.turb_OTF, ang=orientation_angle))
+    det_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.det_OTF, ang=orientation_angle))
+    jit_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.jit_OTF, ang=orientation_angle))
+    dri_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.drft_OTF, ang=orientation_angle))
+    wav_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.wav_OTF, ang=orientation_angle))
+    sys_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.system_OTF, ang=orientation_angle))
+    fil_mtf = np.abs(otf.functional.slice_otf(otf=metrics.otf.filter_OTF, ang=orientation_angle))
 
     plt.plot(
         sf,
@@ -758,7 +826,7 @@ def plot_common_MTFs(metrics: Metrics, orientation_angle: float = 0.0) -> int:  
     return 0
 
 
-def plot_noise_terms(metrics: Metrics, max_val: int = 0) -> int:
+def plot_noise_terms(*, metrics: Metrics, max_val: int = 0) -> int:
     """Generates a plot of common noise components in units of equivalent photoelectrons.
 
     Generates a plot of common noise components in units of equivalent photoelectrons: components total,

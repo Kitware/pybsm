@@ -13,9 +13,9 @@ Public release approval for version 0.1: 88ABW-2018-5226
 Maintainer: Kitware, Inc. <nrtk@kitware.com>
 """
 
-# 3rd party imports
-from typing import Optional
+from __future__ import annotations
 
+# 3rd party imports
 import numpy as np
 
 
@@ -138,15 +138,16 @@ class Sensor:
 
     def __init__(
         self,
+        *,
         name: str,
         D: float,  # noqa: N803
         f: float,
         p_x: float,
         opt_trans_wavelengths: np.ndarray,
         eta: float = 0.0,
-        p_y: Optional[float] = None,
-        w_x: Optional[float] = None,
-        w_y: Optional[float] = None,
+        p_y: float | None = None,
+        w_x: float | None = None,
+        w_y: float | None = None,
         int_time: float = 1,
         dark_current: float = 0,
         other_irradiance: float = 0.0,
