@@ -1,1 +1,8 @@
+0.12.0
+======
+
+Updated supported versions of Python.
+
 * Placed an upperbound on supported Python versions, such that all supported versions can be tested.
+
+* Dropped Python 3.9 due to EOL.
