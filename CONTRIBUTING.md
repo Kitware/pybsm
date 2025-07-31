@@ -2,13 +2,13 @@
 
 ## Overview
 
-This guide provides instructions for contributing to the `pybsm` project. For
-additional details, please refer to the [`pybsm` README](README.md).
+This guide provides instructions for contributing to the `pybsm` project.
+For additional details, please refer to the [`pybsm` README](README.md).
 
 ## Steps to Contribute
 
-1. **Access the Repository** Navigate to the official `pybsm` repository on
-   [JATIC GitLab](https://gitlab.jatic.net/jatic/kitware/pybsm).
+1. **Access the Repository** Navigate to the official `pybsm` repository
+   on [JATIC GitLab](https://gitlab.jatic.net/jatic/kitware/pybsm).
 
 2. **Fork and Clone** Fork the repository into your GitLab user namespace and
    clone it to your local system.
@@ -50,7 +50,8 @@ ______________________________________________________________________
 
 ## Continuous Integration (CI) and Code Review
 
-`pybsm` uses GitLab for code reviews and GitLab CI/CD for automated testing.
+`pybsm` uses GitLab for code reviews and GitLab CI/CD for automated
+testing.
 
 - New MRs trigger CI workflows for `master` and `release` branches.
 - All CI checks must pass before an MR can be merged.
@@ -125,8 +126,8 @@ behavior or transformation a class performs.
 ## Issue Reporting
 
 If an issue is found, it can be reported on the
-[Issue Reporting Page](https://github.com/Kitware/pybsm/issues/new). In the
-description, provide an outline of the problem in as much detail as possible
+[Issue Reporting Page](https://github.com/Kitware/pybsm/issues/new). In
+the description, provide an outline of the problem in as much detail as possible
 being sure to include any relevant logs and error tracebacks. Once the issue is
 created, it will be triaged by a maintainer in a timely manner.
 
