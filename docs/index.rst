@@ -25,6 +25,8 @@ necessarily representing the official policies or endorsements, either expressed
    installation
    explanation
    functionality
+   default_configs
+   useful_calculations
    review_process
    releasing
    miscellaneous
