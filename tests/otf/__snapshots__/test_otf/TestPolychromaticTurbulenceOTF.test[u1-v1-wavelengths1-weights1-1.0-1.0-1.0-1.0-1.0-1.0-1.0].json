@@ -1,0 +1,1 @@
+{"__type__": "tuple", "items": [{"__type__": "ndarray", "dtype": "float64", "shape": [2], "data": [{"__type__": "float", "value": 2.7466560073027004e-09}, {"__type__": "float", "value": 2.0482479721162438e-17}]}, {"__type__": "float", "value": 0.3340840371124818}]}

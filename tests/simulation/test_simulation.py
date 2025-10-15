@@ -10,13 +10,6 @@ from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import simulation
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
-
 
 BASE_FILE_PATH = Path(__file__).parent.parent.parent
 IMAGE_FILE_PATH = (
@@ -89,7 +82,7 @@ class TestSimulation:
         img: np.ndarray,
         pix_values: np.ndarray,
         refl_values: np.ndarray,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test img_to_reflectance with normal inputs and expected outputs."""
         output = simulation.img_to_reflectance(
@@ -97,7 +90,7 @@ class TestSimulation:
             pix_values=pix_values,
             refl_values=refl_values,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("w", "f", "expectation"),

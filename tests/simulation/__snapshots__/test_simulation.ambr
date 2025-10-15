@@ -1,19 +1,4 @@
 # serializer version: 1
-# name: TestSimulation.test_img_to_reflectance[img0-pix_values0-refl_values0]
-  array([0., 1.])
-# ---
-# name: TestSimulation.test_img_to_reflectance[img1-pix_values1-refl_values1]
-  array([[1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
-         [1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]])
-# ---
 # name: TestSimulation.test_instantaneous_FOV[1-1]
   1.0
 # ---
