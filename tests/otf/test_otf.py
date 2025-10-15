@@ -8,12 +8,6 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm import otf
 from pybsm.simulation import Scenario, Sensor
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestOTFHelper:
@@ -89,11 +83,11 @@ class TestOTFHelper:
         lambda0: float,
         z_path: np.ndarray,
         cn2: np.ndarray,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test coherence_diameter with normal inputs and expected outputs."""
         output = otf.coherence_diameter(lambda0=lambda0, z_path=z_path, cn2=cn2)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("h", "v", "cn2_at_1m"),
@@ -128,11 +122,11 @@ class TestOTFHelper:
         h: np.ndarray,
         v: float,
         cn2_at_1m: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test hufnagel_valley_turbulence_profile with normal inputs and expected outputs."""
         output = otf.hufnagel_valley_turbulence_profile(h=h, v=v, cn2_at_1m=cn2_at_1m)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("wavelengths", "weights", "my_function"),
@@ -218,7 +212,7 @@ class TestOTFHelper:
         wavelengths: np.ndarray,
         weights: np.ndarray,
         my_function: Callable,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test weighted_by_wavelength with normal inputs and expected outputs."""
         output = otf.weighted_by_wavelength(
@@ -226,7 +220,7 @@ class TestOTFHelper:
             weights=weights,
             my_function=my_function,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("D", "R", "R0"),
@@ -408,11 +402,11 @@ class TestResample2D:
         img_in: np.ndarray,
         dx_in: float,
         dx_out: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test resample_2D with normal inputs and expected outputs."""
         output = otf.resample_2D(img_in=img_in, dx_in=dx_in, dx_out=dx_out)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestApplyOTFToImage:
@@ -499,7 +493,7 @@ class TestApplyOTFToImage:
         otf_value: np.ndarray,
         df: float,
         ifov: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test apply_otf_to_image with normal inputs and expected outputs."""
         output = otf.apply_otf_to_image(
@@ -510,7 +504,7 @@ class TestApplyOTFToImage:
             df=df,
             ifov=ifov,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestOTFToPSF:
@@ -561,11 +555,11 @@ class TestOTFToPSF:
         otf_value: np.ndarray,
         df: float,
         dx_out: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test otf_to_psf with normal inputs and expected outputs."""
         output = otf.otf_to_psf(otf=otf_value, df=df, dx_out=dx_out)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestCTEOTF:
@@ -699,7 +693,7 @@ class TestCTEOTF:
         phases_n: int,
         cte_eff: float,
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.cte_OTF(
@@ -713,7 +707,7 @@ class TestCTEOTF:
             cte_eff=cte_eff,
             f=f,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestDefocusOTF:
@@ -772,11 +766,11 @@ class TestDefocusOTF:
         v: np.ndarray,
         w_x: float,
         w_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test defocus_OTF with normal inputs and expected outputs."""
         output = otf.defocus_OTF(u=u, v=v, w_x=w_x, w_y=w_y)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestDetectorOTFWithAggregation:
@@ -901,7 +895,7 @@ class TestDetectorOTFWithAggregation:
         p_y: float,
         f: float,
         n: int,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF_with_aggregation with normal inputs and expected outputs."""
         output = otf.detector_OTF_with_aggregation(
@@ -914,7 +908,7 @@ class TestDetectorOTFWithAggregation:
             f=f,
             n=n,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestDiffusionOTF:
@@ -1005,11 +999,11 @@ class TestDiffusionOTF:
         ald: np.ndarray,
         al0: np.ndarray,
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.diffusion_OTF(u=u, v=v, alpha=alpha, ald=ald, al0=al0, f=f)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestGaussianOTF:
@@ -1062,11 +1056,11 @@ class TestGaussianOTF:
         v: np.ndarray,
         blur_size_x: float,
         blur_size_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.gaussian_OTF(u=u, v=v, blur_size_x=blur_size_x, blur_size_y=blur_size_y)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestTdiOTF:
@@ -1168,7 +1162,7 @@ class TestTdiOTF:
         phases_n: int,
         beta: float,
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.tdi_OTF(
@@ -1179,7 +1173,7 @@ class TestTdiOTF:
             beta=beta,
             f=f,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestWavefrontOTF2:
@@ -1231,11 +1225,11 @@ class TestWavefrontOTF2:
         v: np.ndarray,
         cutoff: float,
         w_rms: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test cte_OTF with normal inputs and expected outputs."""
         output = otf.wavefront_OTF_2(u=u, v=v, cutoff=cutoff, w_rms=w_rms)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestSliceOTF:
@@ -1252,11 +1246,11 @@ class TestSliceOTF:
         self,
         otf_input: np.ndarray,
         ang: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test slice_otf with normal inputs and expected outputs."""
         output = otf.slice_otf(otf=otf_input, ang=ang)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestPolychromaticTurbulenceOTF:
@@ -1527,7 +1521,7 @@ class TestPolychromaticTurbulenceOTF:
         cn2_at_1m: float,
         int_time: float,
         aircraft_speed: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test polychromatic_turbulence_OTF with empty input."""
         output = otf.polychromatic_turbulence_OTF(
@@ -1544,7 +1538,7 @@ class TestPolychromaticTurbulenceOTF:
             aircraft_speed=aircraft_speed,
         )
         assert output[0].size == 0
-        snapshot_custom.assert_match(output[1])
+        fuzzy_snapshot.assert_match(output[1])
 
     @pytest.mark.parametrize(
         (
@@ -1680,7 +1674,7 @@ class TestPolychromaticTurbulenceOTF:
         cn2_at_1m: float,
         int_time: float,
         aircraft_speed: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test polychromatic_turbulence_OTF with normal inputs and expected outputs."""
         output = otf.polychromatic_turbulence_OTF(
@@ -1696,7 +1690,7 @@ class TestPolychromaticTurbulenceOTF:
             int_time=int_time,
             aircraft_speed=aircraft_speed,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestDetectorOTF:
@@ -1782,11 +1776,11 @@ class TestDetectorOTF:
         w_x: float,
         w_y: float,
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test detector_OTF with normal inputs and expected outputs."""
         output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestDriftOTF:
@@ -1831,11 +1825,11 @@ class TestDriftOTF:
         v: np.ndarray,
         a_x: float,
         a_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test drift_OTF with normal inputs and expected outputs."""
         output = otf.drift_OTF(u=u, v=v, a_x=a_x, a_y=a_y)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestJitterOTF:
@@ -1900,11 +1894,11 @@ class TestJitterOTF:
         v: np.ndarray,
         s_x: float,
         s_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test jitter_OTF with normal inputs and expected outputs."""
         output = otf.jitter_OTF(u=u, v=v, s_x=s_x, s_y=s_y)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestCommonOTFs:
@@ -2415,7 +2409,7 @@ class TestTurbulenceOTF:
         D: float,  # noqa: N803
         r0: float,
         alpha: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
         output = otf.turbulence_OTF(
@@ -2426,7 +2420,7 @@ class TestTurbulenceOTF:
             r0=r0,
             alpha=alpha,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestWindSpeedTurbulenceOTF:
@@ -2564,7 +2558,7 @@ class TestWindSpeedTurbulenceOTF:
         r0: float,
         td: float,
         vel: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test wind_speed_turbulence_OTF with normal inputs and expected outputs."""
         output = otf.wind_speed_turbulence_OTF(
@@ -2576,7 +2570,7 @@ class TestWindSpeedTurbulenceOTF:
             t_d=td,
             vel=vel,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestFilterOTF:
@@ -2618,11 +2612,11 @@ class TestFilterOTF:
         v: np.ndarray,
         kernel: np.ndarray,
         ifov: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test turbulenceOTF with normal inputs and expected outputs."""
         output = otf.filter_OTF(u=u, v=v, kernel=kernel, ifov=ifov)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestWavefrontOTF:
@@ -2733,7 +2727,7 @@ class TestWavefrontOTF:
         pv: float,
         L_x: float,  # noqa: N803
         L_y: float,  # noqa: N803
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test wavefront_OTF with normal inputs and expected outputs."""
         output = otf.wavefront_OTF(
@@ -2744,7 +2738,7 @@ class TestWavefrontOTF:
             L_x=L_x,
             L_y=L_y,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestCircularApertureOTF:
@@ -2855,7 +2849,7 @@ class TestCircularApertureOTF:
         lambda0: float,
         D: float,  # noqa: N803
         eta: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
         output = otf.circular_aperture_OTF(
@@ -2865,7 +2859,7 @@ class TestCircularApertureOTF:
             D=D,
             eta=eta,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
 
 class TestCircularApertureOTFWithDefocus:
@@ -2955,7 +2949,7 @@ class TestCircularApertureOTFWithDefocus:
         D: float,  # noqa: N803
         f: float,
         defocus: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test circular_aperture_OTF with normal inputs and expected outputs."""
         output = otf.circular_aperture_OTF_with_defocus(
@@ -2966,4 +2960,4 @@ class TestCircularApertureOTFWithDefocus:
             f=f,
             defocus=defocus,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)

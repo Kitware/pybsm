@@ -3,12 +3,6 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm.simulation import Scenario
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestScenario:
@@ -214,7 +208,7 @@ class TestScenario:
         altitude: float,
         ground_range: float,
         interp: bool,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test atm with expected inputs and outputs as well as checking _atm attribute is set properly."""
         scenario = Scenario(
@@ -227,4 +221,4 @@ class TestScenario:
         assert scenario._atm is None
         atm = scenario.atm
         assert scenario._atm is not None
-        snapshot_custom.assert_match(atm)
+        fuzzy_snapshot.assert_match(atm)

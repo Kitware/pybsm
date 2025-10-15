@@ -10,12 +10,6 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm.metrics import functional
 from pybsm.simulation import Scenario, Sensor
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestFunctional:
@@ -59,7 +53,7 @@ class TestFunctional:
         eho: float,
         ng: float,
         snr: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.giqe3(
             rer=rer,
@@ -68,7 +62,7 @@ class TestFunctional:
             ng=ng,
             snr=snr,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("rer", "gsd", "eho", "ng", "snr", "elev_angle", "expectation"),
@@ -112,7 +106,7 @@ class TestFunctional:
         ng: float,
         snr: float,
         elev_angle: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.giqe4(
             rer=rer,
@@ -122,7 +116,7 @@ class TestFunctional:
             snr=snr,
             elev_angle=elev_angle,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("rer_1", "rer_2", "gsd", "snr", "elev_angle", "expectation"),
@@ -161,7 +155,7 @@ class TestFunctional:
         gsd: float,
         snr: float,
         elev_angle: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.giqe5(
             rer_1=rer_1,
@@ -170,7 +164,7 @@ class TestFunctional:
             snr=snr,
             elev_angle=elev_angle,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("pixel_pos", "mtf_slice", "df", "ifov"),
@@ -186,7 +180,7 @@ class TestFunctional:
         mtf_slice: np.ndarray,
         df: float,
         ifov: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.edge_response(
             pixel_pos=pixel_pos,
@@ -194,7 +188,7 @@ class TestFunctional:
             df=df,
             ifov=ifov,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("mtf_slice", "df", "ifov"),
@@ -209,14 +203,14 @@ class TestFunctional:
         mtf_slice: np.ndarray,
         df: float,
         ifov: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.relative_edge_response(
             mtf_slice=mtf_slice,
             df=df,
             ifov=ifov,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("mtf_slice", "df", "ifov"),
@@ -231,14 +225,14 @@ class TestFunctional:
         mtf_slice: np.ndarray,
         df: float,
         ifov: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.edge_height_overshoot(
             mtf_slice=mtf_slice,
             df=df,
             ifov=ifov,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("mtf", "df", "ifov_x", "ifov_y"),
@@ -255,7 +249,7 @@ class TestFunctional:
         df: float,
         ifov_x: float,
         ifov_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.giqe5_RER(
             mtf=mtf,
@@ -263,7 +257,7 @@ class TestFunctional:
             ifov_x=ifov_x,
             ifov_y=ifov_y,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("mtf", "df", "ifov_x", "ifov_y"),
@@ -280,7 +274,7 @@ class TestFunctional:
         df: float,
         ifov_x: float,
         ifov_y: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.giqe_edge_terms(
             mtf=mtf,
@@ -288,7 +282,7 @@ class TestFunctional:
             ifov_x=ifov_x,
             ifov_y=ifov_y,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("mtf_slice", "df", "snr", "ifov", "slant_range", "expectation"),
@@ -330,7 +324,7 @@ class TestFunctional:
         snr: float,
         ifov: float,
         slant_range: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         output = functional.ground_resolved_distance(
             mtf_slice=mtf_slice,
@@ -339,7 +333,7 @@ class TestFunctional:
             ifov=ifov,
             slant_range=slant_range,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("sensor", "scenario", "interp"),
