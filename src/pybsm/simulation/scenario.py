@@ -215,3 +215,19 @@ class Scenario:
                 )
 
         return self._atm
+
+    def __hash__(self) -> int:
+        """Compute hash based on relevant scenario parameters for caching."""
+        relevant_attrs = (
+            self.ihaze,
+            self.altitude,
+            self.ground_range,
+            self.aircraft_speed,
+            self.ha_wind_speed,
+            self.cn2_at_1m,
+            self.target_reflectance,
+            self.target_temperature,
+            self.background_reflectance,
+            self.background_temperature,
+        )
+        return hash(relevant_attrs)
