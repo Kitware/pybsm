@@ -42,9 +42,3 @@ original-example:
     - !reference [.test-setup, before_script]
   script:
     - poetry run python docs/examples/pybsm_example.py
-
-# This is a temporary override while we wait for devel-jatic to support 3.13
-.python-versions:
-  parallel:
-    matrix:
-      - PYTHON_VERSION: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
