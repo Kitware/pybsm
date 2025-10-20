@@ -288,3 +288,161 @@ class TestSensor:
             opt_trans_wavelengths=opt_trans_wavelengths,
         )
         self.check_sensor(sensor, name, d, f, p_x, opt_trans_wavelengths)
+
+    def test_identical_sensors_same_hash(self) -> None:
+        """Verify identical sensors produce same hash."""
+        sensor1 = Sensor(
+            name="test",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+            eta=0.1,
+            p_y=0.01,
+            w_x=0.009,
+            w_y=0.009,
+            s_x=1e-6,
+            s_y=1e-6,
+            da_x=0.0,
+            da_y=0.0,
+            pv=0.1,
+            pv_wavelength=0.5e-6,
+        )
+        sensor2 = Sensor(
+            name="test",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+            eta=0.1,
+            p_y=0.01,
+            w_x=0.009,
+            w_y=0.009,
+            s_x=1e-6,
+            s_y=1e-6,
+            da_x=0.0,
+            da_y=0.0,
+            pv=0.1,
+            pv_wavelength=0.5e-6,
+        )
+        assert hash(sensor1) == hash(sensor2)
+
+    @pytest.mark.parametrize(
+        ("param_name", "value1", "value2"),
+        [
+            ("D", 1.0, 1.5),
+            ("f", 2.0, 3.0),
+            ("p_x", 0.01, 0.02),
+            ("p_y", 0.01, 0.015),
+            ("w_x", 0.009, 0.008),
+            ("w_y", 0.009, 0.008),
+            ("eta", 0.1, 0.2),
+            ("s_x", 1e-6, 2e-6),
+            ("s_y", 1e-6, 2e-6),
+            ("da_x", 0.0, 1e-7),
+            ("da_y", 0.0, 1e-7),
+            ("pv", 0.1, 0.2),
+            ("pv_wavelength", 0.5e-6, 0.6e-6),
+        ],
+    )
+    def test_different_parameters_different_hash(
+        self,
+        param_name: str,
+        value1: float,
+        value2: float,
+    ) -> None:
+        """Verify different parameters produce different hash."""
+        base_params = {
+            "name": "test",
+            "D": 1.0,
+            "f": 2.0,
+            "p_x": 0.01,
+            "opt_trans_wavelengths": np.array([0.4e-6, 0.7e-6]),
+            "eta": 0.1,
+            "p_y": 0.01,
+            "w_x": 0.009,
+            "w_y": 0.009,
+            "s_x": 1e-6,
+            "s_y": 1e-6,
+            "da_x": 0.0,
+            "da_y": 0.0,
+            "pv": 0.1,
+            "pv_wavelength": 0.5e-6,
+        }
+        params1 = base_params.copy()
+        params1[param_name] = value1
+        params2 = base_params.copy()
+        params2[param_name] = value2
+
+        sensor1 = Sensor(**params1)
+        sensor2 = Sensor(**params2)
+
+        assert hash(sensor1) != hash(sensor2)
+
+    def test_different_array_parameters_different_hash(self) -> None:
+        """Verify array parameter changes produce different hash."""
+        sensor1 = Sensor(
+            name="test",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+        )
+        sensor2 = Sensor(
+            name="test",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.5e-6, 0.8e-6]),
+        )
+        assert hash(sensor1) != hash(sensor2)
+
+    def test_hash_consistency(self) -> None:
+        """Verify hash consistency across multiple calls."""
+        sensor = Sensor(
+            name="test",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+        )
+        hash1 = hash(sensor)
+        hash2 = hash(sensor)
+        hash3 = hash(sensor)
+
+        assert hash1 == hash2 == hash3
+
+    def test_hash_used_for_caching(self) -> None:
+        """Verify hash works as cache key."""
+        sensor1 = Sensor(
+            name="test1",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+        )
+        sensor2 = Sensor(
+            name="test2",
+            D=1.0,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+        )
+        sensor3 = Sensor(
+            name="test3",
+            D=1.5,
+            f=2.0,
+            p_x=0.01,
+            opt_trans_wavelengths=np.array([0.4e-6, 0.7e-6]),
+        )
+
+        cache: dict[int, str] = {}
+        cache[hash(sensor1)] = "result1"
+        cache[hash(sensor2)] = "result2"
+        cache[hash(sensor3)] = "result3"
+
+        assert hash(sensor1) == hash(sensor2)
+        assert cache[hash(sensor1)] == "result2"
+
+        assert hash(sensor3) != hash(sensor1)
+        assert cache[hash(sensor3)] == "result3"

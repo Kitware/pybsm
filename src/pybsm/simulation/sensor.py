@@ -231,3 +231,29 @@ class Sensor:
         # actually used anywhere downstream.
         self.filter_kernel = np.array([1])
         self.frame_stacks = 1
+
+    def __hash__(self) -> int:
+        """Compute hash based on sensor parameters."""
+        # Only include parameters that affect OTF calculations
+        relevant_attrs = (
+            self.D,
+            self.f,
+            self.p_x,
+            self.p_y,
+            self.w_x,
+            self.w_y,
+            self.eta,
+            self.s_x,
+            self.s_y,
+            self.da_x,
+            self.da_y,
+            self.pv,
+            self.pv_wavelength,
+            self.L_x,
+            self.L_y,
+            tuple(self.opt_trans_wavelengths),
+            tuple(self.optics_transmission),
+            tuple(self.qe_wavelengths),
+            tuple(self.qe),
+        )
+        return hash(relevant_attrs)
