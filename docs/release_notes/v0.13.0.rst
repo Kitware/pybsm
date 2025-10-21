@@ -1,0 +1,14 @@
+0.13.0
+======
+
+* Added ABC ``ImageSimulator`` class and child classes to simulate individual and composite degradations. Uses
+
+* Created an example jupyter notebook, ``image_simulation_example.ipynb``, to demonstrate how to simulate images.
+
+* Added ``docs/default_configs.rst`` which explains the default config reasoning and setup
+
+* Added ``docs/miscellaneous/uav_default_config.json`` for the default configuration
+
+* Expanded ``docs/useful_calculations.rst`` to include new calculations that are useful to users
+
+* Added repo-wide pytest fixtures for floating-point comparisons
