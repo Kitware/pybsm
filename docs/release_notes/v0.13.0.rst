@@ -1,0 +1,22 @@
+0.13.0
+======
+
+Introduces an extensible image simulation framework with new ImageSimulator base and derived classes, supporting both
+individual and composite degradations. Documentation and examples were expanded to include default configuration
+guidance, UAV simulation settings, and additional useful calculations. Repository-wide test fixtures for
+floating-point comparisons were also added.
+
+Updates / New Features
+----------------------
+
+* Added ABC ``ImageSimulator`` class and child classes to simulate individual and composite degradations.
+
+* Created an example jupyter notebook, ``image_simulation_example.ipynb``, to demonstrate how to simulate images.
+
+* Added ``docs/default_configs.rst`` which explains the default config reasoning and setup.
+
+* Added ``docs/miscellaneous/uav_default_config.json`` for the default configuration.
+
+* Expanded ``docs/useful_calculations.rst`` to include new calculations that are useful to users.
+
+* Added repo-wide pytest fixtures for floating-point comparisons
