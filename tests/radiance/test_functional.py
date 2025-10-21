@@ -7,12 +7,6 @@ from syrupy.assertion import SnapshotAssertion
 
 from pybsm import radiance, utils
 from pybsm.simulation import Sensor
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 @pytest.mark.filterwarnings("ignore:Input array")
@@ -70,7 +64,7 @@ class TestReflectanceToPhotoelectrons:
         w_y: float,
         wavelengths: np.ndarray,
         qe: np.ndarray,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.photon_detection_rate(
@@ -80,7 +74,7 @@ class TestReflectanceToPhotoelectrons:
             wavelengths=wavelengths,
             qe=qe,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("D", "f", "L"),
@@ -129,11 +123,11 @@ class TestReflectanceToPhotoelectrons:
         D: float,  # noqa: N803
         f: float,
         L: np.ndarray,  # noqa: N803
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.at_focal_plane_irradiance(D=D, f=f, L=L)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("lambda0", "T"),
@@ -161,11 +155,11 @@ class TestReflectanceToPhotoelectrons:
         self,
         lambda0: np.ndarray,
         T: float,  # noqa: N803
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.blackbody_radiance(lambda0=lambda0, T=T)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("wavelengths", "values", "new_wavelengths"),
@@ -250,7 +244,7 @@ class TestReflectanceToPhotoelectrons:
         wavelengths: np.ndarray,
         values: np.ndarray,
         new_wavelengths: np.ndarray,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.resample_by_wavelength(
@@ -258,7 +252,7 @@ class TestReflectanceToPhotoelectrons:
             values=values,
             new_wavelengths=new_wavelengths,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         (
@@ -404,7 +398,7 @@ class TestReflectanceToPhotoelectrons:
         qe: np.ndarray,
         other_irradiance: np.ndarray,
         dark_current: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases where both output arrays are empty."""
         output = radiance.signal_rate(
@@ -419,7 +413,7 @@ class TestReflectanceToPhotoelectrons:
             other_irradiance=other_irradiance,
             dark_current=dark_current,
         )
-        snapshot_custom.assert_match(output[0])
+        fuzzy_snapshot.assert_match(output[0])
         assert output[1].size == 0
         assert output[2].size == 0
 
@@ -475,7 +469,7 @@ class TestReflectanceToPhotoelectrons:
         qe: np.ndarray,
         other_irradiance: np.ndarray,
         dark_current: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases where second output array is empty."""
         output = radiance.signal_rate(
@@ -490,7 +484,7 @@ class TestReflectanceToPhotoelectrons:
             other_irradiance=other_irradiance,
             dark_current=dark_current,
         )
-        snapshot_custom.assert_match(output[1:])
+        fuzzy_snapshot.assert_match(output[1:])
         assert output[2].size == 0
 
     @pytest.mark.parametrize(
@@ -557,7 +551,7 @@ class TestReflectanceToPhotoelectrons:
         qe: np.ndarray,
         other_irradiance: np.ndarray,
         dark_current: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.signal_rate(
@@ -572,7 +566,7 @@ class TestReflectanceToPhotoelectrons:
             other_irradiance=other_irradiance,
             dark_current=dark_current,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("wavelengths", "cold_filter_temperature", "cold_filter_emissivity", "D", "f"),
@@ -651,7 +645,7 @@ class TestReflectanceToPhotoelectrons:
         cold_filter_emissivity: float,
         D: float,  # noqa: N803
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.cold_stop_self_emission(
@@ -661,7 +655,7 @@ class TestReflectanceToPhotoelectrons:
             D=D,
             f=f,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         (
@@ -761,7 +755,7 @@ class TestReflectanceToPhotoelectrons:
         cold_filter_transmission: float,
         D: float,  # noqa: N803
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.optics_self_emission(
@@ -772,7 +766,7 @@ class TestReflectanceToPhotoelectrons:
             D=D,
             f=f,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("wavelengths", "cold_shield_temperature", "D", "f"),
@@ -838,7 +832,7 @@ class TestReflectanceToPhotoelectrons:
         cold_shield_temperature: float,
         D: float,  # noqa: N803
         f: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.cold_shield_self_emission(
@@ -847,7 +841,7 @@ class TestReflectanceToPhotoelectrons:
             D=D,
             f=f,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("atm", "reflectance", "temperature"),
@@ -887,7 +881,7 @@ class TestReflectanceToPhotoelectrons:
         atm: np.ndarray,
         reflectance: float,
         temperature: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.total_radiance(
@@ -895,7 +889,7 @@ class TestReflectanceToPhotoelectrons:
             reflectance=reflectance,
             temperature=temperature,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("atm", "reflectance", "temperature"),
@@ -925,7 +919,7 @@ class TestReflectanceToPhotoelectrons:
         atm: np.ndarray,
         reflectance: float,
         temperature: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs, atm input, and expected outputs."""
         output = radiance.total_radiance(
@@ -933,7 +927,7 @@ class TestReflectanceToPhotoelectrons:
             reflectance=reflectance,
             temperature=temperature,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("atm", "sensor", "int_time", "target_temp"),
@@ -1027,7 +1021,7 @@ class TestReflectanceToPhotoelectrons:
         sensor: Sensor,
         int_time: float,
         target_temp: int,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs and expected outputs."""
         output = radiance.reflectance_to_photoelectrons(
@@ -1036,7 +1030,7 @@ class TestReflectanceToPhotoelectrons:
             int_time=int_time,
             target_temp=target_temp,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("atm", "sensor", "int_time", "target_temp"),
@@ -1065,7 +1059,7 @@ class TestReflectanceToPhotoelectrons:
         sensor: Sensor,
         int_time: float,
         target_temp: int,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Cover cases with normal inputs, atm input, and expected outputs."""
         output = radiance.reflectance_to_photoelectrons(
@@ -1074,7 +1068,7 @@ class TestReflectanceToPhotoelectrons:
             int_time=int_time,
             target_temp=target_temp,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         (

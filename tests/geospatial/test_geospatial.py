@@ -2,12 +2,6 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import geospatial
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestGeospatial:
@@ -45,7 +39,7 @@ class TestGeospatial:
         h_target: float,
         h_sensor: float,
         slant_range: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test nadir_angle with normal inputs and expected outputs."""
         output = geospatial.nadir_angle(
@@ -53,7 +47,7 @@ class TestGeospatial:
             h_sensor=h_sensor,
             slant_range=slant_range,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("h_target", "h_sensor", "slant_range"),
@@ -89,7 +83,7 @@ class TestGeospatial:
         h_target: float,
         h_sensor: float,
         slant_range: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test altitude_along_slant_path with normal inputs and expected outputs."""
         output = geospatial.altitude_along_slant_path(
@@ -97,7 +91,7 @@ class TestGeospatial:
             h_sensor=h_sensor,
             slant_range=slant_range,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("ifov", "slant_range"),
@@ -108,10 +102,10 @@ class TestGeospatial:
             (2.0, 2.5),
         ],
     )
-    def test_ground_sample_distance(self, snapshot_custom: SnapshotAssertion, ifov: float, slant_range: float) -> None:
+    def test_ground_sample_distance(self, fuzzy_snapshot: SnapshotAssertion, ifov: float, slant_range: float) -> None:
         """Test ground_sample_distance with normal inputs and expected outputs."""
         output = geospatial.ground_sample_distance(ifov=ifov, slant_range=slant_range)
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("h_target", "h_sensor", "ground_range"),
@@ -123,7 +117,7 @@ class TestGeospatial:
     )
     def test_curved_earth_slant_range(
         self,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
         h_target: float,
         h_sensor: float,
         ground_range: float,
@@ -134,4 +128,4 @@ class TestGeospatial:
             h_sensor=h_sensor,
             ground_range=ground_range,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)

@@ -2,12 +2,6 @@ import pytest
 from syrupy.assertion import SnapshotAssertion
 
 from pybsm import utils
-from tests.test_utils import CustomFloatSnapshotExtension
-
-
-@pytest.fixture
-def snapshot_custom(snapshot: SnapshotAssertion) -> SnapshotAssertion:
-    return snapshot.use_extension(CustomFloatSnapshotExtension)
 
 
 class TestUtils:
@@ -47,7 +41,7 @@ class TestUtils:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere_no_interp with normal inputs and expected outputs."""
         output = utils.load_database_atmosphere_no_interp(
@@ -55,7 +49,7 @@ class TestUtils:
             ground_range=ground_range,
             ihaze=ihaze,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
 
     @pytest.mark.parametrize(
         ("ihaze", "altitude", "ground_range"),
@@ -97,7 +91,7 @@ class TestUtils:
         ihaze: int,
         altitude: float,
         ground_range: float,
-        snapshot_custom: SnapshotAssertion,
+        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test load_database_atmosphere with normal inputs and expected outputs."""
         output = utils.load_database_atmosphere(
@@ -105,4 +99,4 @@ class TestUtils:
             ground_range=ground_range,
             ihaze=ihaze,
         )
-        snapshot_custom.assert_match(output)
+        fuzzy_snapshot.assert_match(output)
