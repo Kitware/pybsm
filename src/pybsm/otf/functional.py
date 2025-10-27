@@ -517,6 +517,7 @@ def drift_OTF(  # noqa: N802
     return out
 
 
+# TODO: I think we need to change the interpolation function that is used here
 def filter_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -554,25 +555,18 @@ def filter_OTF(  # noqa: N802
     # spatial frequency coordinates for the transformed filter
     u_rng = np.linspace(-nyquist, nyquist, xfer_fcn.shape[0])
     v_rng = np.linspace(nyquist, -nyquist, xfer_fcn.shape[1])
-    n_u, n_v = np.meshgrid(u_rng, v_rng)
-
-    # reshape everything to comply with the griddata interpolator requirements
-    xfer_fcn = xfer_fcn.reshape(-1)
-    n_u = n_u.reshape(-1)
-    n_v = n_v.reshape(-1)
 
     # use this function to wrap spatial frequencies beyond Nyquist
     def wrap_val(value: np.ndarray, nyquist: float) -> np.ndarray:
         return (value + nyquist) % (2 * nyquist) - nyquist
 
     # and interpolate up to the desired range
-    return interpolate.griddata(
-        (n_u, n_v),
+    return interpolate.RegularGridInterpolator(
+        (u_rng, v_rng),
         xfer_fcn,
-        (wrap_val(u, nyquist), wrap_val(v, nyquist)),
         method="linear",
         fill_value=0,
-    )
+    )(wrap_val(u, nyquist), wrap_val(v, nyquist))
 
 
 def gaussian_OTF(  # noqa: N802
@@ -1080,10 +1074,13 @@ def weighted_by_wavelength(
         Output can be nan if all weights are 0.
     """
     weights = weights / weights.sum()
-    weighted_fcn = weights[0] * my_function(wavelengths[0])
+    weighted_fcn = my_function(wavelengths[0])
+    np.multiply(weighted_fcn, weights[0], out=weighted_fcn)
 
-    for wii in wavelengths[1:]:
-        weighted_fcn = weighted_fcn + weights[wavelengths == wii] * my_function(wii)
+    for i in range(1, len(wavelengths)):
+        fnc = my_function(wavelengths[i])
+        np.multiply(fnc, weights[i], out=fnc)
+        np.add(weighted_fcn, fnc, out=weighted_fcn)
 
     return weighted_fcn
 
