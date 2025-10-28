@@ -93,6 +93,24 @@ class TestSensor:
         sensor = self.create_default_sensor({"int_time": value})
         assert sensor.int_time == value
 
+    def test_provided_qe(self) -> None:
+        value = np.array((1.0e-9, 2.0e-9, 3.0e-9))
+        sensor = self.create_default_sensor({"qe": value})
+        assert np.array_equal(sensor.qe, value)
+
+    def test_default_qe(self) -> None:
+        sensor = self.create_default_sensor()
+        assert np.array_equal(sensor.qe, np.ones(2))
+
+    def test_provided_qe_wavelengths(self) -> None:
+        value = np.array((0.5, 0.6))
+        sensor = self.create_default_sensor({"qe_wavelengths": value})
+        assert np.array_equal(sensor.qe_wavelengths, value)
+
+    def test_default_qe_wavelengths(self) -> None:
+        sensor = self.create_default_sensor()
+        assert np.array_equal(sensor.qe_wavelengths, sensor.opt_trans_wavelengths)
+
     def test_default_dark_current(self) -> None:
         sensor = self.create_default_sensor()
         assert sensor.dark_current == 0.0
@@ -263,6 +281,24 @@ class TestSensor:
         value = 0.634e-5
         sensor = self.create_default_sensor({"pv_wavelength": value})
         assert sensor.pv_wavelength == value
+
+    def test_default_filter_kernel(self) -> None:
+        sensor = self.create_default_sensor()
+        assert np.array_equal(sensor.filter_kernel, np.array([1]))
+
+    def test_provided_filter_kernel(self) -> None:
+        value = np.array([[-1.0, -1.0, -1.0], [-1.0, 9.0, -1.0], [-1.0, -1.0, -1.0]])
+        sensor = self.create_default_sensor({"filter_kernel": value})
+        assert np.array_equal(sensor.filter_kernel, value)
+
+    def test_default_frame_stacks(self) -> None:
+        sensor = self.create_default_sensor()
+        assert sensor.frame_stacks == 1
+
+    def test_provided_frame_stacks(self) -> None:
+        value = 1
+        sensor = self.create_default_sensor({"frame_stacks": value})
+        assert sensor.frame_stacks == value
 
     @pytest.mark.parametrize(
         ("name", "d", "f", "p_x", "opt_trans_wavelengths"),
