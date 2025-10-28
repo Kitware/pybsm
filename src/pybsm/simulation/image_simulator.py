@@ -20,17 +20,18 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Literal
 
+import numba
 import numpy as np
 from scipy import interpolate
 from scipy.ndimage import correlate
 from scipy.signal import fftconvolve, oaconvolve
 
 from pybsm import noise, radiance
-from pybsm.simulation.functional import img_to_reflectance
+# from pybsm.simulation.functional import img_to_reflectance
 from pybsm.simulation.scenario import Scenario
 from pybsm.simulation.sensor import Sensor
 
-ConvolutionMethods = Literal["fftconvolve", "correlate", "oaconvolve"]
+ConvolutionMethods = Literal["fftconvolve", "pad_fftconvolve", "correlate", "oaconvolve"]
 ResampleBases = Literal["pixel-angle", "ground-angle"]
 
 
@@ -68,6 +69,7 @@ class ImageSimulator(ABC):
         mtf_weights: np.ndarray | None = None,
         slant_range: float | None = None,
         altitude: float | None = None,
+        do_resample: bool = True,
     ) -> None:
         """Initialize the ImageSimulator base class.
 
@@ -166,6 +168,8 @@ class ImageSimulator(ABC):
         # PSF cache keyed by (config_hash, gsd_rounded | None)
         self._psf_cache: dict[tuple[int, float | None], np.ndarray] = dict()
 
+        self.do_resample = do_resample
+
     def apply_convolution(self, image: np.ndarray, psf: np.ndarray) -> tuple[np.ndarray, np.ndarray]:  # noqa C901
         """Apply convolution using this simulator's method.
 
@@ -179,11 +183,19 @@ class ImageSimulator(ABC):
         """
         true_img = image
         if self._use_reflectance:
-            reflectance_img = img_to_reflectance(
-                img=image,
-                pix_values=np.array([image.min(), image.max()]),
-                refl_values=self._reflectance_range,
-            )
+            # reflectance_img = img_to_reflectance(
+            #     img=image,
+            #     pix_values=np.array([image.min(), image.max()]),
+            #     refl_values=self._reflectance_range,
+            # )
+            p1, p2 = image.min(), image.max()
+            r1, r2 = self._reflectance_range
+            scale = (r2 - r1) / (p2 - p1)
+            reflectance_img = true_img.astype(np.float64)
+            np.subtract(reflectance_img, p1, out=reflectance_img)
+            np.multiply(reflectance_img, scale, out=reflectance_img)
+            np.add(reflectance_img, r1, out=reflectance_img)
+            np.clip(reflectance_img, 0, 1, out=reflectance_img)
             true_img = self._reflect_to_photoelectrons(reflectance_img)
 
         method = self._get_convolution_method()
@@ -210,6 +222,32 @@ class ImageSimulator(ABC):
                     img_temp = true_img[..., c].astype(np.float64, copy=False)
                     img_pad = np.pad(img_temp, pads, mode="reflect")
                     blur_img[..., c] = oaconvolve(img_pad, k, mode="valid")
+
+        elif method == "pad_fftconvolve":
+            from scipy import fft
+            ky = psf.shape[0] // 2
+            kx = psf.shape[1] // 2
+
+            padded = np.pad(true_img, ((ky, ky), (kx, kx), (0, 0)), mode='reflect')
+            shape = tuple(s + k - 1 for s, k in zip(padded.shape[:2], psf.shape))
+            fshape = [fft.next_fast_len(s, real=True) for s in shape]
+
+            # fft of kernel (only need to do once, instead of once per image channel
+            # as in fftconvolve)
+            psf_f = fft.rfft2(psf, fshape, axes=(0, 1))
+            # fft of image
+            img_f = fft.rfft2(padded, fshape, axes=(0, 1))
+
+            if true_img.ndim == 3:
+                psf_f = psf_f[..., None]
+
+            # convolution
+            np.multiply(img_f, psf_f, out=img_f)
+            blur_img = fft.irfft2(img_f, fshape, axes=(0, 1))
+
+            # slice off padding
+            blur_img = blur_img[2*ky:2*ky + true_img.shape[0], 2*kx:2*kx + true_img.shape[1]]
+            blur_img = np.ascontiguousarray(blur_img)
 
         elif method == "fftconvolve":
             if true_img.ndim == 3:
@@ -244,7 +282,9 @@ class ImageSimulator(ABC):
         Raises:
             ValueError: If resample basis is unknown.
         """
-        from pybsm.otf.functional import resample_2D
+        # from pybsm.otf.functional import resample_2D
+        from PIL import Image
+        from pybsm.otf.functional import resampled_dimensions
 
         dx_in = gsd / self.slant_range
 
@@ -257,14 +297,33 @@ class ImageSimulator(ABC):
         else:
             raise ValueError(f"Unknown resample basis: {resample_basis}")
 
-        if image.ndim == 3:
-            # Get output shape from first channel
-            resampled_shape = resample_2D(img_in=image[:, :, 0], dx_in=dx_in, dx_out=dx_out).shape
-            sim_img = np.empty((*resampled_shape, 3))
-            for c in range(3):
-                sim_img[..., c] = resample_2D(img_in=image[..., c], dx_in=dx_in, dx_out=dx_out)
+        # if image.ndim == 3:
+        #     # Get output shape from first channel
+        #     resampled_shape = resample_2D(img_in=image[:, :, 0], dx_in=dx_in, dx_out=dx_out).shape
+        #     sim_img = np.empty((*resampled_shape, 3))
+        #     for c in range(3):
+        #         sim_img[..., c] = resample_2D(img_in=image[..., c], dx_in=dx_in, dx_out=dx_out)
+        # else:
+        #     sim_img = resample_2D(img_in=image, dx_in=dx_in, dx_out=dx_out)
+
+        new_y, new_x = resampled_dimensions(img_hw=image.shape[:2], dx_in=dx_in, dx_out=dx_out)
+        mode = Image.Resampling.BILINEAR
+        if image.dtype == np.uint8:
+            if image.ndim == 3:
+                sim_img = np.array(Image.fromarray(image).resize((new_x, new_y), mode))
+            else:
+                sim_img = np.array(Image.fromarray(image, 'L').resize((new_x, new_y), mode))
         else:
-            sim_img = resample_2D(img_in=image, dx_in=dx_in, dx_out=dx_out)
+            # for floating point images, we need to handle each channel as a separate
+            # single-channel floating point image
+            shape = (new_y, new_x, 3 if image.ndim == 3 else 1)
+            sim_img = np.empty(shape, dtype=image.dtype)
+            if image.ndim == 2:
+                image = image[..., None]
+            for i in range(shape[2]):
+                pil_img = Image.fromarray(image[..., i].astype('f'), 'F')
+                sim_img[..., i] = np.array(pil_img.resize((new_y, new_x), mode))
+            sim_img = np.squeeze(sim_img)
 
         return sim_img
 
@@ -277,10 +336,12 @@ class ImageSimulator(ABC):
         Returns:
             Image with noise applied if add_noise is True, otherwise original image.
         """
-        if not self.add_noise:
-            return image
-        poisson_noisy_img = self._rng.poisson(lam=image)
-        return self._rng.normal(poisson_noisy_img, self._g_noise)
+        # if not self.add_noise:
+        #     return image
+        # poisson_noisy_img = self._rng.poisson(lam=image)
+        # return self._rng.normal(poisson_noisy_img, self._g_noise)
+        # NOTE: the numba function doesn't use this objects Generator
+        return apply_noise(image, self._g_noise)
 
     def simulate_image(self, image: np.ndarray, gsd: float | None) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
         """Apply the convolution and optionally resampling if gsd is provided.
@@ -296,7 +357,7 @@ class ImageSimulator(ABC):
         psf = self._get_psf_cached(gsd=gsd, use_default=(gsd is None))
 
         true_img, blur_img = self.apply_convolution(image, psf)
-        if gsd:
+        if gsd and self.do_resample:
             blur_img = self.apply_resampling(blur_img, gsd)
 
         noisy_img = None
@@ -428,7 +489,8 @@ class SystemOTFSimulator(ImageSimulator):
         ).system_OTF
 
     def _get_convolution_method(self) -> ConvolutionMethods:
-        return "correlate"
+        # return "correlate"
+        return "pad_fftconvolve"
 
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
@@ -550,3 +612,13 @@ class TurbulenceApertureSimulator(ImageSimulator):
 
     def _get_resample_basis(self) -> ResampleBases:
         return "ground-angle"
+
+
+@numba.njit(fastmath=True, parallel=True, cache=True)
+def apply_noise(img, g_noise):
+    out = np.empty_like(img)
+    for i in numba.prange(out.shape[0]):
+        for j in range(out.shape[1]):
+            for c in range(out.shape[2]):
+                out[i, j, c] = np.random.normal(np.random.poisson(img[i, j ,c]), g_noise)
+    return out
