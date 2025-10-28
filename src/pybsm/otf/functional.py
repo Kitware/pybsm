@@ -727,13 +727,13 @@ def polychromatic_turbulence_OTF(  # noqa: N802
     )
 
     def r0_function(wav: float) -> float:
-        return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)
+        return np.array(r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0))
 
     r0_band = weighted_by_wavelength(
         wavelengths=wavelengths,
         weights=weights,
         my_function=r0_function,
-    )
+    ).item()
 
     # calculate the turbulence OTF
     turb_function = lambda wavelengths: wind_speed_turbulence_OTF(  # noqa: E731
@@ -838,6 +838,39 @@ def turbulence_OTF(  # noqa: N802
             vv = v[i, j]
             rho = math.sqrt(uu * uu + vv * vv)  # radial spatial frequency
             out[i, j] = math.exp(-3.44 * (lr0 * rho)**e1 * (1 - alpha * (lD * rho)**e2))
+    return out
+
+
+@numba.njit(fastmath=True, parallel=True, cache=True)
+def _weighted_turbulence_OTF(  # noqa: N802
+    *,
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,  # noqa: N803
+    r0: float,
+    alpha1: float,
+    alpha2: float,
+    weight: float,
+):
+    '''TODO For use in windspeed_turbulence_OTF, combines the weighted combination of two
+    separate calls to turbulence_OTF into a single, much faster call.
+    '''
+    out = np.empty_like(u)
+    lr0 = lambda0 / r0
+    lD = lambda0 / D
+    e1 = 5.0 / 3.0
+    e2 = 1.0 / 3.0
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            uu = u[i, j]
+            vv = v[i, j]
+            rho = math.sqrt(uu * uu + vv * vv)  # radial spatial frequency
+            p1 = -3.44 * (lr0 * rho)**e1
+            p2 = (lD * rho)**e2
+            t1 = math.exp(p1 * (1 - alpha1 * p2))
+            t2 = math.exp(p1 * (1 - alpha2 * p2))
+            out[i, j] = weight * t1 + (1 - weight) * t2
     return out
 
 
@@ -970,14 +1003,7 @@ def wind_speed_turbulence_OTF(  # noqa: N802
         Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * t_d / r0)
-    return weight * turbulence_OTF(u=u, v=v, lambda0=lambda0, D=D, r0=r0, alpha=0.5) + (1 - weight) * turbulence_OTF(
-        u=u,
-        v=v,
-        lambda0=lambda0,
-        D=D,
-        r0=r0,
-        alpha=0.0,
-    )
+    return _weighted_turbulence_OTF(u=u, v=v, lambda0=lambda0, D=D, r0=r0, alpha1=0.5, alpha2=0.0, weight=weight)
 
 
 # ----------------------------- END OTF Models -------------------------------
@@ -1519,7 +1545,10 @@ def common_OTFs(  # noqa: N802
         otf.filter_OTF = np.ones(uu.shape)
 
     # system OTF
-    otf.system_OTF = otf.ap_OTF * otf.turb_OTF * otf.det_OTF * otf.jit_OTF * otf.drft_OTF * otf.wav_OTF * otf.filter_OTF
+    # otf.system_OTF = otf.ap_OTF * otf.turb_OTF * otf.det_OTF * otf.jit_OTF * otf.drft_OTF * otf.wav_OTF * otf.filter_OTF
+    otf.system_OTF = otf.ap_OTF.copy()
+    for x_otf in (otf.turb_OTF, otf.det_OTF, otf.jit_OTF, otf.drft_OTF, otf.wav_OTF, otf.filter_OTF):
+        np.multiply(otf.system_OTF, x_otf, out=otf.system_OTF)
 
     return otf
 
@@ -1553,7 +1582,7 @@ def resample_2D(  # noqa: N802
 
     """
     new_x, new_y = resampled_dimensions(
-        img_in=img_in,
+        img_hw=img_in.shape[:2],
         dx_in=dx_in,
         dx_out=dx_out,
     )
@@ -1567,7 +1596,7 @@ def resample_2D(  # noqa: N802
 
 def resampled_dimensions(
     *,
-    img_in: np.ndarray,
+    img_hw: tuple[int, int],
     dx_in: float,
     dx_out: float,
 ) -> tuple[int, int]:
@@ -1599,7 +1628,7 @@ def resampled_dimensions(
         raise ZeroDivisionError
     if dx_in == 0:
         raise ValueError("Invalid sample spacing for input image")
-    new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
-    new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
+    new_x = int(np.round(img_hw[1] * dx_in / dx_out))
+    new_y = int(np.round(img_hw[0] * dx_in / dx_out))
 
     return new_x, new_y
