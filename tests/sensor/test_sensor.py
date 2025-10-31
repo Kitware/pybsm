@@ -46,7 +46,7 @@ class TestSensor:
         assert d == sensor.D
         assert sensor.f == f
         assert sensor.p_x == p_x
-        assert np.equal(sensor.opt_trans_wavelengths.all(), opt_trans_wavelengths.all())
+        assert np.equal(sensor.opt_trans_wavelengths, opt_trans_wavelengths).all()
 
     def test_default_eta(self) -> None:
         sensor = self.create_default_sensor()
