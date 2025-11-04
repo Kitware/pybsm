@@ -113,7 +113,10 @@ class Sensor:
         error)^2
     :param pv_wavelength:
         wavelength at which pv is obtained (m)
-
+    :param filter_kernel:
+        2-D filter kernel (for e.g. sharpening); assumed to sum to one.
+    :param frame_stacks:
+        number of frames added together for improved SNR.
     """
 
     # Correlation lengths of the phase autocorrelation function.  Apparently,
@@ -129,13 +132,6 @@ class Sensor:
     # all already included)
     other_noise: np.ndarray
 
-    # 2-D filter kernel (for sharpening or whatever).  Note that
-    # the kernel is assumed to sum to one.
-    filter_kernel: np.ndarray
-
-    # The number of frames to be added together for improved SNR.
-    frame_stacks: int
-
     def __init__(
         self,
         *,
@@ -149,6 +145,8 @@ class Sensor:
         w_x: float | None = None,
         w_y: float | None = None,
         int_time: float = 1,
+        qe: np.ndarray | None = None,
+        qe_wavelengths: np.ndarray | None = None,
         dark_current: float = 0,
         other_irradiance: float = 0.0,
         read_noise: float = 0,
@@ -168,6 +166,8 @@ class Sensor:
         da_y: float = 0.0,
         pv: float = 0.0,
         pv_wavelength: float = 0.633e-6,
+        filter_kernel: np.ndarray | None = None,
+        frame_stacks: int = 1,
     ) -> None:
         """Returns a sensor object whose name is *name* and...."""
         self.name = name
@@ -197,6 +197,8 @@ class Sensor:
             self.w_y = w_y
 
         self.int_time = int_time
+        self.qe_wavelengths = self.opt_trans_wavelengths if qe_wavelengths is None else qe_wavelengths
+        self.qe = np.ones(self.qe_wavelengths.shape[0]) if qe is None else qe
         self.dark_current = dark_current
         self.other_irradiance = other_irradiance
         self.read_noise = read_noise
@@ -204,10 +206,6 @@ class Sensor:
         self.max_well_fill = max_well_fill
         self.bit_depth = bit_depth
         self.n_tdi = n_tdi
-
-        # TODO this should be exposed so a custom one can be provided.  # noqa: FIX002
-        self.qe_wavelengths = opt_trans_wavelengths  # placeholder
-        self.qe = np.ones(opt_trans_wavelengths.shape[0])  # placeholder
 
         # TODO I don't think these automatically get used everywhere they   # noqa: FIX002
         # should, some functions override by assuming different temperatures.
@@ -226,11 +224,8 @@ class Sensor:
         self.L_x = D
         self.L_y = D
         self.other_noise = np.array([0])
-
-        # TODO, before we expose these, we should track down whether they are  # noqa: FIX002
-        # actually used anywhere downstream.
-        self.filter_kernel = np.array([1])
-        self.frame_stacks = 1
+        self.filter_kernel = np.array([1]) if filter_kernel is None else filter_kernel
+        self.frame_stacks = frame_stacks
 
     def __hash__(self) -> int:
         """Compute hash based on sensor parameters."""
@@ -255,5 +250,8 @@ class Sensor:
             tuple(self.optics_transmission),
             tuple(self.qe_wavelengths),
             tuple(self.qe),
+            tuple(self.filter_kernel.shape),
+            tuple(self.filter_kernel.flatten()),
+            self.frame_stacks,
         )
         return hash(relevant_attrs)
