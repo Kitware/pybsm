@@ -232,16 +232,21 @@ def load_database_atmosphere(
     )
     ground_ranges = _get_ground_range_array(max_ground_range=301e3)
 
-    if altitude < min(altitude_array) or altitude > max(altitude_array):
-        raise IndexError("Altitude not within range of acceptable values (2,20000)")
+    if altitude < min(altitude_array):
+        raise IndexError(f"Altitude must be >= {altitude_array[0].item()}")
     if ground_range < min(ground_ranges) or ground_range > max(ground_ranges):
         raise IndexError("Ground Range not within range of acceptable values (0,300000)")
     # find the database altitudes and ground ranges that bound the values of
     # interest
-    low_alt = altitude_array[altitude_array <= altitude][-1]
-    high_alt = altitude_array[altitude_array >= altitude][0]
-    low_range = ground_ranges[ground_ranges <= ground_range][-1]
-    high_range = ground_ranges[ground_ranges >= ground_range][0]
+    # We allow for higher altitudes by just taking the maximum from the database
+    # and ignoring any (likely negligible) additional atmospheric effects
+    alt_idx = np.searchsorted(altitude_array, altitude, side="right")
+    low_alt = altitude_array[alt_idx - 1]
+    high_alt = low_alt if low_alt == altitude else altitude_array[min(alt_idx, len(altitude_array) - 1)]
+
+    range_idx = np.searchsorted(ground_ranges, ground_range, side="right")
+    low_range = ground_ranges[range_idx - 1]
+    high_range = low_range if low_range == ground_range else ground_ranges[min(range_idx, len(ground_ranges) - 1)]
 
     # first interpolate across the low and high altitudes
     # then interpolate across ground range

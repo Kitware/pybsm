@@ -57,6 +57,8 @@ class TestUtils:
             (-1, 1000.0, 0.0),
             (0, 1000.0, 0.0),
             (1, 1.0, 0.0),
+            (1, 1000.0, -1.0),
+            (1, 1000.0, 302e3),
         ],
     )
     def test_load_database_atmosphere_index_error(
@@ -84,6 +86,7 @@ class TestUtils:
             ),
             (1, 1000.0, 500.0),
             (1, 1000.0, 300.0),
+            (1, 25000.0, 300.0),
         ],
     )
     def test_load_database_atmosphere(
