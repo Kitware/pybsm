@@ -61,13 +61,15 @@ the OTF response (unitless) for that those spatial frequencies.
 
 # standard library imports
 import inspect
+import math
 import os
 import warnings
 from collections.abc import Callable
 
 # 3rd party imports
+import numba
 import numpy as np
-from scipy import integrate, interpolate
+from scipy import fft, integrate, interpolate
 from scipy.ndimage import correlate, zoom
 from scipy.special import jn
 
@@ -101,7 +103,13 @@ r_earth = 6378.164e3  # radius of the earth (m)
 # ------------------------------- OTF Models ---------------------------------
 
 
-def circular_aperture_OTF(  # noqa: N802
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
+def circular_aperture_OTF(  # noqa: N802, C901
     *,
     u: np.ndarray,
     v: np.ndarray,
@@ -118,55 +126,61 @@ def circular_aperture_OTF(  # noqa: N802
     :param v:
         angular spatial frequency coordinates (rad^-1)
     :param lambda0:
-        wavelength (m)
+        wavelength (m), should be > 0
     :param D:
         effective aperture diameter (m)
     :param eta:
-        relative linear obscuration (unitless)
+        relative linear obscuration (unitless), should not be 1
 
     :return:
         H:
             OTF at spatial frequency (u,v) (unitless)
 
-    :raises:
-        ZeroDivisionError:
-            if lambda0 is 0
-
     :WARNING:
         Output can be nan if eta is 1.
-
-    :NOTE:
-        You will see several runtime warnings when this code is first accessed.
-        The issue (calculating arccos and sqrt outside of their domains) is
-        captured and corrected np.nan_to_num
     """
-    rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
-    r0 = D / lambda0  # diffraction limited cutoff spatial frequency (cy/rad)
+    out = np.empty(u.shape)
+    r0 = D / lambda0
+    etasq = eta**2
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            uu = u[i, j]
+            vv = v[i, j]
+            rho = math.sqrt(uu * uu + vv * vv)  # radial spatial frequency
+            rho_t = rho / r0
 
-    # this A term by itself is the unobscured circular aperture OTF
-    a = (2.0 / np.pi) * (np.arccos(rho / r0) - (rho / r0) * np.sqrt(1.0 - (rho / r0) ** 2.0))
-    a = np.nan_to_num(a)
+            # this A term by itself is the unobscured circular aperture OTF
+            a = 0
+            if abs(rho_t) <= 1:
+                a = (2 / math.pi) * (math.acos(rho_t) - rho_t * math.sqrt(1 - rho_t**2))
 
-    # area where (rho < (eta*r0)):
-    b = (2.0 * eta**2.0 / np.pi) * (
-        np.arccos(rho / eta / r0) - (rho / eta / r0) * np.sqrt(1.0 - (rho / eta / r0) ** 2.0)
-    )
-    b = np.nan_to_num(b)
+            if eta > 0.0:
+                rho_t /= eta
+                # area where (rho < (eta*r0)):
+                b = 0.0
+                if abs(rho_t) <= 1:
+                    b = (2.0 * etasq / math.pi) * (math.acos(rho_t) - rho_t * math.sqrt(1 - rho_t**2))
 
-    # area where (rho < ((1.0-eta)*r0/2.0)):
-    c_1 = -2.0 * eta**2.0 * (rho < (1.0 - eta) * r0 / 2.0)
+                # area where (rho < ((1.0-eta)*r0/2.0)):
+                c_1 = -2.0 * etasq * (rho < (1.0 - eta) * r0 / 2)
 
-    # area where (rho <= ((1.0+eta)*r0/2.0)):
-    phi = np.arccos((1.0 + eta**2.0 - (2.0 * rho / r0) ** 2) / 2.0 / eta)
-    c_2 = 2.0 * eta * np.sin(phi) / np.pi + (1.0 + eta**2.0) * phi / np.pi - 2.0 * eta**2.0
-    c_2 = c_2 - (2.0 * (1.0 - eta**2.0) / np.pi) * np.arctan(
-        (1.0 + eta) * np.tan(phi / 2.0) / (1.0 - eta),
-    )
-    c_2 = np.nan_to_num(c_2)
-    c_2 = c_2 * (rho <= ((1.0 + eta) * r0 / 2.0))
+                # area where (rho <= ((1.0+eta)*r0/2.0)):
+                c_2 = 0
+                phi_inner = (1.0 + etasq - (2.0 * rho / r0) ** 2) / 2.0 / eta
+                if abs(phi_inner) <= 1:
+                    phi = math.acos(phi_inner)
+                    c_2 = 2.0 * eta * math.sin(phi) / math.pi + (1.0 + etasq) * phi / math.pi - 2.0 * etasq
+                    c_2 = c_2 - (2.0 * (1.0 - etasq) / math.pi) * math.atan(
+                        (1.0 + eta) * math.tan(phi / 2.0) / (1.0 - eta),
+                    )
+                    # c_2 = np.nan_to_num(c_2)
+                    c_2 = c_2 * (rho <= ((1.0 + eta) * r0 / 2.0))
 
-    # note that c_1+c_2 = C from the IBSM documentation
-    return (a + b + c_1 + c_2) / (1.0 - eta**2.0) if eta > 0.0 else a
+                # note that c_1+c_2 = C from the IBSM documentation
+                out[i, j] = (a + b + c_1 + c_2) / (1.0 - etasq)
+            else:
+                out[i, j] = a
+    return out
 
 
 def circular_aperture_OTF_with_defocus(  # noqa: N802
@@ -332,6 +346,12 @@ def defocus_OTF(  # noqa: N802
     return np.exp((-(np.pi**2.0) / 4.0) * (w_x**2.0 * u**2.0 + w_y**2.0 * v**2.0))
 
 
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
 def detector_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -355,13 +375,19 @@ def detector_OTF(  # noqa: N802
     :param w_y:
         the 1/e blur spot radii in the y direction
     :param f:
-        focal length (m)
+        focal length (m), should be > 0
 
     :return:
         H:
             detector OTF. WARNING: output can be NaN if f is 0
     """
-    return np.sinc(w_x * u / f) * np.sinc(w_y * v / f)
+    out = np.empty_like(u)
+    f1 = w_x / f
+    f2 = w_y / f
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            out[i, j] = np.sinc(f1 * u[i, j]) * np.sinc(f2 * v[i, j])
+    return out
 
 
 def detector_OTF_with_aggregation(  # noqa: N802
@@ -461,6 +487,12 @@ def diffusion_OTF(  # noqa: N802
     return diffusion_OTF_params(al_rho, alpha, ald) / diffusion_OTF_params(al0, alpha, ald)
 
 
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
 def drift_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -486,7 +518,11 @@ def drift_OTF(  # noqa: N802
             OTF at spatial frequency (u,v) (unitless)
 
     """
-    return np.sinc(a_x * u) * np.sinc(a_y * v)
+    out = np.empty_like(u)
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            out[i, j] = np.sinc(a_x * u[i, j]) * np.sinc(a_y * v[i, j])
+    return out
 
 
 def filter_OTF(  # noqa: N802
@@ -519,32 +555,25 @@ def filter_OTF(  # noqa: N802
     n = 100  # array size for the transform
 
     # transform of the kernel
-    xfer_fcn = np.abs(np.fft.fftshift(np.fft.fft2(kernel, [n, n])))
+    xfer_fcn = np.abs(fft.fftshift(fft.fft2(kernel, [n, n])))
 
     nyquist = 0.5 / ifov
 
     # spatial frequency coordinates for the transformed filter
     u_rng = np.linspace(-nyquist, nyquist, xfer_fcn.shape[0])
     v_rng = np.linspace(nyquist, -nyquist, xfer_fcn.shape[1])
-    n_u, n_v = np.meshgrid(u_rng, v_rng)
-
-    # reshape everything to comply with the griddata interpolator requirements
-    xfer_fcn = xfer_fcn.reshape(-1)
-    n_u = n_u.reshape(-1)
-    n_v = n_v.reshape(-1)
 
     # use this function to wrap spatial frequencies beyond Nyquist
     def wrap_val(value: np.ndarray, nyquist: float) -> np.ndarray:
         return (value + nyquist) % (2 * nyquist) - nyquist
 
     # and interpolate up to the desired range
-    return interpolate.griddata(
-        (n_u, n_v),
+    return interpolate.RegularGridInterpolator(
+        (u_rng, v_rng),
         xfer_fcn,
-        (wrap_val(u, nyquist), wrap_val(v, nyquist)),
         method="linear",
         fill_value=0,
-    )
+    )((wrap_val(u, nyquist), wrap_val(v, nyquist)))
 
 
 def gaussian_OTF(  # noqa: N802
@@ -585,6 +614,12 @@ def gaussian_OTF(  # noqa: N802
     return np.exp(-np.pi * ((u / fcX) ** 2 + (v / fcY) ** 2))
 
 
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
 def jitter_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -613,7 +648,16 @@ def jitter_OTF(  # noqa: N802
             OTF at spatial frequency (u,v) (unitless)
 
     """
-    return np.exp((-2.0 * np.pi**2.0) * (s_x**2.0 * u**2.0 + s_y**2.0 * v**2.0))
+    out = np.empty(u.shape)
+    sxsq = s_x**2
+    sysq = s_y**2
+    c = -2 * math.pi**2
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            uu = u[i, j] ** 2
+            vv = v[i, j] ** 2
+            out[i, j] = math.exp(c * (sxsq * uu + sysq * vv))
+    return out
 
 
 def polychromatic_turbulence_OTF(  # noqa: N802
@@ -694,14 +738,14 @@ def polychromatic_turbulence_OTF(  # noqa: N802
         cn2=cn2,
     )
 
-    def r0_function(wav: float) -> float:
-        return r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0)
+    def r0_function(wav: float) -> np.ndarray:
+        return np.array(r0_at_1um * wav ** (6.0 / 5.0) * (1e-6) ** (-6.0 / 5.0))
 
     r0_band = weighted_by_wavelength(
         wavelengths=wavelengths,
         weights=weights,
         my_function=r0_function,
-    )
+    ).item()
 
     # calculate the turbulence OTF
     turb_function = lambda wavelengths: wind_speed_turbulence_OTF(  # noqa: E731
@@ -709,7 +753,7 @@ def polychromatic_turbulence_OTF(  # noqa: N802
         v=v,
         lambda0=wavelengths,
         D=D,
-        r0=r0_function(wavelengths),
+        r0=r0_function(wavelengths).item(),
         t_d=int_time,
         vel=aircraft_speed,
     )
@@ -762,6 +806,12 @@ def tdi_OTF(  # noqa: N802
     return np.sinc(xx) * exp_sum / (n_tdi * phases_n)
 
 
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64, float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
 def turbulence_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -794,12 +844,64 @@ def turbulence_OTF(  # noqa: N802
             Output can be inf if D is 0.
             Output can be nan if lambda0 and alpha are 0.
     """
-    rho = np.sqrt(u**2.0 + v**2.0)  # radial spatial frequency
-    return np.exp(
-        -3.44 * (lambda0 * rho / r0) ** (5.0 / 3.0) * (1 - alpha * (lambda0 * rho / D) ** (1.0 / 3.0)),
-    )
+    out = np.empty_like(u)
+    lr0 = lambda0 / r0
+    lD = lambda0 / D  # noqa: N806
+    e1 = 5.0 / 3.0
+    e2 = 1.0 / 3.0
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            uu = u[i, j]
+            vv = v[i, j]
+            rho = math.sqrt(uu * uu + vv * vv)  # radial spatial frequency
+            out[i, j] = math.exp(-3.44 * (lr0 * rho) ** e1 * (1 - alpha * (lD * rho) ** e2))
+    return out
 
 
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64, float64, float64, float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
+def _weighted_turbulence_OTF(  # noqa: N802
+    *,
+    u: np.ndarray,
+    v: np.ndarray,
+    lambda0: float,
+    D: float,  # noqa: N803
+    r0: float,
+    alpha1: float,
+    alpha2: float,
+    weight: float,
+) -> np.ndarray:
+    """For use in windspeed_turbulence_OTF, calculates the weighted combination of two
+    separate calls to turbulence_OTF in a single, much faster function.
+    """
+    out = np.empty_like(u)
+    lr0 = lambda0 / r0
+    lD = lambda0 / D  # noqa: N806
+    e1 = 5.0 / 3.0
+    e2 = 1.0 / 3.0
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            uu = u[i, j]
+            vv = v[i, j]
+            rho = math.sqrt(uu * uu + vv * vv)  # radial spatial frequency
+            p1 = -3.44 * (lr0 * rho) ** e1
+            p2 = (lD * rho) ** e2
+            t1 = math.exp(p1 * (1 - alpha1 * p2))
+            t2 = math.exp(p1 * (1 - alpha2 * p2))
+            out[i, j] = weight * t1 + (1 - weight) * t2
+    return out
+
+
+@numba.njit(
+    "float64[:, :](float64[:, :], float64[:, :], float64, float64, float64, float64)",
+    fastmath=True,
+    parallel=True,
+    cache=True,
+)
 def wavefront_OTF(  # noqa: N802
     *,
     u: np.ndarray,
@@ -842,9 +944,14 @@ def wavefront_OTF(  # noqa: N802
         Output can be nan if lambda0 is 0.
 
     """
-    auto_c = np.exp(-(lambda0**2) * ((u / L_x) ** 2 + (v / L_y) ** 2))
-
-    return np.exp(-pv * (1 - auto_c))
+    out = np.empty_like(u)
+    lsq = -lambda0 * lambda0
+    npv = -pv
+    for i in numba.prange(u.shape[0]):
+        for j in range(u.shape[1]):
+            auto_c = math.exp(lsq * ((u[i, j] / L_x) ** 2 + (v[i, j] / L_y) ** 2))
+            out[i, j] = math.exp(npv * (1 - auto_c))
+    return out
 
 
 def wavefront_OTF_2(  # noqa: N802
@@ -923,14 +1030,7 @@ def wind_speed_turbulence_OTF(  # noqa: N802
         Output can be nan if is D is 0.
     """
     weight = np.exp(-vel * t_d / r0)
-    return weight * turbulence_OTF(u=u, v=v, lambda0=lambda0, D=D, r0=r0, alpha=0.5) + (1 - weight) * turbulence_OTF(
-        u=u,
-        v=v,
-        lambda0=lambda0,
-        D=D,
-        r0=r0,
-        alpha=0.0,
-    )
+    return _weighted_turbulence_OTF(u=u, v=v, lambda0=lambda0, D=D, r0=r0, alpha1=0.5, alpha2=0.0, weight=weight)
 
 
 # ----------------------------- END OTF Models -------------------------------
@@ -960,7 +1060,7 @@ def otf_to_psf(*, otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
 
     """
     # transform the psf
-    psf = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(otf))))
+    psf = np.real(fft.fftshift(fft.ifft2(fft.fftshift(otf))))
 
     # determine image space sampling
     dx_in = 1 / (otf.shape[0] * df)
@@ -987,6 +1087,7 @@ def otf_to_psf(*, otf: np.ndarray, df: float, dx_out: float) -> np.ndarray:
     ]
     psf_out = np.asarray([])
     # find the support region of the blur kernel
+    # NOTE: this could possibly be made faster by incrementally updating the sum at each iteration
     for ii in np.arange(10, np.min(otf.shape), 5):
         psf_out = get_middle(psf, ii)
         if psf_out.sum() > 0.95:  # note the 0.95 is heuristic (but seems to work well)
@@ -1027,10 +1128,13 @@ def weighted_by_wavelength(
         Output can be nan if all weights are 0.
     """
     weights = weights / weights.sum()
-    weighted_fcn = weights[0] * my_function(wavelengths[0])
+    weighted_fcn = np.atleast_1d(np.asarray(my_function(wavelengths[0])))
+    np.multiply(weighted_fcn, weights[0], out=weighted_fcn)
 
-    for wii in wavelengths[1:]:
-        weighted_fcn = weighted_fcn + weights[wavelengths == wii] * my_function(wii)
+    for i in range(1, len(wavelengths)):
+        fnc = np.atleast_1d(np.asarray(my_function(wavelengths[i])))
+        np.multiply(fnc, weights[i], out=fnc)
+        np.add(weighted_fcn, fnc, out=weighted_fcn)
 
     return weighted_fcn
 
@@ -1469,7 +1573,9 @@ def common_OTFs(  # noqa: N802
         otf.filter_OTF = np.ones(uu.shape)
 
     # system OTF
-    otf.system_OTF = otf.ap_OTF * otf.turb_OTF * otf.det_OTF * otf.jit_OTF * otf.drft_OTF * otf.wav_OTF * otf.filter_OTF
+    otf.system_OTF = otf.ap_OTF.copy()
+    for x_otf in (otf.turb_OTF, otf.det_OTF, otf.jit_OTF, otf.drft_OTF, otf.wav_OTF, otf.filter_OTF):
+        np.multiply(otf.system_OTF, x_otf, out=otf.system_OTF)
 
     return otf
 
@@ -1503,7 +1609,7 @@ def resample_2D(  # noqa: N802
 
     """
     new_x, new_y = resampled_dimensions(
-        img_in=img_in,
+        img_hw=(img_in.shape[0], img_in.shape[1]),
         dx_in=dx_in,
         dx_out=dx_out,
     )
@@ -1517,7 +1623,7 @@ def resample_2D(  # noqa: N802
 
 def resampled_dimensions(
     *,
-    img_in: np.ndarray,
+    img_hw: tuple[int, int],
     dx_in: float,
     dx_out: float,
 ) -> tuple[int, int]:
@@ -1549,7 +1655,7 @@ def resampled_dimensions(
         raise ZeroDivisionError
     if dx_in == 0:
         raise ValueError("Invalid sample spacing for input image")
-    new_x = int(np.round(img_in.shape[1] * dx_in / dx_out))
-    new_y = int(np.round(img_in.shape[0] * dx_in / dx_out))
+    new_x = int(np.round(img_hw[1] * dx_in / dx_out))
+    new_y = int(np.round(img_hw[0] * dx_in / dx_out))
 
     return new_x, new_y

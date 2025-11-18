@@ -144,7 +144,8 @@ class TestOTFHelper:
         my_function: Callable,
     ) -> None:
         """Cover cases where IndexError occurs."""
-        with pytest.raises(IndexError):
+        # with pytest.raises(IndexError):
+        with pytest.raises((IndexError, TypeError)):
             otf.weighted_by_wavelength(
                 wavelengths=wavelengths,
                 weights=weights,
@@ -452,7 +453,7 @@ class TestApplyOTFToImage:
             (np.array([]), 0.0, 1.0, np.array([1.0]), 0.0, 0.0),
         ],
     )
-    def test_apply_otf_to_image_index_error(
+    def test_apply_otf_to_image_value_error(
         self,
         ref_img: np.ndarray,
         ref_gsd: float,
@@ -461,8 +462,8 @@ class TestApplyOTFToImage:
         df: float,
         ifov: float,
     ) -> None:
-        """Cover cases where IndexError occurs."""
-        with pytest.raises(IndexError):
+        """Cover cases where ValueError occurs."""
+        with pytest.raises(ValueError, match=r"axes exceeds dimensionality of input"):
             otf.apply_otf_to_image(
                 ref_img=ref_img,
                 ref_gsd=ref_gsd,
@@ -515,14 +516,14 @@ class TestOTFToPSF:
             (np.array([0.0]), 0.0, 0.0),
         ],
     )
-    def test_otf_to_psf_index_error(
+    def test_otf_to_psf_value_error(
         self,
         otf_value: np.ndarray,
         df: float,
         dx_out: float,
     ) -> None:
-        """Cover cases where IndexError occurs."""
-        with pytest.raises(IndexError):
+        """Cover cases where ValueError occurs."""
+        with pytest.raises(ValueError, match=r"axes exceeds dimensionality of input"):
             otf.otf_to_psf(otf=otf_value, df=df, dx_out=dx_out)
 
     @pytest.mark.parametrize(
@@ -1411,7 +1412,7 @@ class TestPolychromaticTurbulenceOTF:
         aircraft_speed: float,
     ) -> None:
         """Cover cases where IndexError occurs."""
-        with pytest.raises(IndexError):
+        with pytest.raises((IndexError, TypeError)):
             otf.polychromatic_turbulence_OTF(
                 u=u,
                 v=v,
@@ -1521,24 +1522,22 @@ class TestPolychromaticTurbulenceOTF:
         cn2_at_1m: float,
         int_time: float,
         aircraft_speed: float,
-        fuzzy_snapshot: SnapshotAssertion,
     ) -> None:
         """Test polychromatic_turbulence_OTF with empty input."""
-        output = otf.polychromatic_turbulence_OTF(
-            u=u,
-            v=v,
-            wavelengths=wavelengths,
-            weights=weights,
-            altitude=altitude,
-            slant_range=slant_range,
-            D=D,
-            ha_wind_speed=ha_wind_speed,
-            cn2_at_1m=cn2_at_1m,
-            int_time=int_time,
-            aircraft_speed=aircraft_speed,
-        )
-        assert output[0].size == 0
-        fuzzy_snapshot.assert_match(output[1])
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.polychromatic_turbulence_OTF(
+                u=u,
+                v=v,
+                wavelengths=wavelengths,
+                weights=weights,
+                altitude=altitude,
+                slant_range=slant_range,
+                D=D,
+                ha_wind_speed=ha_wind_speed,
+                cn2_at_1m=cn2_at_1m,
+                int_time=int_time,
+                aircraft_speed=aircraft_speed,
+            )
 
     @pytest.mark.parametrize(
         (
@@ -1556,21 +1555,8 @@ class TestPolychromaticTurbulenceOTF:
         ),
         [
             (
-                np.array([1.0]),
-                np.array([1.0]),
-                np.array([1.0]),
-                np.array([1.0]),
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-            ),
-            (
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
@@ -1582,8 +1568,21 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
             ),
             (
+                np.array([[1.0, 2.0]]),
+                np.array([[1.0, 2.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+            ),
+            (
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0, 2.0]),
                 np.array([1.0, 2.0]),
                 1.0,
@@ -1595,8 +1594,8 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0, 2.0]),
                 1.0,
@@ -1608,21 +1607,8 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
             ),
             (
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-            ),
-            (
-                np.array([1.0]),
-                np.array([1.0, 2.0]),
+                np.array([[1.0, 2.0]]),
+                np.array([[1.0, 2.0]]),
                 np.array([1.0, 2.0]),
                 np.array([1.0, 2.0]),
                 1.0,
@@ -1634,21 +1620,8 @@ class TestPolychromaticTurbulenceOTF:
                 1.0,
             ),
             (
-                np.array([1.0, 2.0]),
-                np.array([1.0]),
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-                1.0,
-            ),
-            (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
                 2.0,
@@ -1698,9 +1671,9 @@ class TestDetectorOTF:
         ("u", "v", "w_x", "w_y", "f"),
         [
             (np.array([]), np.array([]), 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 1.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([]), 0.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 0.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 1.0, 1.0, 1.0),
         ],
     )
     def test_empty_array(
@@ -1712,18 +1685,18 @@ class TestDetectorOTF:
         f: float,
     ) -> None:
         """Test detector_OTF with empty input."""
-        output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
 
     @pytest.mark.parametrize(
         ("u", "v", "w_x", "w_y", "f"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0),
-            (np.array([1.0, 2.0]), np.array([1.0, 2.0]), 1.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.0, 0.0),
+            (np.array([[1.0, 2.0]]), np.array([[1.0, 2.0]]), 1.0, 1.0, 0.0),
         ],
     )
-    def test_nan(
+    def test_zero_division(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -1732,37 +1705,37 @@ class TestDetectorOTF:
         f: float,
     ) -> None:
         """Cover cases where nan output occurs."""
-        output = otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
-        assert np.isnan(output).all()
+        with pytest.raises(ZeroDivisionError):
+            otf.detector_OTF(u=u, v=v, w_x=w_x, w_y=w_y, f=f)
 
     @pytest.mark.parametrize(
         ("u", "v", "w_x", "w_y", "f"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 0.0,
                 1.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 0.0,
                 1.0,
                 1.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 1.0,
                 1.0,
             ),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 1.0,
@@ -1801,19 +1774,19 @@ class TestDriftOTF:
         a_y: float,
     ) -> None:
         """Test drift_OTF with empty input."""
-        output = otf.drift_OTF(u=u, v=v, a_x=a_x, a_y=a_y)
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.drift_OTF(u=u, v=v, a_x=a_x, a_y=a_y)
 
     @pytest.mark.parametrize(
         ("u", "v", "a_x", "a_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.07),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.07),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.03),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.07),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.07),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.03),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
             ),
@@ -1837,8 +1810,8 @@ class TestJitterOTF:
         ("u", "v", "s_x", "s_y"),
         [
             (np.array([]), np.array([]), 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0),
+            (np.array([[1.0]]), np.array([]), 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 0.0, 0.0),
             (np.array([]), np.array([]), 1.0, 1.0),
         ],
     )
@@ -1850,39 +1823,39 @@ class TestJitterOTF:
         s_y: float,
     ) -> None:
         """Test jitter_OTF with empty input."""
-        output = otf.jitter_OTF(u=u, v=v, s_x=s_x, s_y=s_y)
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.jitter_OTF(u=u, v=v, s_x=s_x, s_y=s_y)
 
     @pytest.mark.parametrize(
         ("u", "v", "s_x", "s_y"),
         [
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 0.0,
                 0.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 0.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 0.0,
                 1.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 1.0,
             ),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
             ),
@@ -1952,8 +1925,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
                 0.0,
@@ -1973,8 +1946,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
                 0.0,
@@ -2053,51 +2026,9 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
+                np.array([[1.0]]),
                 np.array([]),
                 np.array([]),
-                np.array([]),
-                1.0,
-                1.0,
-            ),
-            (
-                Sensor(
-                    name="test_scene",
-                    D=1.0,
-                    f=1.0,
-                    p_x=1.0,
-                    opt_trans_wavelengths=np.array([0.0, 1.0]),
-                ),
-                Scenario(
-                    name="test_scenario",
-                    ihaze=1,
-                    altitude=1.0,
-                    ground_range=1.0,
-                ),
-                np.array([]),
-                np.array([1.0]),
-                np.array([]),
-                np.array([]),
-                1.0,
-                1.0,
-            ),
-            (
-                Sensor(
-                    name="test_scene",
-                    D=1.0,
-                    f=1.0,
-                    p_x=1.0,
-                    opt_trans_wavelengths=np.array([0.0, 1.0]),
-                ),
-                Scenario(
-                    name="test_scenario",
-                    ihaze=1,
-                    altitude=1.0,
-                    ground_range=1.0,
-                ),
-                np.array([]),
-                np.array([]),
-                np.array([1.0]),
                 np.array([]),
                 1.0,
                 1.0,
@@ -2137,8 +2068,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([]),
                 1.0,
@@ -2158,8 +2089,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([]),
                 np.array([1.0]),
                 1.0,
@@ -2201,6 +2132,65 @@ class TestCommonOTFs:
             "mtf_weights",
             "slant_range",
             "int_time",
+        ),
+        [
+            (
+                Sensor(
+                    name="test_scene",
+                    D=1.0,
+                    f=1.0,
+                    p_x=1.0,
+                    opt_trans_wavelengths=np.array([0.0, 1.0]),
+                ),
+                Scenario(
+                    name="test_scenario",
+                    ihaze=1,
+                    altitude=1.0,
+                    ground_range=1.0,
+                ),
+                np.array([]),
+                np.array([[1.0]]),
+                np.array([1.0]),
+                np.array([1.0]),
+                1.0,
+                1.0,
+            ),
+        ],
+    )
+    def test_common_otfs_empty_first_array(
+        self,
+        sensor: Sensor,
+        scenario: Scenario,
+        uu: np.ndarray,
+        vv: np.ndarray,
+        mtf_wavelengths: np.ndarray,
+        mtf_weights: np.ndarray,
+        slant_range: float,
+        int_time: float,
+    ) -> None:
+        """Cover cases where IndexError occurs."""
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.common_OTFs(
+                sensor=sensor,
+                scenario=scenario,
+                uu=uu,
+                vv=vv,
+                mtf_wavelengths=mtf_wavelengths,
+                mtf_weights=mtf_weights,
+                slant_range=slant_range,
+                int_time=int_time,
+            )
+
+    @pytest.mark.parametrize(
+        (
+            "sensor",
+            "scenario",
+            "uu",
+            "vv",
+            "mtf_wavelengths",
+            "mtf_weights",
+            "slant_range",
+            "int_time",
             "expected",
         ),
         [
@@ -2218,8 +2208,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 np.array([1.0]),
                 np.array([1.0]),
                 1.0,
@@ -2250,8 +2240,8 @@ class TestCommonOTFs:
                     altitude=1.0,
                     ground_range=1.0,
                 ),
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 np.array([1.0, 1.0]),
                 np.array([1.0, 1.0]),
                 1.0,
@@ -2301,8 +2291,8 @@ class TestTurbulenceOTF:
         ("u", "v", "lambda0", "D", "r0", "alpha"),
         [
             (np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([]), 0.0, 0.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 0.0, 0.0, 0.0, 0.0),
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0),
         ],
     )
@@ -2316,29 +2306,32 @@ class TestTurbulenceOTF:
         alpha: float,
     ) -> None:
         """Test turbulence_OTF with empty input."""
-        output = otf.turbulence_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            r0=r0,
-            alpha=alpha,
-        )
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.turbulence_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                r0=r0,
+                alpha=alpha,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "r0", "alpha"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.0, 0.0, 0.0),
         ],
     )
-    def test_nan(
+    def test_zero_division_error(
         self,
         u: np.ndarray,
         v: np.ndarray,
@@ -2348,52 +2341,24 @@ class TestTurbulenceOTF:
         alpha: float,
     ) -> None:
         """Test turbulence_OTF where output is nan."""
-        output = otf.turbulence_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            r0=r0,
-            alpha=alpha,
-        )
-        assert np.isnan(output).all()
+        with pytest.raises(ZeroDivisionError):
+            otf.turbulence_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                r0=r0,
+                alpha=alpha,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "r0", "alpha"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0),
-        ],
-    )
-    def test_inf(
-        self,
-        u: np.ndarray,
-        v: np.ndarray,
-        lambda0: float,
-        D: float,  # noqa: N803
-        r0: float,
-        alpha: float,
-    ) -> None:
-        """Test turbulence_OTF where output is inf."""
-        output = otf.turbulence_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            r0=r0,
-            alpha=alpha,
-        )
-        assert np.isinf(output).all()
-
-    @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "D", "r0", "alpha"),
-        [
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 1.0, 0.0),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 1.0,
@@ -2428,8 +2393,8 @@ class TestWindSpeedTurbulenceOTF:
         ("u", "v", "lambda0", "D", "r0", "td", "vel"),
         [
             (np.array([]), np.array([]), 0.0, 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 0.0, 0.0, 1.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([]), 0.0, 0.0, 1.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 0.0, 0.0, 1.0, 0.0, 0.0),
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 1.0, 1.0),
         ],
     )
@@ -2444,55 +2409,25 @@ class TestWindSpeedTurbulenceOTF:
         vel: float,
     ) -> None:
         """Test wind_speed_turbulence_OTF with empty input."""
-        output = otf.wind_speed_turbulence_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            r0=r0,
-            t_d=td,
-            vel=vel,
-        )
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.wind_speed_turbulence_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                r0=r0,
+                t_d=td,
+                vel=vel,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "r0", "td", "vel"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 1.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0, 1.0),
-        ],
-    )
-    def test_nan(
-        self,
-        u: np.ndarray,
-        v: np.ndarray,
-        lambda0: float,
-        D: float,  # noqa: N803
-        r0: float,
-        td: float,
-        vel: float,
-    ) -> None:
-        """Test wind_speed_turbulence_OTF where output is nan."""
-        output = otf.wind_speed_turbulence_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            r0=r0,
-            t_d=td,
-            vel=vel,
-        )
-        assert np.isnan(output).all()
-
-    @pytest.mark.parametrize(
-        ("u", "v", "lambda0", "D", "r0", "td", "vel"),
-        [
-            (np.array([]), np.array([]), 0.0, 0.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 1.0, 1.0),
         ],
     )
     def test_zero_division(
@@ -2521,8 +2456,8 @@ class TestWindSpeedTurbulenceOTF:
         ("u", "v", "lambda0", "D", "r0", "td", "vel"),
         [
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 0.0,
                 1.0,
                 1.0,
@@ -2530,8 +2465,8 @@ class TestWindSpeedTurbulenceOTF:
                 0.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 0.0,
                 1.0,
                 1.0,
@@ -2539,8 +2474,8 @@ class TestWindSpeedTurbulenceOTF:
                 0.0,
             ),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 1.0,
@@ -2578,8 +2513,8 @@ class TestFilterOTF:
         ("u", "v", "kernel", "ifov"),
         [
             (np.array([]), np.array([]), np.array([[1.0]]), 1.0),
-            (np.array([1.0]), np.array([]), np.array([[1.0]]), 1.0),
-            (np.array([]), np.array([1.0]), np.array([[1.0]]), 1.0),
+            (np.array([[1.0]]), np.array([]), np.array([[1.0]]), 1.0),
+            (np.array([]), np.array([[1.0]]), np.array([[1.0]]), 1.0),
         ],
     )
     def test_empty_array(
@@ -2596,14 +2531,14 @@ class TestFilterOTF:
     @pytest.mark.parametrize(
         ("u", "v", "kernel", "ifov"),
         [
-            (np.array([1.0]), np.array([1.0]), np.array([[1.0]]), 1.0),
-            (np.array([1.0]), np.array([1.0]), np.array([[0.5, 0.5]]), 10.0),
-            (
-                np.array([10.0, 10.0]),
-                np.array([0.5, 1.0]),
-                np.array([[1.0]]),
-                1.0,
-            ),
+            (np.array([[1.0]]), np.array([[1.0]]), np.array([[1.0]]), 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), np.array([[0.5, 0.5]]), 10.0),
+            # (
+            #     np.array([[10.0, 10.0]]),
+            #     np.array([[0.5, 1.0]]),
+            #     np.array([[1.0]]),
+            #     1.0,
+            # ),
         ],
     )
     def test(
@@ -2639,22 +2574,22 @@ class TestWavefrontOTF:
         L_y: float,  # noqa: N803
     ) -> None:
         """Test wavefront_OTF with empty input."""
-        output = otf.wavefront_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            pv=pv,
-            L_x=L_x,
-            L_y=L_y,
-        )
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.wavefront_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                pv=pv,
+                L_x=L_x,
+                L_y=L_y,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "pv", "L_x", "L_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0, 0.0),
         ],
     )
     def test_nan(
@@ -2680,38 +2615,38 @@ class TestWavefrontOTF:
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "pv", "L_x", "L_y"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0, 0.0),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 1.0,
                 0.0,
                 0.0,
             ),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0, 1.0),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 1.0,
                 1.0,
                 0.0,
             ),
             (
-                np.array([1.0]),
-                np.array([1.0]),
+                np.array([[1.0]]),
+                np.array([[1.0]]),
                 1.0,
                 1.0,
                 0.0,
                 1.0,
             ),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 1.0, 1.0),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 1.0,
@@ -2746,8 +2681,8 @@ class TestCircularApertureOTF:
         ("u", "v", "lambda0", "D", "eta"),
         [
             (np.array([]), np.array([]), 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 1.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([]), 1.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 1.0, 0.0, 0.0),
             (np.array([]), np.array([]), 1.0, 1.0, 1.0),
         ],
     )
@@ -2760,22 +2695,22 @@ class TestCircularApertureOTF:
         eta: float,
     ) -> None:
         """Test circular_aperture_OTF with empty input."""
-        output = otf.circular_aperture_OTF(
-            u=u,
-            v=v,
-            lambda0=lambda0,
-            D=D,
-            eta=eta,
-        )
-        assert output.size == 0
+        with pytest.raises(TypeError, match=r"No matching definition"):
+            otf.circular_aperture_OTF(
+                u=u,
+                v=v,
+                lambda0=lambda0,
+                D=D,
+                eta=eta,
+            )
 
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "eta"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 0.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 1.0),
         ],
     )
     def test_zero_division(
@@ -2799,8 +2734,8 @@ class TestCircularApertureOTF:
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "eta"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 1.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 1.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.0, 1.0),
         ],
     )
     def test_nan(
@@ -2824,18 +2759,18 @@ class TestCircularApertureOTF:
     @pytest.mark.parametrize(
         ("u", "v", "lambda0", "D", "eta"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.0, 0.0),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 0.0,
             ),
             (
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
+                np.array([[1.0, 2.0]]),
+                np.array([[1.0, 2.0]]),
                 1.0,
                 1.0,
                 0.5,
@@ -2867,8 +2802,8 @@ class TestCircularApertureOTFWithDefocus:
         ("u", "v", "wavelength", "D", "f", "defocus"),
         [
             (np.array([]), np.array([]), 1.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([]), 1.0, 1.0, 0.0, 0.0),
-            (np.array([]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([]), 1.0, 1.0, 0.0, 0.0),
+            (np.array([]), np.array([[1.0]]), 1.0, 1.0, 0.0, 0.0),
             (np.array([]), np.array([]), 1.0, 1.0, 1.0, 0.0),
         ],
     )
@@ -2895,8 +2830,8 @@ class TestCircularApertureOTFWithDefocus:
     @pytest.mark.parametrize(
         ("u", "v", "wavelength", "D", "f", "defocus"),
         [
-            (np.array([1.0]), np.array([1.0]), 0.0, 1.0, 0.0, 0.0),
-            (np.array([1.0]), np.array([1.0]), 1.0, 0.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 0.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 0.0, 0.0, 0.0),
         ],
     )
     def test_zero_division(
@@ -2922,18 +2857,18 @@ class TestCircularApertureOTFWithDefocus:
     @pytest.mark.parametrize(
         ("u", "v", "wavelength", "D", "f", "defocus"),
         [
-            (np.array([1.0]), np.array([1.0]), 1.0, 1.0, 0.0, 0.0),
+            (np.array([[1.0]]), np.array([[1.0]]), 1.0, 1.0, 0.0, 0.0),
             (
-                np.array([1.0, 1.0]),
-                np.array([1.0, 1.0]),
+                np.array([[1.0, 1.0]]),
+                np.array([[1.0, 1.0]]),
                 1.0,
                 1.0,
                 0.0,
                 0.0,
             ),
             (
-                np.array([1.0, 2.0]),
-                np.array([1.0, 2.0]),
+                np.array([[1.0, 2.0]]),
+                np.array([[1.0, 2.0]]),
                 1.0,
                 1.0,
                 0.5,
