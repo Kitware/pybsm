@@ -1,0 +1,18 @@
+0.14.0
+======
+
+* Optomized OTF functions and ``ImageSimulator`` to improve execution time.
+
+* Added a flag for explicitly enabling/disabling image resampling based on GSD.
+
+* Updated OTF tests to reflect changes in OTF functions.
+
+* Removed the upper bound on altitude for the atmospheric database.
+
+* Added two tests to check the bounds on the ground range for the atmospheric database.
+
+* Added two tests to check the bounds on the altitude for the atmospheric database.
+
+* Exposed ``qe``, ``qe_wavelengths``, ``filter_kernel`` and ``frame_stacks``
+
+* FIX: ``Sensor`` test now correctly compares ``opt_trans_wavelengths``.
