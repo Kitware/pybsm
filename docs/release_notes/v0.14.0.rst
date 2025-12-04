@@ -1,6 +1,13 @@
 0.14.0
 ======
 
+This release focuses on performance optimization of OTF functions using numba,
+adds GSD-based image resampling controls, removes altitude limits on the
+atmospheric database, and exposes additional sensor parameters.
+
+Updates / New Features
+----------------------
+
 * Optomized OTF functions and ``ImageSimulator`` to improve execution time.
 
 * Added a flag for explicitly enabling/disabling image resampling based on GSD.
@@ -15,4 +22,7 @@
 
 * Exposed ``qe``, ``qe_wavelengths``, ``filter_kernel`` and ``frame_stacks``
 
-* FIX: ``Sensor`` test now correctly compares ``opt_trans_wavelengths``.
+Fixes
+-----
+
+* ``Sensor`` test now correctly compares ``opt_trans_wavelengths``.
