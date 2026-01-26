@@ -309,13 +309,13 @@ class ImageSimulator(ABC):
         dx_in = gsd / self.slant_range
 
         dx_out = self._calculate_dx_out(gsd=gsd)
-        new_y, new_x = resampled_dimensions(img_hw=(image.shape[0], image.shape[1]), dx_in=dx_in, dx_out=dx_out)
+        new_x, new_y = resampled_dimensions(img_hw=(image.shape[0], image.shape[1]), dx_in=dx_in, dx_out=dx_out)
         mode = Image.Resampling.BILINEAR
         if image.dtype == np.uint8:
             if image.ndim == 3:
-                sim_img = np.array(Image.fromarray(image).resize((new_x, new_y), mode))
+                sim_img = np.array(Image.fromarray(image).resize((new_y, new_x), mode))
             else:
-                sim_img = np.array(Image.fromarray(image, "L").resize((new_x, new_y), mode))
+                sim_img = np.array(Image.fromarray(image, "L").resize((new_y, new_x), mode))
         else:
             # for floating point images, we need to handle each channel as a separate
             # single-channel PIL floating point image
@@ -325,7 +325,7 @@ class ImageSimulator(ABC):
                 image = image[..., None]
             for i in range(shape[2]):
                 pil_img = Image.fromarray(image[..., i].astype("f"), "F")
-                sim_img[..., i] = np.array(pil_img.resize((new_y, new_x), mode))
+                sim_img[..., i] = np.array(pil_img.resize((new_x, new_y), mode))
             sim_img = np.squeeze(sim_img)
 
         return sim_img
