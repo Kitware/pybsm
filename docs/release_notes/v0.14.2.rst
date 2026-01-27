@@ -1,0 +1,6 @@
+0.14.2
+======
+
+----------------------
+
+* Updated numba dependency to support Python 3.13 by using version-dependent
