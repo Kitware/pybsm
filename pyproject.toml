@@ -47,7 +47,10 @@ scipy = [
     {version = ">=1.14.1", python = ">=3.13" }, # scipy==1.14.1 is the first release supporting python 3.13
 ]
 setuptools = ">=78.1.1"  # CVE-2025-47273
-numba = "^0.62.1"
+numba = [
+    {version = "^0.62.1", python = "<3.13" },
+    {version = ">=0.63.0", python = ">=3.13" },  # numba==0.63.0 is the first release supporting python 3.13
+]
 
 # :auto linting:
 # Linting
