@@ -1,6 +1,12 @@
 0.14.2
 ======
 
+A quick hotfix to allow numba on ``py3.13``, which was failing downstream.
+
+Updates / New Features
 ----------------------
+
+Fixes
+-----
 
 * Updated numba dependency to support Python 3.13 by using version-dependent
