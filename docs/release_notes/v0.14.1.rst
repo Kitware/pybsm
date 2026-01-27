@@ -1,0 +1,12 @@
+0.14.1
+======
+
+A quick hotfix for a flipped ``x, y`` in ``image_simulator.apply_resampling``.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Swapped x and y shape axis for new images in ``image_simulator.apply_resampling``.
