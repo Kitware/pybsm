@@ -25,7 +25,7 @@ classifiers = [
 ]
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
-version = "0.14.1"
+version = "0.14.2"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
@@ -47,7 +47,10 @@ scipy = [
     {version = ">=1.14.1", python = ">=3.13" }, # scipy==1.14.1 is the first release supporting python 3.13
 ]
 setuptools = ">=78.1.1"  # CVE-2025-47273
-numba = "^0.62.1"
+numba = [
+    {version = "^0.62.1", python = "<3.13" },
+    {version = ">=0.63.0", python = ">=3.13" },  # numba==0.63.0 is the first release supporting python 3.13
+]
 
 # :auto linting:
 # Linting
