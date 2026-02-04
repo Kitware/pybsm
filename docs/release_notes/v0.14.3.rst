@@ -1,0 +1,4 @@
+0.14.3
+======
+
+* Ensured ``ImageSimulator`` does not squeeze away single-pixel image dimensions.
