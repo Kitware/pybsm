@@ -289,6 +289,29 @@ class ImageSimulator(ABC):
 
         return dx_out
 
+    def _apply_resampling_uint8(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:
+        from PIL import Image
+
+        array_mode = None if image.ndim == 3 else "L"
+        return np.array(Image.fromarray(image, array_mode).resize(new_wh, mode))
+
+    def _apply_resampling_float(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:
+        from PIL import Image
+
+        # for floating point images, we need to handle each channel as a separate
+        # single-channel PIL floating point image
+        shape = (new_wh[1], new_wh[0], 3 if image.ndim == 3 else 1)
+        sim_img = np.empty(shape, dtype=image.dtype)
+        if image.ndim == 2:
+            image = image[..., None]
+        for i in range(shape[2]):
+            pil_img = Image.fromarray(image[..., i].astype("f"), "F")
+            sim_img[..., i] = np.array(pil_img.resize(new_wh, mode))
+        if sim_img.shape[-1] == 1:
+            sim_img = np.squeeze(sim_img, axis=-1)
+
+        return sim_img
+
     def apply_resampling(self, image: np.ndarray, gsd: float) -> np.ndarray:
         """Apply resampling based on sensor parameters.
 
@@ -307,28 +330,12 @@ class ImageSimulator(ABC):
         from pybsm.otf.functional import resampled_dimensions
 
         dx_in = gsd / self.slant_range
-
         dx_out = self._calculate_dx_out(gsd=gsd)
-        new_x, new_y = resampled_dimensions(img_hw=(image.shape[0], image.shape[1]), dx_in=dx_in, dx_out=dx_out)
+        new_wh = resampled_dimensions(img_hw=(image.shape[0], image.shape[1]), dx_in=dx_in, dx_out=dx_out)
         mode = Image.Resampling.BILINEAR
         if image.dtype == np.uint8:
-            if image.ndim == 3:
-                sim_img = np.array(Image.fromarray(image).resize((new_y, new_x), mode))
-            else:
-                sim_img = np.array(Image.fromarray(image, "L").resize((new_y, new_x), mode))
-        else:
-            # for floating point images, we need to handle each channel as a separate
-            # single-channel PIL floating point image
-            shape = (new_y, new_x, 3 if image.ndim == 3 else 1)
-            sim_img = np.empty(shape, dtype=image.dtype)
-            if image.ndim == 2:
-                image = image[..., None]
-            for i in range(shape[2]):
-                pil_img = Image.fromarray(image[..., i].astype("f"), "F")
-                sim_img[..., i] = np.array(pil_img.resize((new_x, new_y), mode))
-            sim_img = np.squeeze(sim_img)
-
-        return sim_img
+            return self._apply_resampling_uint8(image=image, new_wh=new_wh, mode=mode)
+        return self._apply_resampling_float(image=image, new_wh=new_wh, mode=mode)
 
     def apply_noise(self, image: np.ndarray) -> np.ndarray:
         """Apply noise if enabled.
