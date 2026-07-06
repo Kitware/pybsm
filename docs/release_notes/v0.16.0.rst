@@ -1,0 +1,33 @@
+0.16.0
+======
+
+Adds a way to run ``ImageSimulator`` in reverse, turning simulated output back
+into reflectance or pixel values, along with clearer rules for interpolated
+``Scenario`` inputs, a couple of hang fixes, and dependency updates for security.
+
+Updates / New Features
+----------------------
+
+* Added a reverse pass to ``ImageSimulator``. The new
+  ``photoelectrons_to_reflectance`` and ``photoelectrons_to_pixels`` methods
+  take the output of ``simulate_image`` and turn it back into reflectance or
+  display pixels. The result accounts for the sensor's calibration, so the
+  same scene shot by two different sensors comes out comparable.
+  ``photoelectrons_to_pixels`` also has a ``mode="minmax"`` option that
+  stretches each image on its own. That is handy for eyeballing a single
+  scene, but avoid it when you need to compare across sensors.
+
+* Made the interpolation rules for ``Scenario`` clearer. With ``interp=True``,
+  ``altitude`` and ``ground_range`` can be any value inside the MODTRAN
+  tables, not just the exact points listed. With ``interp=False`` they still
+  have to match an exact entry.
+
+* Updated dependencies to clear a few security advisories.
+
+Fixes
+-----
+
+* ``apply_convolution`` no longer hangs on a flat, uniform-gray image.
+
+* ``apply_noise`` now raises a ``RuntimeError`` with a helpful message when the
+  input contains ``NaN`` or ``Inf`` values, instead of hanging quietly.
