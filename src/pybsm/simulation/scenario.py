@@ -120,8 +120,21 @@ class Scenario:
             (e.g. at h = 1 m) used to calculate the turbulence profile; the
             default, 1.7e-14, is the HV 5/7 profile value
         :parameter interp:
-            A flag to indicate whether atmospheric interpolation should be used.
-            Defaults to False.
+            Whether atmospheric interpolation should be used. Defaults to False.
+
+            When ``interp=False`` (default), ``altitude`` and ``ground_range``
+            must be exact MODTRAN database entries (see the lists in the
+            ``altitude`` and ``ground_range`` parameter docstrings above).
+
+            When ``interp=True``, ``altitude`` may be any value between the
+            smallest and largest tabulated altitudes, and ``ground_range``
+            may be any value between 0 and the largest tabulated
+            ``ground_range`` for the chosen altitude (the upper bound is
+            altitude-dependent — see the ``ground_range`` parameter docstring
+            above). The atmospheric grid is bilinearly interpolated by
+            ``load_database_atmosphere``. Values outside those limits still
+            raise — interpolation only fills the gaps between tabulated
+            entries, it does not extrapolate beyond them.
         """
         self.name = name
         self._ihaze = ihaze

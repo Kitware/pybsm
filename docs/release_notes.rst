@@ -28,3 +28,4 @@ Release Notes
    release_notes/v0.14.2
    release_notes/v0.14.3
    release_notes/v0.15.0
+   release_notes/v0.16.0

@@ -16,6 +16,7 @@ Maintainer: Kitware, Inc. <nrtk@kitware.com>
 from __future__ import annotations
 
 import copy
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Literal, cast
@@ -94,7 +95,7 @@ class ImageSimulator(ABC):
             ValueError: If mtf_wavelengths is empty or mtf_weights is empty.
         """
         if use_reflectance and reflectance_range is None:
-            raise ValueError("Must provide refl_values when use_reflectance = True")
+            raise ValueError("Must provide reflectance_range when use_reflectance=True")
 
         if reflectance_range is not None:
             if reflectance_range.shape[0] != 2:
@@ -115,6 +116,10 @@ class ImageSimulator(ABC):
         # Store deep copies to prevent external mutation affecting us
         self._sensor = copy.deepcopy(sensor)
         self._scenario = copy.deepcopy(scenario)
+        # Sensor and scenario are set-once (no public setter, deep-copied above),
+        # so the PSF cache key never changes — compute the hash once instead of
+        # rehashing on every _get_psf_cached lookup.
+        self._config_hash = hash((hash(self._sensor), hash(self._scenario)))
 
         self._use_reflectance = use_reflectance
         self._rng = np.random.default_rng(rng)
@@ -139,6 +144,11 @@ class ImageSimulator(ABC):
 
             if self._use_reflectance:
                 self._reflect_to_photoelectrons: Callable = interpolate.interp1d(ref, pe)
+                self._init_inverse_coefs(ref, pe)
+                # Once-per-instance warning flags reset only at __init__,
+                # never on cache rebuild.
+                self._inverse_clip_warned: bool = False
+                self._inverse_fallback_warned: bool = False
 
             wavelengths = spectral_weights[0]
             weights = spectral_weights[1]
@@ -151,6 +161,9 @@ class ImageSimulator(ABC):
         else:
             self._mtf_wavelengths: np.ndarray = np.asarray(mtf_wavelengths)
             self._mtf_weights: np.ndarray = np.asarray(mtf_weights)
+
+        # Always-readable last-call clip-fraction state, regardless of `use_reflectance`.
+        self._last_clip_fraction: tuple[float, float] = (0.0, 0.0)
 
         # Pre-compute common derived values
         self._altitude = altitude if altitude else self._scenario.altitude
@@ -179,18 +192,40 @@ class ImageSimulator(ABC):
             psf: Point spread function kernel.
 
         Returns:
-            Tuple of (true_img, blur_img) where true_img is the image converted to
-            photoelectrons and blur_img is the convolved result.
+            Tuple of (true_img, blur_img) where ``true_img`` is the image
+            converted to photoelectrons when ``use_reflectance=True``
+            (otherwise passed through), and ``blur_img`` is the convolved
+            result.
+
+        Note:
+            With ``use_reflectance=True`` the input pixel range is first
+            mapped to reflectance and then to photoelectrons. To go the other
+            way (e.g. to display the result), use
+            ``photoelectrons_to_reflectance`` or ``photoelectrons_to_pixels``.
+
+            A uniform input image (``image.min() == image.max()``) cannot be
+            stretched to the reflectance range, so every pixel is mapped to
+            the midpoint of ``reflectance_range``. This keeps the result
+            finite, but a uniform input does *not* round-trip to its
+            original pixel value — its output depends on the sensor
+            configuration, not on the input.
         """
         true_img = image
         if self._use_reflectance:
             p1, p2 = image.min(), image.max()
             r1, r2 = self._reflectance_range
-            scale = (r2 - r1) / (p2 - p1)
             reflectance_img = true_img.astype(np.float64)
-            np.subtract(reflectance_img, p1, out=reflectance_img)
-            np.multiply(reflectance_img, scale, out=reflectance_img)
-            np.add(reflectance_img, r1, out=reflectance_img)
+            if p2 == p1:
+                # Uniform input: scale is undefined. Map every pixel to the
+                # midpoint of the reflectance range so the forward path stays
+                # finite (without this, scale -> inf and NaN propagates into
+                # the FFT, hanging the simulator on synthetic flat inputs).
+                reflectance_img.fill((float(r1) + float(r2)) / 2.0)
+            else:
+                scale = (r2 - r1) / (p2 - p1)
+                np.subtract(reflectance_img, p1, out=reflectance_img)
+                np.multiply(reflectance_img, scale, out=reflectance_img)
+                np.add(reflectance_img, r1, out=reflectance_img)
             np.clip(reflectance_img, 0, 1, out=reflectance_img)
             true_img = self._reflect_to_photoelectrons(reflectance_img)
 
@@ -345,9 +380,24 @@ class ImageSimulator(ABC):
 
         Returns:
             Image with noise applied if add_noise is True, otherwise original image.
+
+        Raises:
+            RuntimeError: If ``image`` contains any ``NaN`` or ``Inf`` value
+                while ``add_noise`` is enabled. Non-finite inputs are not
+                supported; the error message reports the counts and shape
+                so the caller can locate them upstream.
         """
         if not self.add_noise:
             return image
+
+        if not np.all(np.isfinite(image)):
+            raise RuntimeError(
+                f"ImageSimulator.apply_noise: non-finite image "
+                f"({int(np.isnan(image).sum())} NaN, "
+                f"{int(np.isinf(image).sum())} Inf, shape={image.shape}). "
+                f"Clean or filter non-finite values out of the input "
+                f"before calling apply_noise.",
+            )
 
         # poisson_noisy_img = self._rng.poisson(lam=image)
         # return self._rng.normal(poisson_noisy_img, self._g_noise)
@@ -366,7 +416,22 @@ class ImageSimulator(ABC):
 
         Returns:
             Tuple of (true_img, blur_img, noisy_img) where noisy_img is None if
-            add_noise is False.
+            add_noise is False. When ``use_reflectance=True``, all three arrays
+            are in photoelectron units; pass the chosen array through
+            ``photoelectrons_to_pixels`` to recover display pixels. When
+            ``use_reflectance=False``, the arrays remain in the input's native
+            pixel units (with Poisson noise applied to those values directly);
+            ``photoelectrons_to_pixels`` will route through the sensor's ADC
+            model.
+
+        Note:
+            One simulator instance can be reused across input frames of
+            different shapes — the PSF cache and noise kernels do not
+            depend on input shape.
+
+            If a pixel of the input is non-finite, ``apply_noise`` raises
+            ``RuntimeError`` instead of hanging silently. See ``apply_noise``
+            for the rationale.
         """
         psf = self._get_psf_cached(gsd=gsd, use_default=(gsd is None))
 
@@ -379,6 +444,360 @@ class ImageSimulator(ABC):
             noisy_img = self.apply_noise(blur_img)
 
         return true_img, blur_img, noisy_img
+
+    def photoelectrons_to_reflectance(
+        self,
+        photoelectrons: np.ndarray,
+        *,
+        clip_to_unit: bool = True,
+    ) -> np.ndarray:
+        """Convert photoelectrons back to reflectance using the cached inverse formula.
+
+        Computes ``ref = (pe - B) / A`` where ``(A, B)`` are cached at
+        ``__init__`` from the first and last points of the forward grid.
+
+        Precision: the inverse matches the forward map to machine
+        precision (~1e-13 relative) only when the forward map is linear
+        in reflectance — i.e. ``pe = A * ref + B`` for some constants
+        ``A`` and ``B``. This is the case for pyBSM's built-in forward
+        chain. If a caller replaces the forward map with a non-linear
+        one, the endpoint-fit ``(A, B)`` may not match interior grid
+        points and residuals can be arbitrarily large.
+
+        The method detects the most common non-linear case — a
+        non-monotonic forward map (e.g. saturation flattening the tail)
+        — and emits a once-per-instance warning. A smooth non-linear
+        monotonic forward map will silently degrade precision; that case
+        is caller responsibility.
+
+        Args:
+            photoelectrons: Photoelectron array of any shape. Float-coerced
+                internally.
+            clip_to_unit: If True (default), clip the output to ``[0, 1]``.
+                Photoelectron inputs that fall outside the forward grid
+                bounds map to reflectance values outside ``[0, 1]`` without
+                this clip.
+
+        Returns:
+            Reflectance array of the same shape as ``photoelectrons``, dtype
+            ``float64``.
+
+        Raises:
+            ValueError: If ``use_reflectance=False``. This method requires
+                reflectance mode; for raw-pixel mode use
+                ``photoelectrons_to_pixels`` (the ADC path).
+            ValueError: If the sensor's radiometric calibration is flat —
+                every reflectance produces the same photoelectron count,
+                so the inverse is undefined. Check the sensor/scenario
+                inputs to ``ImageSimulator``.
+        """
+        if not self._use_reflectance:
+            raise ValueError(
+                "ImageSimulator.photoelectrons_to_reflectance: requires "
+                "use_reflectance=True; for raw-pixel mode use "
+                "photoelectrons_to_pixels (ADC path).",
+            )
+        # Non-monotonic forward grid means the endpoint-fit (A, B) does not
+        # match interior points; warn once but still return the endpoint-fit
+        # result. (The pixel-domain path falls back to ADC in this case;
+        # here there is no fallback, so the caller is responsible.)
+        if not self._forward_is_monotonic:
+            self._warn_inverse_precision_degraded(reason="forward_nonmonotonic")
+        affine_a, affine_b = self._affine_pe_coefs
+        if affine_a == 0.0:
+            raise ValueError(
+                "ImageSimulator.photoelectrons_to_reflectance: cannot invert "
+                "because the sensor's radiometric calibration is flat — "
+                "every scene reflectance maps to the same photoelectron "
+                "count, so the input is not recoverable. Check the sensor "
+                "and scenario configuration passed to ImageSimulator.",
+            )
+        ref = (np.asarray(photoelectrons, dtype=np.float64) - affine_b) / affine_a
+        if clip_to_unit:
+            np.clip(ref, 0.0, 1.0, out=ref)
+        return ref
+
+    def photoelectrons_to_pixels(
+        self,
+        photoelectrons_img: np.ndarray,
+        p1: float = 0.0,
+        p2: float = 255.0,
+        *,
+        mode: Literal["radiometric", "minmax"] = "radiometric",
+    ) -> np.ndarray:
+        """Convert a photoelectron array into display pixels in ``[p1, p2]``.
+
+        Two mapping modes:
+
+        - ``mode="radiometric"`` (default): sensor-calibrated. With
+          ``use_reflectance=True``, the forward photoelectron-to-reflectance
+          map is inverted analytically and reflectance is then remapped into
+          ``[p1, p2]``. With ``use_reflectance=False``, the same pe array is
+          digitized through the sensor's ADC (well capacity + bit-depth
+          quantization) before being remapped. Either way, the output
+          depends on the sensor, not on the per-image min/max — so two
+          sensors viewing the same scene produce comparable pixels. Choose
+          this for cross-sensor comparison or comparison against a reference.
+        - ``mode="minmax"``: per-image histogram stretch into ``[p1, p2]``.
+          Ignores the sensor entirely. Use this for side-by-side qualitative
+          comparisons (e.g. PSF / blur kernels on a fixed scene) where
+          radiometric fidelity is irrelevant. **Not** suitable for
+          cross-sensor comparison.
+
+        Args:
+            photoelectrons_img: Photoelectron array.
+            p1: Lower bound of the output pixel range. Default 0.0.
+            p2: Upper bound of the output pixel range. Default 255.0.
+            mode: ``"radiometric"`` (default) or ``"minmax"``. See above for
+                the trade-offs.
+
+        Returns:
+            Pixel array of the same shape as ``photoelectrons_img``, dtype
+            ``float64``. The caller is responsible for any final ``uint8``
+            cast.
+
+        Raises:
+            ValueError: If the output range is not strictly ascending
+                (``p1 >= p2``), or if ``mode`` is not one of
+                ``"radiometric"`` / ``"minmax"``.
+            RuntimeError: If ``photoelectrons_img`` contains ``NaN`` or
+                ``Inf`` — fail fast rather than silently cast non-finite
+                values to 0.
+
+        Note:
+            On the radiometric path, photoelectrons outside the forward
+            grid bounds are clipped to those bounds. A once-per-instance
+            warning fires when more than 1% of the input is clipped. The
+            output is also clipped to ``[p1, p2]`` so a subsequent
+            ``uint8`` cast does not wrap around.
+        """
+        self._validate_pe_to_pixels_args(photoelectrons_img, p1, p2, mode)
+
+        # Empty input: short-circuit before any per-image min/max or
+        # clip-fraction division by size.
+        if photoelectrons_img.size == 0:
+            return np.empty(photoelectrons_img.shape, dtype=np.float64)
+
+        if mode == "minmax":
+            return self._photoelectrons_to_pixels_minmax(photoelectrons_img, p1, p2)
+        if self._use_reflectance:
+            return self._photoelectrons_to_pixels_radiometric(photoelectrons_img, p1, p2)
+        return self._adc_photoelectrons_to_pixels(photoelectrons_img, out_range=(p1, p2))
+
+    @staticmethod
+    def _validate_pe_to_pixels_args(
+        photoelectrons_img: np.ndarray,
+        p1: float,
+        p2: float,
+        mode: str,
+    ) -> None:
+        """Raise on bad inputs to ``photoelectrons_to_pixels`` before any computation.
+
+        Order of checks matches the public method's documented contract:
+        output range, mode literal, then non-finite values.
+        """
+        if p1 >= p2:
+            raise ValueError(
+                f"ImageSimulator.photoelectrons_to_pixels: output range must be strictly ascending; "
+                f"got p1={p1!r}, p2={p2!r}.",
+            )
+        if mode not in {"radiometric", "minmax"}:
+            raise ValueError(
+                f"ImageSimulator.photoelectrons_to_pixels: mode must be 'radiometric' or 'minmax'; got mode={mode!r}.",
+            )
+        if not np.all(np.isfinite(photoelectrons_img)):
+            raise RuntimeError(
+                f"ImageSimulator.photoelectrons_to_pixels: non-finite "
+                f"photoelectrons_img ({int(np.isnan(photoelectrons_img).sum())} NaN, "
+                f"{int(np.isinf(photoelectrons_img).sum())} Inf, "
+                f"shape={photoelectrons_img.shape}). Clean or filter "
+                f"non-finite values out of the input before calling "
+                f"photoelectrons_to_pixels.",
+            )
+
+    def _photoelectrons_to_pixels_minmax(
+        self,
+        photoelectrons_img: np.ndarray,
+        p1: float,
+        p2: float,
+    ) -> np.ndarray:
+        """Stretch ``photoelectrons_img`` linearly into ``[p1, p2]`` from its own min/max.
+
+        Sensor-agnostic. Uniform input maps every pixel to the midpoint of
+        ``[p1, p2]`` so the result stays finite (matches the uniform-input
+        convention in ``apply_convolution``).
+        """
+        pe_min = float(photoelectrons_img.min())
+        pe_max = float(photoelectrons_img.max())
+        if pe_max == pe_min:
+            return np.full(photoelectrons_img.shape, (p1 + p2) / 2.0, dtype=np.float64)
+        pixels = (photoelectrons_img.astype(np.float64) - pe_min) / (pe_max - pe_min) * (p2 - p1) + p1
+        return np.clip(pixels, p1, p2)
+
+    def _photoelectrons_to_pixels_radiometric(
+        self,
+        photoelectrons_img: np.ndarray,
+        p1: float,
+        p2: float,
+    ) -> np.ndarray:
+        """Apply the inverse formula and remap reflectance into ``[p1, p2]``.
+
+        If the forward grid is non-monotonic (saturation flattened the tail),
+        the inverse formula is not reliable; fall back to the ADC path and
+        warn once. Otherwise: record the clip fraction (warning once if it
+        exceeds 1%), clip to the forward grid endpoints, invert to
+        reflectance, and remap from ``reflectance_range`` into ``[p1, p2]``.
+        """
+        if not self._forward_is_monotonic:
+            self._warn_inverse_fallback(reason="forward_nonmonotonic")
+            return self._adc_photoelectrons_to_pixels(photoelectrons_img, out_range=(p1, p2))
+
+        self._record_clip_fraction(photoelectrons_img)
+        clipped = np.clip(photoelectrons_img, self._fwd_y_min, self._fwd_y_max)
+        ref = self.photoelectrons_to_reflectance(clipped, clip_to_unit=True)
+        r1, r2 = float(self._reflectance_range[0]), float(self._reflectance_range[1])
+        pixels = (ref - r1) / (r2 - r1) * (p2 - p1) + p1
+        # ref in [0, 1] but [r1, r2] may be a sub-interval — the linear remap
+        # can exit [p1, p2]. Final clip prevents silent uint8-cast wraparound.
+        return np.clip(pixels, p1, p2)
+
+    def _record_clip_fraction(self, photoelectrons_img: np.ndarray) -> None:
+        """Compute the clip fraction, store it, and warn once if it exceeds 1%."""
+        n_total = photoelectrons_img.size
+        frac_lo = float((photoelectrons_img < self._fwd_y_min).sum()) / n_total
+        frac_hi = float((photoelectrons_img > self._fwd_y_max).sum()) / n_total
+        self._last_clip_fraction = (frac_lo, frac_hi)
+        if (frac_lo > 0.01 or frac_hi > 0.01) and not self._inverse_clip_warned:
+            warnings.warn(
+                f"ImageSimulator.photoelectrons_to_pixels: >1% of pixels "
+                f"clipped to forward-table bounds "
+                f"(low={frac_lo:.3%}, high={frac_hi:.3%}). "
+                f"Physically correct (well floor/ceiling) but worth "
+                f"investigating if unexpected. Once-per-instance.",
+                UserWarning,
+                stacklevel=4,
+            )
+            self._inverse_clip_warned = True
+
+    def _adc_photoelectrons_to_pixels(
+        self,
+        photoelectrons: np.ndarray,
+        *,
+        out_range: tuple[float, float] = (0.0, 255.0),
+    ) -> np.ndarray:
+        """Quantize photoelectrons through the sensor's ADC, then map to pixels.
+
+        Models: ``pe -> clipped to well capacity -> digitized to bit_depth
+        levels -> linearly remapped to out_range``. The ADC truncates
+        (``floor``), not rounds.
+
+        Args:
+            photoelectrons: Photoelectron array.
+            out_range: Inclusive lower/upper bounds for the output pixels.
+
+        Returns:
+            Pixel array of the same shape as ``photoelectrons``, dtype
+            ``float64``.
+
+        Raises:
+            ValueError: If the sensor's effective well capacity
+                (``max_n * max_well_fill``) is non-positive, if
+                ``bit_depth`` is below 1, or if ``out_range`` is not
+                strictly ascending.
+        """
+        p_lo, p_hi = out_range
+        if p_lo >= p_hi:
+            raise ValueError(
+                f"ImageSimulator._adc_photoelectrons_to_pixels: out_range must be "
+                f"strictly ascending; got out_range={out_range!r}.",
+            )
+        well_cap = float(self._sensor.max_n) * float(self._sensor.max_well_fill)
+        if well_cap <= 0.0:
+            raise ValueError(
+                f"ImageSimulator._adc_photoelectrons_to_pixels: degenerate sensor well capacity "
+                f"(max_n={self._sensor.max_n!r}, "
+                f"max_well_fill={self._sensor.max_well_fill!r}).",
+            )
+        bit_depth_int = int(self._sensor.bit_depth)
+        if bit_depth_int < 1:
+            raise ValueError(
+                f"ImageSimulator._adc_photoelectrons_to_pixels: bit_depth must be >= 1, "
+                f"got {self._sensor.bit_depth!r}.",
+            )
+        adc_max = (2**bit_depth_int) - 1
+        pe_clipped = np.clip(np.asarray(photoelectrons, dtype=np.float64), 0.0, well_cap)
+        dn = np.floor((pe_clipped / well_cap) * adc_max)
+        pixels = (dn / adc_max) * (p_hi - p_lo) + p_lo
+        return np.clip(pixels, p_lo, p_hi)
+
+    def _init_inverse_coefs(self, ref: np.ndarray, pe: np.ndarray) -> None:
+        """Compute and store the inverse coefficients and the monotonicity flag.
+
+        ``A`` and ``B`` are taken from the line through the first and last
+        grid points. For pyBSM's built-in forward chain this line coincides
+        with every interior grid point (reflectance enters the radiance
+        integral only as a scalar multiplier), so the inverse is one
+        subtract-divide per pixel instead of a per-call interpolation. The
+        monotonicity flag is computed alongside so both inverse entry points
+        can short-circuit on it without rescanning the forward grid.
+
+        Set once at ``__init__``. Tests that swap the forward map post-init
+        must call this explicitly to keep the derived attrs consistent.
+
+        Args:
+            ref: Reflectance grid array.
+            pe: Photoelectron grid array, same length as ``ref``.
+        """
+        self._fwd_y_min = float(pe[0])
+        self._fwd_y_max = float(pe[-1])
+        affine_a = float(pe[-1] - pe[0]) / float(ref[-1] - ref[0])
+        affine_b = float(pe[0]) - affine_a * float(ref[0])
+        self._affine_pe_coefs = (affine_a, affine_b)
+        self._forward_is_monotonic = bool(np.all(np.diff(pe) > 0))
+
+    def _warn_inverse_fallback(self, *, reason: str) -> None:
+        """Emit a once-per-instance warning when falling back to ADC quantization.
+
+        Args:
+            reason: Short tag describing the fallback trigger; embedded in the
+                emitted warning text. Currently only ``"forward_nonmonotonic"``.
+        """
+        if self._inverse_fallback_warned:
+            return
+        warnings.warn(
+            f"ImageSimulator.photoelectrons_to_pixels: the inverse formula "
+            f"cannot be used (reason={reason!r}), so output is falling back "
+            f"to ADC quantization. Outputs from this simulator may no "
+            f"longer be comparable to those from other sensors. "
+            f"Once-per-instance.",
+            UserWarning,
+            stacklevel=4,
+        )
+        self._inverse_fallback_warned = True
+
+    def _warn_inverse_precision_degraded(self, *, reason: str) -> None:
+        """Emit a once-per-instance warning when the inverse precision claim is degraded.
+
+        Shares ``_inverse_fallback_warned`` with ``_warn_inverse_fallback``, so
+        the user sees at most one inverse-degradation warning per simulator
+        instance regardless of which entry point (pixels or reflectance)
+        detects the problem first.
+
+        Args:
+            reason: Short tag describing the trigger. Currently only
+                ``"forward_nonmonotonic"`` (saturated forward grid).
+        """
+        if self._inverse_fallback_warned:
+            return
+        warnings.warn(
+            f"ImageSimulator.photoelectrons_to_reflectance: the forward map "
+            f"is non-monotonic (reason={reason!r}), so the inverse formula "
+            f"may have errors well above machine precision at interior "
+            f"points. Once-per-instance.",
+            UserWarning,
+            stacklevel=3,
+        )
+        self._inverse_fallback_warned = True
 
     @property
     def mtf_wavelengths(self) -> np.ndarray:
@@ -436,8 +855,8 @@ class ImageSimulator(ABC):
         pass
 
     def _get_config_hash(self) -> int:
-        """Get hash representing the current sensor/scenario configuration."""
-        return hash((hash(self.sensor), hash(self.scenario)))
+        """Return the cached sensor/scenario configuration hash (set once at ``__init__``)."""
+        return self._config_hash
 
     def _get_psf(self, gsd: float) -> np.ndarray:
         from pybsm.otf.functional import otf_to_psf
