@@ -1,0 +1,13 @@
+0.16.1
+======
+
+This patch relaxes overly restrictive NumPy requirements, allowing pyBSM to be
+installed alongside packages that require NumPy 2.
+
+Updates / New Features
+----------------------
+
+Fixes
+-----
+
+* Allowed NumPy 2 on Python 3.10 through 3.12.
