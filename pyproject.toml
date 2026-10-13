@@ -26,7 +26,7 @@ classifiers = [
 ]
 # :auto package-meta:
 # package-specific meta, don't put this in "generated package-meta"
-version = "0.16.0"
+version = "0.16.1"
 authors = ["Kitware, Inc. <nrtk@kitware.com>"]
 description = "pyBSM is a Python-based tool for sensor modeling. It provides common components useful for simulating the image formation process through different imaging systems."
 
@@ -35,22 +35,24 @@ description = "pyBSM is a Python-based tool for sensor modeling. It provides com
 python = ">=3.10"
 # :auto python-version:
 
-# Hinge because:
+# Keep separate Python ranges so Poetry can select compatible NumPy versions.
 # https://stackoverflow.com/questions/77431252/why-doesnt-poetry-select-the-good-version-of-my-dependency
+# NumPy ranges match SMQTK; NumPy 1 and 2 are supported on
+# Python 3.10–3.12. Numba supplies its own NumPy compatibility bounds.
 numpy = [
-    {version = ">=1.22,<2.0", python = "<3.12" }, # CVE-2021-34141
-    {version = "^1.26", python = ">=3.12,<3.13" },  # numpy==1.26 is the first release supporting python 3.12
-    {version = ">=2.1", python = ">=3.13" } # numpy==2.1 is the first release supporting python 3.13
+    {version = ">=1.23.5", python = "<3.13" }, # Matches SMQTK on Python 3.10–3.12
+    {version = ">=2.1", python = ">=3.13,<3.14" }, # Python 3.13 wheels
+    {version = ">=2.3.2", python = ">=3.14" } # Python 3.14 wheels
 ]
 matplotlib = ">=3.5.2"
 scipy = [
     {version = ">=1.10.0", python = "<3.13" },   # CVE-2023-25399
     {version = ">=1.14.1", python = ">=3.13" }, # scipy==1.14.1 is the first release supporting python 3.13
 ]
-setuptools = ">=78.1.1"  # CVE-2025-47273
+setuptools = ">=83.0.0"  # CVE-2026-59890
 numba = [
     {version = "^0.62.1", python = "<3.13" },
-    {version = ">=0.63.0", python = ">=3.13" },  # numba==0.63.0 is the first release supporting python 3.13
+    {version = ">=0.63.0", python = ">=3.13" },  # Numba 0.63 adds Python 3.14 support
 ]
 
 # :auto linting:
@@ -92,7 +94,7 @@ pytest = ">=7.2.0"
 pytest-cov = ">=4.0.0"
 syrupy = ">=4.0.0,<5.0.0" # Update to v5 will require changes to conftest.py
 # Jupyter notebook testing
-notebook = ">=7.2.2"
+notebook = ">=7.6.3"
 papermill = ">=2.4.0"
 pyright = {version=">=1.1.320",extras=["nodejs"]}
 # :auto tests:
