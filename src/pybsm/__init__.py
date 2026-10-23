@@ -1,4 +1,4 @@
-"""Define the nrtk package"""
+"""Define the pybsm package."""
 
 import importlib.metadata
 

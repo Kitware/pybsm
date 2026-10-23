@@ -1,0 +1,23 @@
+verbose = "warn"
+format = "markdown"
+mode = "color"
+no_progress = true
+max_concurrency = 16
+max_retries = 3
+retry_wait_time = 2
+include_mail = false
+extensions = ["md", "html", "txt", "py"]
+
+exclude_path = [
+  "docs/_build/html/_sources",
+  "docs/_build/html/_static",
+  "docs/_build/html/release_notes",
+]
+
+exclude = [
+  "http://localhost:5500/",
+  "https://localhost:5500/",
+  "http://localhost:8888/",
+  "https://www.sphinx-doc.org/",
+  "https://gitlab.jatic.net/",
+]

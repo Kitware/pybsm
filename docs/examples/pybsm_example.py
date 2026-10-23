@@ -77,12 +77,10 @@ ground_ranges = np.arange(0, 101e3, 10e3)
 
 ref_img.pix_values = np.array([ref_img.img.min(), ref_img.img.max()])
 ref_img.refl_values = np.array([0.05, 0.5])
-idx = 1
 plt.subplot(2, 4, 1)
 plt.title("Input image", fontdict={"fontsize": 8})
 plt.imshow(simulation.stretch_contrast_convert_8bit(img=ref_img.img), cmap="gray")
-for ii in np.arange(4, ground_ranges.shape[0]):
-    idx += 1
+for idx, ii in enumerate(np.arange(4, ground_ranges.shape[0]), start=2):
     plt.subplot(2, 4, idx)
     plt.suptitle("ihaze-" + str(ihaze) + "_altitude-" + str(altitude), fontsize=10)
     plt.title(

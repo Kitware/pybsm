@@ -1,13 +1,46 @@
+default:
+  tags:
+    - k8s-small-cpu
+
+variables:
+  # The Git LFS atmosphere and test data are large; jobs that need them set this to "0".
+  GIT_LFS_SKIP_SMUDGE: "1"
+
+stages:
+  # Our CI/CD Jobs
+  - test
+  - quality
+  - docs
+
+  # Development / Maintenance
+  - mirror
+  - publish
+
+  # JATIC Required Stages
+  - security # this can be replaced with DevSecOps security job
+
+.unschedulable: &unschedulable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+    when: never
+  - when: always
+
+.skippable: &skippable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+    when: never
+  - when: always
+
 include:
-  - project: "jatic/kitware/devel-jatic"
-    ref: "main"
-    file: ".gitlab-ci.yml"
+  - local: .gitlab-ci/.gitlab-shared.yml
 
-  # job overrides specific to this repo
   - local: .gitlab-ci/.gitlab-test.yml
+  - local: .gitlab-ci/.gitlab-quality.yml
+  - local: .gitlab-ci/.gitlab-docs.yml
 
-trigger_compliance:
-  extends: .trigger_compliance
-  rules: !reference [.trigger_compliance, rules]
-  variables:
-    PACKAGE_NAME: "pybsm"
+  - local: .gitlab-ci/.gitlab-mirror.yml
+    <<: *skippable
+  - local: .gitlab-ci/.gitlab-publish.yml
+    <<: *skippable
+
+  - local: .gitlab-ci/.gitlab-security.yml

@@ -1,4 +1,3 @@
-# :auto shared:
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -44,6 +43,7 @@ htmlcov/
 .nox/
 .coverage
 .coverage.*
+.junit.*.xml
 .cache
 nosetests.xml
 coverage.xml
@@ -142,4 +142,3 @@ cython_debug/
 
 # ruff
 .ruff_cache
-# :auto shared:

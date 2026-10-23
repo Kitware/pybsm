@@ -31,7 +31,7 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def load_database_atmosphere_no_interp(
@@ -202,7 +202,6 @@ def load_database_atmosphere(
             + diffuse radiance) * surface reflectance
     :NOTE: units for columns 1 through 5 are in radiance W/(sr m^2 m)
     """
-
     # define arrays of all possible altitude and ground ranges
     altitude_array = np.array(
         [
@@ -240,13 +239,15 @@ def load_database_atmosphere(
     # interest
     # We allow for higher altitudes by just taking the maximum from the database
     # and ignoring any (likely negligible) additional atmospheric effects
-    alt_idx = np.searchsorted(altitude_array, altitude, side="right")
-    low_alt = altitude_array[alt_idx - 1]
-    high_alt = low_alt if low_alt == altitude else altitude_array[min(alt_idx, len(altitude_array) - 1)]
+    alt_idx = int(np.searchsorted(altitude_array, altitude, side="right"))
+    low_alt = float(altitude_array[alt_idx - 1])
+    high_alt = low_alt if low_alt == altitude else float(altitude_array[min(alt_idx, len(altitude_array) - 1)])
 
-    range_idx = np.searchsorted(ground_ranges, ground_range, side="right")
-    low_range = ground_ranges[range_idx - 1]
-    high_range = low_range if low_range == ground_range else ground_ranges[min(range_idx, len(ground_ranges) - 1)]
+    range_idx = int(np.searchsorted(ground_ranges, ground_range, side="right"))
+    low_range = float(ground_ranges[range_idx - 1])
+    high_range = (
+        low_range if low_range == ground_range else float(ground_ranges[min(range_idx, len(ground_ranges) - 1)])
+    )
 
     # first interpolate across the low and high altitudes
     # then interpolate across ground range

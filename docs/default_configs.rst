@@ -72,7 +72,7 @@ Sensor's Bit Depth ``bit_depth``
 This usually can be deduced by looking at the maximum pixel value in your
 images, as the number of bits must be at least as large as that number. Note
 that bit depth represents the number of bits used, **not** the total number of
-values. The total range is given by :math:`2^{\text{bit_depth}}`. For example,
+values. The total range is given by :math:`2^{\text{bit\_depth}}`. For example,
 if the maximum pixel value in the image is 985, I would estimate a bit depth of
 "10" since :math:`2^{10}=1024 > 985`. ``bit_depth`` should be an integer and is
 typically either 8, 10, 12, or 16.

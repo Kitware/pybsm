@@ -10,6 +10,7 @@ from PIL import Image
 from syrupy.assertion import SnapshotAssertion
 from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
+from typing_extensions import override
 
 if np.lib.NumpyVersion(np.__version__) >= "2.0.0":
 
@@ -26,6 +27,7 @@ class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
         self.rtol = rtol
         self.atol = atol
 
+    @override
     def serialize(self, data: np.ndarray | float, **_: Any) -> str:  # noqa: C901
         def _serialize_item(item: np.ndarray | complex | tuple | list) -> dict:  # noqa: C901
             if isinstance(item, np.ndarray):
@@ -77,6 +79,7 @@ class FuzzyFloatSnapshotExtension(JSONSnapshotExtension):
 
         return _deserialize_item(json.loads(data))
 
+    @override
     def matches(self, *, serialized_data: str, snapshot_data: str) -> bool:  # noqa: C901
         try:
             expected = self.deserialize(snapshot_data)
@@ -131,12 +134,13 @@ class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
         min_psnr: Minimum PSNR value in dB required to pass (default: 48.13)
     """
 
-    _file_extension = "tiff"
+    file_extension = "tiff"
 
     def __init__(self, *, min_psnr: float = 48.13, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.min_psnr = min_psnr
 
+    @override
     def serialize(self, data: np.ndarray, **_: Any) -> bytes:
         im = Image.fromarray(data)
         byte_arr = io.BytesIO()
@@ -149,6 +153,7 @@ class PSNRImageSnapshotExtension(SingleFileSnapshotExtension):
             image.load()
             return np.array(image)
 
+    @override
     def matches(self, *, serialized_data: bytes, snapshot_data: bytes) -> bool:
         expected_array = self.deserialize(snapshot_data)
         received_array = self.deserialize(serialized_data)

@@ -1,50 +1,136 @@
 ###############################################################################
 # Stage -- Unit Testing
 ###############################################################################
-#
-# Overrides:
-#
-# 1) pybsm specific notebooks.
-# 2) Added the original example as a job
-#
-###############################################################################
 
-# Don't run both core and extras because pyBSM doesn't have any extras, so equivalent jobs
-# We have to run pytest-extras over pytest-core to compute coverage consistent with other repos
-pytest-core:
+.test-setup:
+  extends: .tox-setup
+  stage: test
   rules:
-    - when: never
-pytest-extras:
-  rules:
-    - !reference [.test-setup, rules]
-
-notebooks:
-  extends: .notebooks
-  rules: !reference [.notebooks, rules]
-  parallel:
-    matrix:
-      # Sequences combinatorically combine within a list entry
-      - NOTEBOOK_DIR: "docs/examples"
-        NOTEBOOK_FILE: [
-          "pybsm_visualization.ipynb"
-        ]
-
-# Overrides devel-jatic to add 3.14. May be removed if/when devel-jatic is likewise updated
-.python-versions:
-  parallel:
-    matrix:
-      - PYTHON_VERSION: [ "3.10", "3.11", "3.12", "3.13", "3.14" ]
-
-# Job to ensure the provided example script still runs
-# NOTE: this version of tests was to confirm the original pybsm_example.py
-# functioned properly, just as a dummy placeholder for unit testing. Until
-# we've updated this and/or the unit tests, we're using the notebook below.
-original-example:
-  extends: [.test-setup, .python-versions]
-  needs: [pytest-extras] # if unit tests don't pass, don't run the original script
-  dependencies: []
-  image: python:${PYTHON_VERSION}
+    - !reference [.shared-setup, rules]
   before_script:
-    - !reference [.test-setup, before_script]
+    - !reference [.tox-setup, before_script]
+
+.tox:pytest:
+  extends: .test-setup
+  tags:
+    - k8s-medium-cpu
+  variables:
+    # Needs the Git LFS atmosphere and test data.
+    GIT_LFS_SKIP_SMUDGE: "0"
   script:
-    - poetry run python docs/examples/pybsm_example.py
+    # Convert PYTHON_VERSION (3.10) to tox factor (py310) and run specific env
+    - tox -e "py${PYTHON_VERSION//./}-pytest"
+  artifacts:
+    when: always
+    paths:
+      - ".coverage.*"
+    reports:
+      junit: ".junit.*.xml"
+    expire_in: 1 day
+
+tox:pytest:py3.10:
+  extends: .tox:pytest
+  image: python:3.10
+  variables:
+    PYTHON_VERSION: "3.10"
+
+tox:pytest:py3.11:
+  extends: .tox:pytest
+  image: python:3.11
+  variables:
+    PYTHON_VERSION: "3.11"
+
+tox:pytest:py3.12:
+  extends: .tox:pytest
+  image: python:3.12
+  variables:
+    PYTHON_VERSION: "3.12"
+
+tox:pytest:py3.13:
+  extends: .tox:pytest
+  image: python:3.13
+  variables:
+    PYTHON_VERSION: "3.13"
+
+tox:pytest:py3.14:
+  extends: .tox:pytest
+  image: python:3.14
+  variables:
+    PYTHON_VERSION: "3.14"
+
+tox:coverage:
+  extends: .test-setup
+  needs:
+    - job: tox:pytest:py3.10
+      artifacts: true
+    - job: tox:pytest:py3.11
+      artifacts: true
+    - job: tox:pytest:py3.12
+      artifacts: true
+    - job: tox:pytest:py3.13
+      artifacts: true
+    - job: tox:pytest:py3.14
+      artifacts: true
+  dependencies:
+    - tox:pytest:py3.10
+    - tox:pytest:py3.11
+    - tox:pytest:py3.12
+    - tox:pytest:py3.13
+    - tox:pytest:py3.14
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?%)/'
+  script:
+    - tox -e coverage
+  artifacts:
+    when: always
+    paths:
+      - .coverage
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    expire_in: 1 day
+
+tox:notebooks:examples:
+  extends: .test-setup
+  image: python:3.13
+  tags:
+    - k8s-medium-cpu
+  variables:
+    # The wheel built from the checkout must contain the real atmosphere data.
+    GIT_LFS_SKIP_SMUDGE: "0"
+  dependencies: []
+  rules:
+    # If changes are made to an active merge request.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
+    - when: never  # explicit fail-exclude terminal condition.
+  allow_failure: true
+  parallel:
+    matrix:
+      - NOTEBOOK_FILE: ["pybsm_visualization.ipynb"]
+  script:
+    - tox -e papermill -- "$NOTEBOOK_FILE" /dev/null
+
+tox:example:
+  extends: [.test-setup, .python-versions]
+  image: python:$PYTHON_VERSION
+  tags:
+    - k8s-medium-cpu
+  variables:
+    # The example reads the Git LFS atmosphere data.
+    GIT_LFS_SKIP_SMUDGE: "0"
+  needs:
+    - job: tox:pytest:py3.10
+      artifacts: false
+    - job: tox:pytest:py3.11
+      artifacts: false
+    - job: tox:pytest:py3.12
+      artifacts: false
+    - job: tox:pytest:py3.13
+      artifacts: false
+    - job: tox:pytest:py3.14
+      artifacts: false
+  script:
+    - tox -e "py${PYTHON_VERSION//./}-example"

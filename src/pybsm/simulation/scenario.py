@@ -17,6 +17,7 @@ from __future__ import annotations
 
 # 3rd party imports
 import numpy as np
+from typing_extensions import override
 
 # local imports
 from pybsm import utils
@@ -80,8 +81,7 @@ class Scenario:
         cn2_at_1m: float = 1.7e-14,
         interp: bool | None = False,
     ) -> None:
-        """
-        Initializes a scenario object.
+        """Initializes a scenario object.
 
         :parameter name:
             The name of the scenario object
@@ -154,9 +154,10 @@ class Scenario:
 
     @property
     def ihaze(self) -> int:
-        """
-        Get or set ihaze, MODTRAN code for visibility. Valid options are ihaze = 1 (Rural
-        extinction with 23 km visibility) or ihaze = 2 (Rural extinction with 5 km visibility)
+        """Get or set ihaze, the MODTRAN code for visibility.
+
+        Valid options are ihaze = 1 (Rural extinction with 23 km visibility)
+        or ihaze = 2 (Rural extinction with 5 km visibility).
         """
         return self._ihaze
 
@@ -229,6 +230,7 @@ class Scenario:
 
         return self._atm
 
+    @override
     def __hash__(self) -> int:
         """Compute hash based on relevant scenario parameters for caching."""
         relevant_attrs = (

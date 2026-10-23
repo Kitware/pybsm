@@ -44,7 +44,7 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def instantaneous_FOV(*, w: int, f: int) -> float:  # noqa: N802
@@ -245,7 +245,7 @@ def simulate_image(
         int_time=int_time,
     ).system_OTF
 
-    df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2  # noqa: PD901
+    df = (abs(u_rng[1] - u_rng[0]) + abs(v_rng[0] - v_rng[1])) / 2
 
     if df <= 0:
         raise ValueError("Cutoff frequency values must be increasing.")
@@ -288,7 +288,7 @@ def simulate_image(
     noisy_img = pybsm_rng.normal(poisson_noisy_img, g_noise)
 
     if noisy_img.shape[0] > ref_img.img.shape[0]:
-        logging.warn(
+        logging.warning(
             "The simulated image has oversampled the reference image!  This result should not be trusted!!",
         )
 
@@ -300,8 +300,7 @@ def stretch_contrast_convert_8bit(
     img: np.ndarray,
     perc: list[float] | None = None,
 ) -> np.ndarray:
-    """
-    Adjusts the contrast of an image and converts it to an 8-bit format.
+    """Adjusts the contrast of an image and converts it to an 8-bit format.
 
     This function stretches the contrast of the input image based on specified
     percentile values. The pixel values are normalized to the 8-bit range (0-255)

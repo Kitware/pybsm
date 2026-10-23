@@ -2,29 +2,29 @@
 
 ## Overview
 
-This guide provides instructions for contributing to the `pybsm` project.
-For additional details, please refer to the [`pybsm` README](README.md).
+This guide provides instructions for contributing to the `pybsm` project. For
+additional details, please refer to the [`pybsm` README](README.md).
 
 ## Steps to Contribute
 
-1. **Access the Repository** Navigate to the official `pybsm` repository
-   on [JATIC GitLab](https://gitlab.jatic.net/jatic/kitware/pybsm).
+1. **Access the Repository** Navigate to the official `pybsm` repository on
+   [JATIC GitLab](https://gitlab.jatic.net/jatic/kitware/pybsm).
 
 2. **Fork and Clone** Fork the repository into your GitLab user namespace and
    clone it to your local system.
 
    ```bash
-   $ git clone <your-fork-url>
-   $ cd pybsm
+   git clone <your-fork-url>
+   cd pybsm
    ```
 
 3. **Create a Topic Branch** Work on a new topic branch for your contribution:
 
    ```bash
-   $ git checkout -b <branch-name>
-   $ <edit files>
-   $ git add <file1> <file2> ...
-   $ git commit -m "Descriptive commit message"
+   git checkout -b <branch-name>
+   <edit files>
+   git add <file1> <file2> ...
+   git commit -m "Descriptive commit message"
    ```
 
    - Ensure that your commits include an update to the
@@ -36,7 +36,7 @@ For additional details, please refer to the [`pybsm` README](README.md).
 4. **Push Your Branch** Push your changes to your forked repository:
 
    ```bash
-   $ git push origin HEAD -u
+   git push origin HEAD -u
    ```
 
 5. **Create a Merge Request (MR)** On GitLab, navigate to the "Merge Requests"
@@ -50,11 +50,11 @@ ______________________________________________________________________
 
 ## Continuous Integration (CI) and Code Review
 
-`pybsm` uses GitLab for code reviews and GitLab CI/CD for automated
-testing.
+`pybsm` uses GitLab for code reviews and GitLab CI/CD for automated testing.
 
-- New MRs trigger CI workflows for `master` and `release` branches.
-- All CI checks must pass before an MR can be merged.
+- Merge requests and updates to `main` trigger automated checks.
+- Required checks must pass before an MR can be merged.
+- See [CI/CD Pipeline](cicd-pipeline.md) for local commands and advisory checks.
 
 We use [Sphinx](https://www.sphinx-doc.org/) for API documentation, both manual
 and automated.
@@ -126,8 +126,8 @@ behavior or transformation a class performs.
 ## Issue Reporting
 
 If an issue is found, it can be reported on the
-[Issue Reporting Page](https://github.com/Kitware/pybsm/issues/new). In
-the description, provide an outline of the problem in as much detail as possible
+[Issue Reporting Page](https://github.com/Kitware/pybsm/issues/new). In the
+description, provide an outline of the problem in as much detail as possible
 being sure to include any relevant logs and error tracebacks. Once the issue is
 created, it will be triaged by a maintainer in a timely manner.
 
