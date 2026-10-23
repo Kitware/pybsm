@@ -31,10 +31,10 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 # define some useful physical constants
-r_earth = 6378.164e3  # radius of the earth (m)
+r_earth: float = 6378.164e3  # radius of the earth (m)
 
 
 def altitude_along_slant_path(

@@ -17,13 +17,12 @@ they are needed.
 <a id="1">[1]</a> LeMaster, Daniel A., and Michael T. Eismann. ‘pyBSM: A Python
 Package for Modeling Imaging Systems’. Society of Photo-Optical Instrumentation
 Engineers (SPIE) Conference Series, edited by Eric J. Kelmelis, vol. 10204,
-2017, p. 1020405, https://doi.org10.1117/12.2262561. Society of Photo-Optical
+2017, p. 1020405, <https://doi.org/10.1117/12.2262561>. Society of Photo-Optical
 Instrumentation Engineers (SPIE) Conference Series.
 
 <a id="2">[2]</a> LeMaster, Daniel, et al. Validating pyBSM: A Python Package
-for Modeling Imaging Systems. 05 2018, p. 19, https://doi.org10.1117/12.2305228.
-
-<!-- :auto installation: -->
+for Modeling Imaging Systems. 05 2018, p. 19,
+<https://doi.org/10.1117/12.2305228>.
 
 ## Installation
 
@@ -32,7 +31,7 @@ for Modeling Imaging Systems. 05 2018, p. 19, https://doi.org10.1117/12.2305228.
 To install the current version via `pip`:
 
 ```bash
-pip install pybsm[<extra1>,<extra2>,...]
+pip install pybsm
 ```
 
 To install the current version via `conda-forge`:
@@ -41,25 +40,13 @@ To install the current version via `conda-forge`:
 conda install -c conda-forge pybsm
 ```
 
-Certain plugins may require additional runtime dependencies. Details on these
-requirements can be found
-[here](https://pybsm.readthedocs.io/en/latest/installation.html).
-
 For more detailed installation instructions, visit the
 [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html).
-
-<!-- :auto installation: -->
-
-<!-- :auto getting-started: -->
 
 ## Getting Started
 
 Explore usage examples of the `pybsm` package in various contexts using the
 Jupyter notebooks provided in the `./docs/examples/` directory.
-
-<!-- :auto getting-started: -->
-
-<!-- :auto documentation: -->
 
 ## Documentation
 
@@ -70,7 +57,7 @@ To build the Sphinx-based documentation locally for the latest reference:
 
 ```bash
 # Install dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --only main,linting,tests,docs
 # Navigate to the documentation root
 cd docs
 # Build the documentation
@@ -78,10 +65,6 @@ poetry run make html
 # Open the generated documentation in your browser
 firefox _build/html/index.html
 ```
-
-<!-- :auto documentation: -->
-
-<!-- :auto contributing: -->
 
 ## Contributing
 
@@ -97,10 +80,6 @@ The following points help ensure contributions follow development practices.
 - Additional contribution guidelines and issue reporting steps can be found in
   [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-<!-- :auto contributing: -->
-
-<!-- :auto developer-tools: -->
-
 ### Developer Tools
 
 Ensure the source tree is acquired locally before proceeding.
@@ -109,14 +88,12 @@ Ensure the source tree is acquired locally before proceeding.
 
 You can install using [Poetry](https://python-poetry.org/):
 
-> [!IMPORTANT] pyBSM currently requires `poetry<2.0`
-
-> [!WARNING] Users unfamiliar with Poetry should use caution. See
-> [installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html#from-source)
-> for more information.
+Development requires `poetry>=2.2`. See the
+[installation documentation](https://pybsm.readthedocs.io/en/latest/installation.html#from-source)
+for setup details.
 
 ```bash
-poetry install --with main,linting,tests,docs --extras "<extra1> <extra2> ..."
+poetry sync --only main,linting,tests,docs
 ```
 
 #### Pre-commit Hooks
@@ -129,24 +106,38 @@ To install and use pre-commit hooks:
 
 ```bash
 # Install required dependencies
-poetry install --sync --with main,linting,tests,docs
+poetry sync --only main,linting,tests,docs
 # Initialize pre-commit hooks for the repository
 poetry run pre-commit install
 # Run pre-commit checks on all files
 poetry run pre-commit run --all-files
 ```
 
-<!-- :auto developer-tools: -->
+#### CI Environments
 
-<!-- :auto license: -->
+CI uses [tox](https://tox.wiki/) to run the same checks locally and on GitLab.
+Install `tox>=4.22` in an isolated environment, for example with `pipx`:
+
+```bash
+pipx install 'tox>=4.22'
+tox -e precommit
+tox -e py313-pytest
+tox -e coverage
+tox -e py313-example
+tox -e papermill -- pybsm_visualization.ipynb /tmp/pybsm-visualization.ipynb
+```
+
+The test environments cover Python 3.10 through 3.14; each interpreter must be
+installed to run its corresponding environment. Running `tox` without `-e` runs
+all five test environments. The coverage environment combines their reports and
+requires at least 90% coverage. The example and notebook environments use a
+noninteractive Matplotlib backend, and the notebook environment installs a wheel
+built from the checkout. Pre-commit runs both internal type checking and public
+type completeness checks, matching nrtk.
 
 ## License
 
 [Apache 2.0](./LICENSE)
-
-<!-- :auto license: -->
-
-<!-- :auto contacts: -->
 
 ## Contacts
 
@@ -163,10 +154,6 @@ poetry run pre-commit run --all-files
 
 **Program Representative**: Austin Whitesell (MITRE) @awhitesell
 
-<!-- :auto contacts: -->
-
-<!-- :auto acknowledgment: -->
-
 ## Acknowledgment
 
 This material is based upon work supported by the Chief Digital and Artificial
@@ -174,5 +161,3 @@ Intelligence Office under Contract No. 519TC-23-9-2032. The views and
 conclusions contained herein are those of the author(s) and should not be
 interpreted as necessarily representing the official policies or endorsements,
 either expressed or implied, of the U.S. Government.
-
-<!-- :auto acknowledgment: -->

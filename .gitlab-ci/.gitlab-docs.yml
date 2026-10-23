@@ -1,0 +1,111 @@
+###############################################################################
+# Stage -- Documentation
+###############################################################################
+
+.docs-setup:
+  extends: .shared-setup
+  stage: docs
+  before_script:
+    - !reference [.shared-setup, before_script]
+    - poetry sync --only main,docs,tests
+
+# Job to check the release notes folder
+release-notes:
+  extends: .docs-setup
+  needs: [] # Don't wait for previous stages/jobs
+  allow_failure: true
+  # We don't need poetry or git-lfs.
+  before_script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+  script:
+    - git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --depth 1
+    - scripts/check_for_release_notes.sh origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "release"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - !reference [.shared-setup, rules] # Don't overwrite normal rules
+
+pages-branch:
+  extends: .docs-setup
+  artifacts:
+      expose_as: 'Documentation Build'
+      paths:
+        - docs/_build/html/
+  environment:
+      name: docs-preview/$CI_MERGE_REQUEST_IID
+      url: "https://jatic.pages.jatic.net/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/index.html"
+      auto_stop_in: 1 week
+  script:
+    - cd docs
+    - poetry run make html
+  variables:
+      PUBLIC_URL: "/-/kitware/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs/_build/html/"
+  rules:
+    # Don't run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - !reference [.docs-setup, rules]
+
+pages: # this must be named "pages" to get GitLab to run "pages:deploy"
+  extends: .docs-setup
+  script:
+    - cd docs
+    - poetry run make html
+    - mv _build/html/ ../public/
+  artifacts:
+    paths:
+    - public
+  rules:
+    # Only run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+pdf-build:
+  extends: .docs-setup
+  artifacts:
+      expose_as: 'Documentation PDF'
+      paths:
+        - docs/_pdf
+  allow_failure: true
+  before_script:
+    - !reference [.docs-setup, before_script]
+    - apt-get install latexmk texlive texlive-latex-extra texlive-luatex fonts-freefont-ttf -y
+  script:
+    - cd docs
+    - poetry run python -m sphinx -T -b latex -d _build/doctrees -D language=en . ./_pdf
+    - cd _pdf
+    - latexmk -r latexmkrc -pdflua -f -dvi- -ps- -interaction=nonstopmode
+
+markdownlint:
+  extends: .docs-setup
+  needs: []
+  before_script: []  # skip poetry sync — this image has no apt/python
+  image:
+    name: davidanson/markdownlint-cli2
+    entrypoint: ['']
+  script:
+    - markdownlint-cli2 '*.md' 'docs/**/*.md'
+
+check-links:
+  extends: .docs-setup
+  needs:
+    - job: pages-branch
+      artifacts: true
+  dependencies:
+    - pages-branch
+  before_script: []  # skip poetry sync — this image has no apt/python
+  image:
+    name: lycheeverse/lychee:latest
+    entrypoint: ['']
+  script:
+    - lychee --version
+    # Check all markdown files and built html
+    - find . -name '*.md' -not -path './docs/*' -print0 | xargs -0 lychee --config lychee.toml docs/_build/html/ src/
+  allow_failure: true
+  timeout: 10 minutes
+  rules:
+    # Don't run this rule if on main branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: never
+    - !reference [.docs-setup, rules]

@@ -90,14 +90,14 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 # define some useful physical constants
-hc = 6.62607004e-34  # Plank's constant  (m^2 kg / s)
-cc = 299792458.0  # speed of light (m/s)
-kc = 1.38064852e-23  # Boltzmann constant (m^2 kg / s^2 K)
-qc = 1.60217662e-19  # charge of an electron (coulombs)
-r_earth = 6378.164e3  # radius of the earth (m)
+hc: float = 6.62607004e-34  # Plank's constant  (m^2 kg / s)
+cc: float = 299792458.0  # speed of light (m/s)
+kc: float = 1.38064852e-23  # Boltzmann constant (m^2 kg / s^2 K)
+qc: float = 1.60217662e-19  # charge of an electron (coulombs)
+r_earth: float = 6378.164e3  # radius of the earth (m)
 
 
 # ------------------------------- OTF Models ---------------------------------
@@ -473,7 +473,7 @@ def diffusion_OTF(  # noqa: N802
             diffusion OTF
     """
 
-    def diffusion_OTF_params(  # noqa: N802
+    def diffusion_OTF_params(  # noqa: N802, PLR0917 - positional numerical helper
         al: np.ndarray,
         alpha: np.ndarray,
         ald: np.ndarray,
@@ -564,7 +564,7 @@ def filter_OTF(  # noqa: N802
     v_rng = np.linspace(nyquist, -nyquist, xfer_fcn.shape[1])
 
     # use this function to wrap spatial frequencies beyond Nyquist
-    def wrap_val(value: np.ndarray, nyquist: float) -> np.ndarray:
+    def wrap_val(value: np.ndarray, nyquist: float) -> np.ndarray:  # noqa: PLR0917 - positional numerical helper
         return (value + nyquist) % (2 * nyquist) - nyquist
 
     # and interpolate up to the desired range
@@ -875,9 +875,7 @@ def _weighted_turbulence_OTF(  # noqa: N802
     alpha2: float,
     weight: float,
 ) -> np.ndarray:
-    """For use in windspeed_turbulence_OTF, calculates the weighted combination of two
-    separate calls to turbulence_OTF in a single, much faster function.
-    """
+    """Combine two turbulence_OTF calls in one faster function for windspeed_turbulence_OTF."""
     out = np.empty_like(u)
     lr0 = lambda0 / r0
     lD = lambda0 / D  # noqa: N806

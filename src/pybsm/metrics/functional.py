@@ -44,7 +44,7 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def giqe3(*, rer: float, gsd: float, eho: float, ng: float, snr: float) -> float:
@@ -132,6 +132,7 @@ def giqe4(*, rer: float, gsd: float, eho: float, ng: float, snr: float, elev_ang
 
 def giqe5(*, rer_1: float, rer_2: float, gsd: float, snr: float, elev_angle: float) -> tuple[float, float, float]:
     """NGA The General Image Quality Equation version 5.0. 16 Sep 2015.
+
     (originally published by https://gwg.nga.mil/)
     https://github.com/Kitware/pybsm/blob/main/docs/GIQE-5_for_Public_Release.pdf
 
@@ -821,7 +822,7 @@ def plot_common_MTFs(*, metrics: Metrics, orientation_angle: float = 0.0) -> int
         "",
         xy=(nyquist, 0),
         xytext=(nyquist, 0.1),
-        arrowprops=dict(facecolor="black", shrink=0.05),
+        arrowprops={"facecolor": "black", "shrink": 0.05},
     )
     return 0
 
@@ -883,6 +884,6 @@ def plot_noise_terms(*, metrics: Metrics, max_val: int = 0) -> int:
         + "%",
     )
     if max_val > 0:
-        plt.ylim([0, max_val])
+        plt.ylim((0, max_val))
     plt.tight_layout()  # prevents text from getting cutoff
     return 0

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 # 3rd party imports
 import numpy as np
+from typing_extensions import override
 
 
 class Sensor:
@@ -175,30 +176,30 @@ class Sensor:
         self.f = f
         self.p_x = p_x
         self.opt_trans_wavelengths = opt_trans_wavelengths
-        self.optics_transmission = np.ones(opt_trans_wavelengths.shape[0])
+        self.optics_transmission: np.ndarray = np.ones(opt_trans_wavelengths.shape[0])
         self.eta = eta
 
         if p_y is None:
             # Assume square pixels.
-            self.p_y = p_x
+            self.p_y: float = p_x
         else:
             self.p_y = p_y
 
         if w_x is None:
             # Assume is 100% fill factor and square detectors.
-            self.w_x = p_x
+            self.w_x: float = p_x
         else:
             self.w_x = w_x
 
         if w_y is None:
             # Assume is same fill factor as along the x.
-            self.w_y = p_x / self.w_x * self.p_y
+            self.w_y: float = p_x / self.w_x * self.p_y
         else:
             self.w_y = w_y
 
         self.int_time = int_time
-        self.qe_wavelengths = self.opt_trans_wavelengths if qe_wavelengths is None else qe_wavelengths
-        self.qe = np.ones(self.qe_wavelengths.shape[0]) if qe is None else qe
+        self.qe_wavelengths: np.ndarray = self.opt_trans_wavelengths if qe_wavelengths is None else qe_wavelengths
+        self.qe: np.ndarray = np.ones(self.qe_wavelengths.shape[0]) if qe is None else qe
         self.dark_current = dark_current
         self.other_irradiance = other_irradiance
         self.read_noise = read_noise
@@ -224,9 +225,10 @@ class Sensor:
         self.L_x = D
         self.L_y = D
         self.other_noise = np.array([0])
-        self.filter_kernel = np.array([1]) if filter_kernel is None else filter_kernel
+        self.filter_kernel: np.ndarray = np.array([1]) if filter_kernel is None else filter_kernel
         self.frame_stacks = frame_stacks
 
+    @override
     def __hash__(self) -> int:
         """Compute hash based on sensor parameters."""
         # Only include parameters that affect OTF calculations

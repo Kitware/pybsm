@@ -1,5 +1,3 @@
-.. :auto introduction:
-
 Installation
 ============
 
@@ -10,10 +8,6 @@ For local development, you can use `Poetry`_.
 
 pybsm installation has been tested on Unix and Linux systems.
 
-.. :auto introduction:
-
-
-.. :auto install-commands:
 
 .. _pip:
 
@@ -33,20 +27,17 @@ From :command:`conda-forge`
 
     conda install -c conda-forge pybsm
 
-.. :auto install-commands:
-
-.. :auto from-source:
 
 From Source
 -----------
 The following assumes `Poetry`_ (`installation`_ and `usage`_) is already installed.
 
 .. note::
-  pybsm currently requires ``poetry<2.0``
+  pybsm requires ``poetry>=2.2`` for development
 
 `Poetry`_ is used for development of pybsm. Unlike the previous options,
-`Poetry`_ will not only allows developers to install any extras they need,
-but also install developmental dependencies like ``pytest`` and pybsm's linting tools.
+`Poetry`_ installs the package and development dependencies such as ``pytest``
+and pybsm's linting tools.
 
 Please heed the following warning from Poetry's own documentation:
 
@@ -63,9 +54,6 @@ introduction possible.
   Poetry installation is only recommended for advanced pybsm users. For most users, :ref:`pip<pip>` or
   :ref:`conda<conda>` installation is sufficient.
 
-.. :auto from-source:
-
-.. :auto quick-start:
 
 Quick Start
 ^^^^^^^^^^^
@@ -74,11 +62,8 @@ Quick Start
 
     cd /where/things/should/go/
     git clone https://github.com/kitware/pybsm.git ./
-    poetry install
+    poetry sync --only main
 
-.. :auto quick-start:
-
-.. :auto dev-deps:
 
 Installing Developer Dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -89,11 +74,8 @@ specified in the :file:`pyproject.toml` file, with versions specified
 
 .. prompt:: bash
 
-    poetry install --sync --with linting,tests,docs
+    poetry sync --only main,linting,tests,docs
 
-.. :auto dev-deps:
-
-.. :auto build-docs:
 
 Building the Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -118,9 +100,6 @@ Calling the command ``make help`` here will show the other documentation
 formats that may be available (although be aware that some of them require
 additional dependencies such as :program:`TeX` or :program:`LaTeX`).
 
-.. :auto build-docs:
-
-.. :auto live-preview:
 
 Live Preview
 """"""""""""
@@ -143,13 +122,8 @@ This will serve the resulting HTML files at http://localhost:5500.
 Having this URL open in a browser will provide you with an up-to-date
 preview of the rendered documentation.
 
-.. :auto live-preview:
-
-.. :auto installation-links:
 
 .. _Poetry: https://python-poetry.org
 .. _installation: https://python-poetry.org/docs/#installation
 .. _usage: https://python-poetry.org/docs/basic-usage/
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
-
-.. :auto installation-links:

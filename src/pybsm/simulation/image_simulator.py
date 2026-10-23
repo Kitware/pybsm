@@ -26,6 +26,7 @@ import numpy as np
 from scipy import interpolate
 from scipy.ndimage import correlate
 from scipy.signal import fftconvolve, oaconvolve
+from typing_extensions import override
 
 from pybsm import noise, radiance
 
@@ -86,6 +87,7 @@ class ImageSimulator(ABC):
             mtf_weights: Weights for MTF calculations.
             slant_range: Optional slant range override.
             altitude: Optional altitude override.
+            do_resample: Whether to resample the simulated image to the requested ground sample distance.
 
         Raises:
             ValueError: If use_reflectance is True and reflectance_range was not provided.
@@ -180,11 +182,11 @@ class ImageSimulator(ABC):
         self._df = (abs(_u_rng[1] - _u_rng[0]) + abs(_v_rng[0] - _v_rng[1])) / 2
 
         # PSF cache keyed by (config_hash, gsd_rounded | None)
-        self._psf_cache: dict[tuple[int, float | None], np.ndarray] = dict()
+        self._psf_cache: dict[tuple[int, float | None], np.ndarray] = {}
 
         self.do_resample = do_resample
 
-    def apply_convolution(self, image: np.ndarray, psf: np.ndarray) -> tuple[np.ndarray, np.ndarray]:  # noqa C901
+    def apply_convolution(self, image: np.ndarray, psf: np.ndarray) -> tuple[np.ndarray, np.ndarray]:  # noqa: C901, PLR0917
         """Apply convolution using this simulator's method.
 
         Args:
@@ -324,13 +326,13 @@ class ImageSimulator(ABC):
 
         return dx_out
 
-    def _apply_resampling_uint8(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:
+    def _apply_resampling_uint8(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:  # noqa: PLR0917
         from PIL import Image
 
         array_mode = None if image.ndim == 3 else "L"
         return np.array(Image.fromarray(image, array_mode).resize(new_wh, mode))
 
-    def _apply_resampling_float(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:
+    def _apply_resampling_float(self, image: np.ndarray, new_wh: tuple[int, int], mode: int) -> np.ndarray:  # noqa: PLR0917
         from PIL import Image
 
         # for floating point images, we need to handle each channel as a separate
@@ -347,7 +349,7 @@ class ImageSimulator(ABC):
 
         return sim_img
 
-    def apply_resampling(self, image: np.ndarray, gsd: float) -> np.ndarray:
+    def apply_resampling(self, image: np.ndarray, gsd: float) -> np.ndarray:  # noqa: PLR0917
         """Apply resampling based on sensor parameters.
 
         Args:
@@ -407,7 +409,7 @@ class ImageSimulator(ABC):
             return _apply_noise2d(image, self._g_noise, seeds)
         return _apply_noise3d(image, self._g_noise, seeds)
 
-    def simulate_image(self, image: np.ndarray, gsd: float | None) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
+    def simulate_image(self, image: np.ndarray, gsd: float | None) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:  # noqa: PLR0917
         """Apply the convolution and optionally resampling if gsd is provided.
 
         Args:
@@ -517,7 +519,7 @@ class ImageSimulator(ABC):
             np.clip(ref, 0.0, 1.0, out=ref)
         return ref
 
-    def photoelectrons_to_pixels(
+    def photoelectrons_to_pixels(  # noqa: PLR0917
         self,
         photoelectrons_img: np.ndarray,
         p1: float = 0.0,
@@ -585,7 +587,7 @@ class ImageSimulator(ABC):
         return self._adc_photoelectrons_to_pixels(photoelectrons_img, out_range=(p1, p2))
 
     @staticmethod
-    def _validate_pe_to_pixels_args(
+    def _validate_pe_to_pixels_args(  # noqa: PLR0917
         photoelectrons_img: np.ndarray,
         p1: float,
         p2: float,
@@ -615,7 +617,7 @@ class ImageSimulator(ABC):
                 f"photoelectrons_to_pixels.",
             )
 
-    def _photoelectrons_to_pixels_minmax(
+    def _photoelectrons_to_pixels_minmax(  # noqa: PLR0917
         self,
         photoelectrons_img: np.ndarray,
         p1: float,
@@ -634,7 +636,7 @@ class ImageSimulator(ABC):
         pixels = (photoelectrons_img.astype(np.float64) - pe_min) / (pe_max - pe_min) * (p2 - p1) + p1
         return np.clip(pixels, p1, p2)
 
-    def _photoelectrons_to_pixels_radiometric(
+    def _photoelectrons_to_pixels_radiometric(  # noqa: PLR0917
         self,
         photoelectrons_img: np.ndarray,
         p1: float,
@@ -730,7 +732,7 @@ class ImageSimulator(ABC):
         pixels = (dn / adc_max) * (p_hi - p_lo) + p_lo
         return np.clip(pixels, p_lo, p_hi)
 
-    def _init_inverse_coefs(self, ref: np.ndarray, pe: np.ndarray) -> None:
+    def _init_inverse_coefs(self, ref: np.ndarray, pe: np.ndarray) -> None:  # noqa: PLR0917
         """Compute and store the inverse coefficients and the monotonicity flag.
 
         ``A`` and ``B`` are taken from the line through the first and last
@@ -801,42 +803,42 @@ class ImageSimulator(ABC):
 
     @property
     def mtf_wavelengths(self) -> np.ndarray:
-        """Getter for _mtf_wavelengths"""
+        """Getter for _mtf_wavelengths."""
         return self._mtf_wavelengths
 
     @property
     def mtf_weights(self) -> np.ndarray:
-        """Getter for _mtf_weights"""
+        """Getter for _mtf_weights."""
         return self._mtf_weights
 
     @property
     def uu(self) -> np.ndarray:
-        """Getter for _uu"""
+        """Getter for _uu."""
         return self._uu
 
     @property
     def vv(self) -> np.ndarray:
-        """Getter for _vv"""
+        """Getter for _vv."""
         return self._vv
 
     @property
     def slant_range(self) -> float:
-        """Getter for _slant_range"""
+        """Getter for _slant_range."""
         return self._slant_range
 
     @property
     def add_noise(self) -> bool:
-        """Getter for _add_noise"""
+        """Getter for _add_noise."""
         return self._add_noise
 
     @property
     def sensor(self) -> Sensor:
-        """Getter for _sensor"""
+        """Getter for _sensor."""
         return self._sensor
 
     @property
     def scenario(self) -> Scenario:
-        """Getter for _scenario"""
+        """Getter for _scenario."""
         return self._scenario
 
     @abstractmethod
@@ -851,7 +853,7 @@ class ImageSimulator(ABC):
 
     @abstractmethod
     def _get_resample_basis(self) -> ResampleBases:
-        """Return the resample basis used to define dx_out in resample2D"""
+        """Return the resample basis used to define dx_out in resample2D."""
         pass
 
     def _get_config_hash(self) -> int:
@@ -874,7 +876,7 @@ class ImageSimulator(ABC):
         dx_out = 1.0 / (otf.shape[0] * self._df)
         return otf_to_psf(otf=otf, df=self._df, dx_out=dx_out)
 
-    def _get_psf_cached(self, gsd: float | None = None, use_default: bool = False) -> np.ndarray:
+    def _get_psf_cached(self, gsd: float | None = None, use_default: bool = False) -> np.ndarray:  # noqa: PLR0917
         """Get PSF with caching based on simulator configuration and GSD.
 
         Args:
@@ -907,6 +909,7 @@ class ImageSimulator(ABC):
 class SystemOTFSimulator(ImageSimulator):
     """Simulator using common_OTFs with optional noise."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm import otf
 
@@ -921,10 +924,12 @@ class SystemOTFSimulator(ImageSimulator):
             int_time=self.sensor.int_time,
         ).system_OTF
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         # return "correlate"
         return "pad_fftconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
 
@@ -932,6 +937,7 @@ class SystemOTFSimulator(ImageSimulator):
 class JitterSimulator(ImageSimulator):
     """Simulator for jitter-based optical effects."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm.otf.functional import jitter_OTF
 
@@ -942,9 +948,11 @@ class JitterSimulator(ImageSimulator):
             s_y=self.sensor.s_y,
         )
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         return "oaconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
 
@@ -952,6 +960,7 @@ class JitterSimulator(ImageSimulator):
 class CircularApertureSimulator(ImageSimulator):
     """Simulator for circular aperture diffraction effects."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm.otf.functional import circular_aperture_OTF, weighted_by_wavelength
 
@@ -971,9 +980,11 @@ class CircularApertureSimulator(ImageSimulator):
             my_function=ap_function,
         )
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         return "oaconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
 
@@ -981,6 +992,7 @@ class CircularApertureSimulator(ImageSimulator):
 class DetectorSimulator(ImageSimulator):
     """Simulator for detector spatial integration effects."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm.otf.functional import detector_OTF
 
@@ -992,9 +1004,11 @@ class DetectorSimulator(ImageSimulator):
             f=self.sensor.f,
         )
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         return "oaconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
 
@@ -1002,6 +1016,7 @@ class DetectorSimulator(ImageSimulator):
 class DefocusSimulator(ImageSimulator):
     """Simulator for defocus blur effects."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm.otf.functional import defocus_OTF
 
@@ -1012,9 +1027,11 @@ class DefocusSimulator(ImageSimulator):
             w_y=self.sensor.w_y,
         )
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         return "fftconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "pixel-angle"
 
@@ -1022,6 +1039,7 @@ class DefocusSimulator(ImageSimulator):
 class TurbulenceApertureSimulator(ImageSimulator):
     """Simulator for atmospheric turbulence and aperture effects."""
 
+    @override
     def _compute_otf(self) -> np.ndarray:
         from pybsm.otf.functional import polychromatic_turbulence_OTF
 
@@ -1040,9 +1058,11 @@ class TurbulenceApertureSimulator(ImageSimulator):
         )
         return turbulence_otf
 
+    @override
     def _get_convolution_method(self) -> ConvolutionMethods:
         return "oaconvolve"
 
+    @override
     def _get_resample_basis(self) -> ResampleBases:
         return "ground-angle"
 
@@ -1053,7 +1073,7 @@ def _seed_numba_rng(seed: int) -> None:
 
 
 @numba.njit("float64[:, :, :](float64[:, :, :], float64, uint64[:])", fastmath=True, parallel=True, cache=True)
-def _apply_noise3d(img: np.ndarray, g_noise: float, seeds: np.ndarray) -> np.ndarray:
+def _apply_noise3d(img: np.ndarray, g_noise: float, seeds: np.ndarray) -> np.ndarray:  # noqa: PLR0917
     out = np.empty_like(img)
     for i in numba.prange(out.shape[0]):
         _seed_numba_rng(seeds[i])
@@ -1064,7 +1084,7 @@ def _apply_noise3d(img: np.ndarray, g_noise: float, seeds: np.ndarray) -> np.nda
 
 
 @numba.njit("float64[:, :](float64[:, :], float64, uint64[:])", fastmath=True, parallel=True, cache=True)
-def _apply_noise2d(img: np.ndarray, g_noise: float, seeds: np.ndarray) -> np.ndarray:
+def _apply_noise2d(img: np.ndarray, g_noise: float, seeds: np.ndarray) -> np.ndarray:  # noqa: PLR0917
     out = np.empty_like(img)
     for i in numba.prange(out.shape[0]):
         _seed_numba_rng(seeds[i])

@@ -45,13 +45,13 @@ warnings.filterwarnings("ignore", r"divide by zero encountered in true_divide")
 
 # find the current path (used to locate the atmosphere database)
 # dir_path = os.path.dirname(os.path.abspath(__file__))
-dir_path = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+dir_path: str = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 # define some useful physical constants
-hc = 6.62607004e-34  # Plank's constant  (m^2 kg / s)
-cc = 299792458.0  # speed of light (m/s)
-kc = 1.38064852e-23  # Boltzmann constant (m^2 kg / s^2 K)
-qc = 1.60217662e-19  # charge of an electron (coulombs)
+hc: float = 6.62607004e-34  # Plank's constant  (m^2 kg / s)
+cc: float = 299792458.0  # speed of light (m/s)
+kc: float = 1.38064852e-23  # Boltzmann constant (m^2 kg / s^2 K)
+qc: float = 1.60217662e-19  # charge of an electron (coulombs)
 
 
 def at_focal_plane_irradiance(
@@ -876,6 +876,10 @@ def resample_by_wavelength(
     :raises:
         ValueError:
             if the length of wavelengths array and values array are
-            not equal
+            not equal, or wavelengths is empty
     """
+    # Newer NumPy versions accept empty sample arrays when the query is also empty.
+    # Keep rejecting empty samples before calling np.interp.
+    if wavelengths.size == 0:
+        raise ValueError("wavelengths must not be empty")
     return np.interp(new_wavelengths, wavelengths, values, 0.0, 0.0)

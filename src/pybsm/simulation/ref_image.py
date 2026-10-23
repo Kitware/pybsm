@@ -50,8 +50,7 @@ class RefImage:
         refl_values: np.ndarray | None = None,
         name: str = "ref_image",
     ) -> None:
-        """
-        Initializes a reference image.
+        """Initializes a reference image.
 
         :param img: Reference image.
         :param gsd:

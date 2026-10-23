@@ -526,6 +526,6 @@ class TestFunctional:
         assert mock_plt.subplots.call_count == 1
         mock_plt.title.assert_called_once()
 
-        mock_plt.ylim.assert_called_once_with([0, 1])
+        mock_plt.ylim.assert_called_once_with((0, 1))
 
         mock_plt.tight_layout.assert_called_once()

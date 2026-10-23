@@ -31,4 +31,4 @@ class OTF:
     system_OTF: np.ndarray  # noqa: N815
 
     def __init__(self) -> None:
-        """Simple object to hold all of the OTFs"""
+        """Simple object to hold all of the OTFs."""
